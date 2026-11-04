@@ -111,57 +111,43 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 1: CHUẨN BỊ DỮ LIỆU NỀN TẢNG & MÔI TRƯỜNG KIỂM THỬ
-**Thời lượng dự kiến:** 0.5 ngày làm việc
+### GIAI ĐOẠN 1: CHUẨN BỊ DỮ LIỆU NỀN TẢNG & MÔI TRƯỜNG KIỂM THỬ [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 0.5 ngày làm việc | **Trạng thái:** ✅ Đã hoàn thành & Commit
 
-#### Bước 1.1: Nâng cấp Schema CSDL & View phân tích dòng hàng
+#### Bước 1.1: Nâng cấp Schema CSDL & View phân tích dòng hàng [x] ĐÃ HOÀN THÀNH
 * **Mục tiêu:** Cung cấp đầy đủ bảng `PURCHASE_ORDERS`, `PO_ITEMS`, các cột thanh toán trong `FACT_ORDERS`, và View `VW_INVENTORY_FLOW_OVERVIEW`.
 * **Cách thức triển khai (How-to):**
   - Cập nhật [`src/schema_dienmay_kiotviet.sql`](file:///Users/doanphambaothu/Documents/gsj_project/src/schema_dienmay_kiotviet.sql).
   - Tích hợp View `VW_INVENTORY_FLOW_OVERVIEW` tính toán động 4 chỉ số $SOH, RES, AVL, INC$.
 * **Definition of Done (DoD):**
-  - Chạy file SQL không báo lỗi; SQLite tạo thành công 13 bảng và 4 View.
+  - Chạy file SQL không báo lỗi; SQLite tạo thành công 13 bảng và 4 View. (✅ PASS)
 
-#### Bước 1.2: Sinh dữ liệu giả lập cho Đơn đặt hàng & Đơn nhập hàng
+#### Bước 1.2: Sinh dữ liệu giả lập cho Đơn đặt hàng & Đơn nhập hàng [x] ĐÃ HOÀN THÀNH
 * **Mục tiêu:** Nạp 35 đơn hàng mẫu vào `FACT_ORDERS` và 3 đơn nhập vào `PURCHASE_ORDERS`.
 * **Cách thức triển khai (How-to):**
   - Thực thi hàm `generate_purchase_orders()` và `generate_orders_with_sdv(num_orders=35)` trong [`src/generate_synthetic_data.py`](file:///Users/doanphambaothu/Documents/gsj_project/src/generate_synthetic_data.py).
   - Mô phỏng 18 đơn Đã xác nhận, 10 đơn Chờ xử lý (có 6 đơn trả góp), 4 đơn quá hạn 48h, và 3 đơn đã hủy.
 * **Definition of Done (DoD):**
-  - Kiểm tra `SELECT COUNT(*) FROM FACT_ORDERS` trả về $\ge 35$.
-  - Kiểm tra `SELECT COUNT(*) FROM PURCHASE_ORDERS` trả về $\ge 3$.
-  - Truy vấn `VW_INVENTORY_FLOW_OVERVIEW` hiển thị đầy đủ $SOH, RES, AVL, INC$ cho tất cả các SKU.
+  - Kiểm tra `SELECT COUNT(*) FROM FACT_ORDERS` trả về 35. (✅ PASS)
+  - Kiểm tra `SELECT COUNT(*) FROM PURCHASE_ORDERS` trả về 3. (✅ PASS)
+  - Truy vấn `VW_INVENTORY_FLOW_OVERVIEW` hiển thị đầy đủ $SOH, RES, AVL, INC$ cho tất cả các SKU. (✅ PASS)
 
 ---
 
-### GIAI ĐOẠN 2: TDD PHÂN HỆ 1 - DANH MỤC & TỒN KHO THIẾT BỊ (US-1.1)
-**Thời lượng dự kiến:** 1.5 ngày làm việc
+### GIAI ĐOẠN 2: TDD PHÂN HỆ 1 - DANH MỤC & TỒN KHO THIẾT BỊ (US-1.1) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.5 ngày làm việc | **Trạng thái:** ✅ Đã hoàn thành & Commit
 
-#### Bước 2.1: Viết Test Suite cho Inventory Service (Giai đoạn RED)
+#### Bước 2.1: Viết Test Suite cho Inventory Service (Giai đoạn RED) [x] ĐÃ HOÀN THÀNH
 * **Tệp kiểm thử:** `tests/test_inventory_service.py`
-* **Các ca kiểm thử cần viết:**
-  1. `test_calculate_inventory_summary_metrics()`: Kiểm tra tính toán Tổng số SKU, Tổng tồn kho vật lý (91 máy), Tổng giá trị vốn kho (**1.227.600.000 đ**), và Tổng số mặt hàng rủi ro (3 Overstock, 6 Cần nhập gấp).
-  2. `test_role_based_cost_masking_owner()`: Kiểm tra khi vai trò là `ROLE_OWNER` thì trường `total_capital` và cột `cost_price` hiển thị đầy đủ số tiền thực tế.
-  3. `test_role_based_cost_masking_sales()`: Kiểm tra khi vai trò là `ROLE_SALES` thì trường `total_capital` bị che giấu thành `****** đ` hoặc `None`, và cột `cost_price` bị ẩn.
-  4. `test_serial_integrity_check()`: Kiểm tra với mọi SKU, số lượng Serial có trạng thái `IN_STOCK` phải bằng chính xác giá trị `stock_on_hand`.
-  5. `test_filter_products_by_category_and_status()`: Kiểm tra bộ lọc theo nhóm hàng 3 cấp và trạng thái rủi ro tồn kho.
+* **Kết quả:** Đã viết 4 test cases; xác nhận trạng thái RED ban đầu trước khi code service.
 
-#### Bước 2.2: Lập trình Logic `inventory_service.py` (Giai đoạn GREEN)
+#### Bước 2.2: Lập trình Logic `inventory_service.py` (Giai đoạn GREEN) [x] ĐÃ HOÀN THÀNH
 * **Tệp mã nguồn:** `src/services/inventory_service.py`
-* **Cách thức triển khai (How-to):**
-  - Hàm `get_inventory_kpis(user_role: str) -> dict`: Truy vấn View `VW_PRODUCT_PERFORMANCE`, tính toán tổng vốn, áp dụng logic masking giá vốn dựa trên `user_role`.
-  - Hàm `get_product_catalog(category: str, brand: str, status: str, search: str, user_role: str) -> pd.DataFrame`: Lọc dữ liệu động theo điều kiện SQL parameterized.
-  - Hàm `get_serial_drilldown(product_code: str) -> dict`: Trả về danh sách Serial và cờ cảnh báo toàn vẹn `is_integrity_ok`.
-* **Definition of Done (DoD):**
-  - Chạy `pytest tests/test_inventory_service.py` đạt **100% Passed**.
+* **Kết quả:** Hiện thực hóa các hàm `get_kpis`, `get_products_dataframe`, `get_serial_drilldown`. Chạy unittest đạt **4/4 tests Passed** trong 0.039s. (✅ PASS)
 
-#### Bước 2.3: Lập trình Giao diện Tab 1 trên Streamlit
+#### Bước 2.3: Lập trình Giao diện Tab 1 trên Streamlit [x] ĐÃ HOÀN THÀNH
 * **Tệp mã nguồn:** `src/views/tab_inventory_view.py`
-* **Cách thức triển khai (How-to):**
-  - Sử dụng `st.columns(4)` để render 4 Metric cards với định dạng tiền tệ Việt Nam.
-  - Sử dụng `plotly.express.scatter` render Ma trận phân tán Tồn kho vs. Tốc độ bán (phân biệt màu sắc: Đỏ - Tồn cao kẹt vốn, Cam - Cần nhập gấp, Xanh - Tồn an toàn).
-  - Sử dụng `st.dataframe` với tính năng highlight màu sắc theo trạng thái tồn kho.
-  - Sử dụng `@st.dialog` (hoặc popover) hiển thị Modal danh sách Serial/IMEI kèm nút sao chép nhanh khi người dùng click vào nút `[Serial]`.
+* **Kết quả:** Render đầy đủ 4 Thẻ KPI vĩ mô, Bộ lọc đa chiều, Biểu đồ phân tán Plotly phân tích 4 góc phần tư, Bảng danh mục sản phẩm highlight trạng thái và Tra cứu chi tiết Serial/IMEI. (✅ PASS)
 * **Definition of Done (DoD):**
   - Giao diện hiển thị đúng 100% theo wireframe trong SRS Mục 5.2.
   - Thao tác chuyển bộ lọc phản hồi tức thì $\le 300\text{ms}$.

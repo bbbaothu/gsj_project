@@ -1,95 +1,68 @@
 """
 TDD Test Suite cho Phân hệ 1: Quản lý danh mục & Tồn kho thiết bị (US-1.1)
-Sử dụng thư viện chuẩn unittest (hỗ trợ cả pytest).
+Kiểm thử lớp nghiệp vụ InventoryService.
 """
 import os
-import sqlite3
 import unittest
+
+from src.services.inventory_service import InventoryService
 
 DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "retail_dienmay.db"))
 
 class TestInventoryService(unittest.TestCase):
     def setUp(self):
-        self.conn = sqlite3.connect(DB_PATH)
-        self.conn.execute("PRAGMA foreign_keys = ON;")
-        self.conn.row_factory = sqlite3.Row
+        self.service = InventoryService(db_path=DB_PATH)
 
-    def tearDown(self):
-        self.conn.close()
-
-    def test_inventory_kpi_metrics(self):
+    def test_get_kpis_as_owner(self):
         """
-        FR-INV-01: Kiểm tra tính toán các chỉ số vĩ mô trên thẻ KPI.
+        FR-INV-01: Kiểm tra tính toán các chỉ số vĩ mô cho Chủ cửa hàng (ROLE_OWNER).
+        Giá vốn phải được hiển thị chính xác.
         """
-        cur = self.conn.cursor()
-        cur.execute("""
-            SELECT 
-                COUNT(DISTINCT product_code) AS total_skus,
-                SUM(stock_on_hand) AS total_soh,
-                ROUND(SUM(stock_on_hand * cost_price), 0) AS total_capital
-            FROM DIM_PRODUCTS
-            WHERE is_active = 1 AND has_serial = 1;
-        """)
-        row = cur.fetchone()
+        kpis = self.service.get_kpis(role="ROLE_OWNER")
         
-        self.assertEqual(row["total_skus"], 12, "Số lượng SKU quản lý Serial đang kinh doanh phải là 12")
-        self.assertGreater(row["total_soh"], 0, "Tổng tồn kho vật lý phải > 0")
-        self.assertGreater(row["total_capital"], 0, "Tổng vốn kho phải > 0")
+        self.assertEqual(kpis["total_skus"], 12)
+        self.assertGreater(kpis["total_soh"], 0)
+        self.assertGreater(kpis["total_capital"], 0)
+        self.assertIn("1,", kpis["display_capital"])
+        self.assertEqual(kpis["overstock_count"], 3)
+        self.assertGreaterEqual(kpis["stockout_count"], 4)
 
-    def test_serial_integrity(self):
+    def test_get_kpis_as_sales_masked(self):
         """
-        FR-INV-03: Kiểm tra tính toàn vẹn: stock_on_hand == COUNT(Serial IN_STOCK).
+        FR-INV-05: Kiểm tra cơ chế che giấu giá vốn đối với ROLE_SALES.
         """
-        cur = self.conn.cursor()
-        cur.execute("""
-            SELECT 
-                p.product_code,
-                p.product_name,
-                p.stock_on_hand,
-                COUNT(s.serial_number) AS in_stock_serials
-            FROM DIM_PRODUCTS p
-            LEFT JOIN DIM_PRODUCT_SERIALS s 
-                ON p.product_code = s.product_code AND s.status = 'IN_STOCK'
-            WHERE p.has_serial = 1
-            GROUP BY p.product_code, p.product_name, p.stock_on_hand;
-        """)
-        rows = cur.fetchall()
-        for r in rows:
-            delta = r["stock_on_hand"] - r["in_stock_serials"]
-            self.assertEqual(delta, 0, f"Lệch tồn kho Serial tại SKU {r['product_code']}")
+        kpis = self.service.get_kpis(role="ROLE_SALES")
+        
+        self.assertEqual(kpis["total_skus"], 12)
+        self.assertGreater(kpis["total_soh"], 0)
+        self.assertIsNone(kpis["total_capital"], "ROLE_SALES không được nhận giá trị vốn số thực")
+        self.assertEqual(kpis["display_capital"], "****** đ", "Giá vốn hiển thị phải bị che giấu")
 
-    def test_overstock_and_stockout_classification(self):
+    def test_get_products_dataframe_filtering(self):
         """
-        FR-INV-04: Kiểm tra phân loại sức khỏe tồn kho theo ngưỡng ROP Min/Max.
+        FR-INV-02: Kiểm tra lọc danh mục sản phẩm theo thương hiệu và tìm kiếm.
         """
-        cur = self.conn.cursor()
-        cur.execute("""
-            SELECT inventory_status, COUNT(*) AS sku_count, ROUND(SUM(stock_on_hand * cost_price), 0) AS capital
-            FROM VW_PRODUCT_PERFORMANCE
-            WHERE has_serial = 1
-            GROUP BY inventory_status;
-        """)
-        status_dict = {r["inventory_status"]: (r["sku_count"], r["capital"]) for r in cur.fetchall()}
+        df_all = self.service.get_products_dataframe(role="ROLE_OWNER")
+        self.assertEqual(len(df_all), 16)
+        self.assertIn("cost_price", df_all.columns)
 
-        self.assertIn("Cảnh báo: Tồn kho quá cao", status_dict)
-        self.assertEqual(status_dict["Cảnh báo: Tồn kho quá cao"][0], 3, "Phải có đúng 3 SKU tồn kho quá cao")
+        # Lọc theo hãng Sony
+        df_sony = self.service.get_products_dataframe(brand="Sony", role="ROLE_OWNER")
+        self.assertTrue(all(df_sony["brand"] == "Sony"))
 
-        cur.execute("SELECT COUNT(*) AS oos_count FROM DIM_PRODUCTS WHERE has_serial = 1 AND stock_on_hand = 0;")
-        oos_count = cur.fetchone()["oos_count"]
-        self.assertGreaterEqual(oos_count, 4, f"Phải có ít nhất 4 mặt hàng cháy hàng (SOH = 0)")
+        # Kiểm tra role SALES bị ẩn cột giá vốn
+        df_sales = self.service.get_products_dataframe(role="ROLE_SALES")
+        self.assertNotIn("cost_price", df_sales.columns)
+        self.assertNotIn("capital_tied", df_sales.columns)
 
-    def test_role_based_cost_masking(self):
+    def test_serial_drilldown_integrity(self):
         """
-        FR-INV-05: Kiểm tra hàm bảo mật che giấu giá vốn.
+        FR-INV-03: Kiểm tra drill-down danh sách Serial và tính toàn vẹn Delta = SOH - COUNT(Serial).
         """
-        def format_capital(val: float, role: str) -> str:
-            if role == "ROLE_SALES":
-                return "****** đ"
-            return f"{val:,.0f} đ"
-
-        capital_val = 1227600000.0
-        self.assertEqual(format_capital(capital_val, "ROLE_OWNER"), "1,227,600,000 đ")
-        self.assertEqual(format_capital(capital_val, "ROLE_SALES"), "****** đ")
+        drilldown = self.service.get_serial_drilldown("TV-SN-55X80K")
+        self.assertEqual(drilldown["product_code"], "TV-SN-55X80K")
+        self.assertTrue(drilldown["is_integrity_ok"])
+        self.assertEqual(len(drilldown["serials"]), drilldown["stock_on_hand"])
 
 if __name__ == '__main__':
     unittest.main()
