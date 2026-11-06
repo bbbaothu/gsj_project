@@ -12,14 +12,25 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from src.services.inventory_service import InventoryService
+from src.services.order_service import OrderService
+from src.views.tab_inventory_view import render_tab_inventory
+from src.views.tab_order_flow_view import render_tab_order_flow
+
 st.set_page_config(
-    page_title="Điện Máy Tuấn Hưng - Sole Trader Dashboard",
+    page_title="Stock Sense - Quản Lý Kho Điện Máy",
     page_icon="🏪",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 DB_PATH = "data/retail_dienmay.db"
+
+@st.cache_resource
+def get_services():
+    return InventoryService(DB_PATH), OrderService(DB_PATH)
+
+inv_service, ord_service = get_services()
 
 @st.cache_data(ttl=30)
 def load_data():
@@ -130,6 +141,15 @@ if selected_brand != 'Tất cả':
     filtered_sales = filtered_sales[filtered_sales['brand'] == selected_brand]
 
 st.sidebar.markdown("---")
+st.sidebar.subheader("🔐 Phân Quyền Người Dùng (RBAC)")
+role_options = {
+    "👑 Chủ cửa hàng (Xem đầy đủ Giá vốn & Tài sản)": "ROLE_OWNER",
+    "👤 Nhân viên bán hàng (Bảo mật - Che giá vốn)": "ROLE_SALES"
+}
+selected_role_label = st.sidebar.selectbox("Vai trò truy cập:", list(role_options.keys()), index=0)
+current_role = role_options[selected_role_label]
+
+st.sidebar.markdown("---")
 st.sidebar.caption(f"⚡ Đã ghi nhận **{filtered_sales['invoice_code'].nunique()}** hóa đơn bán lẻ")
 
 # -----------------------------------------------------------------------------
@@ -141,18 +161,31 @@ st.markdown("""
 > **1 chi nhánh duy nhất**, và **lượng nhập hàng chịu ảnh hưởng nặng từ cảm tính chủ quan** (Gut-feeling inventory bias).
 """)
 
-tab1, tab2, tab3, tab4 = st.tabs([
-    "📈 Tổng quan Vận hành Cửa hàng",
-    "⚠️ Phân tích Tồn kho Cảm tính (Gut-Feeling)",
-    "👥 Khách hàng Quen & RFM",
-    "🛡️ Bảo hành & Trách nhiệm Hậu mãi"
+tab_inv, tab_flow, tab_perf, tab_rfm, tab_warranty = st.tabs([
+    "📦 1. Tổng quan Kho & Danh mục (US-1.1)",
+    "🚚 2. Điều phối Đơn hàng & Dòng hàng (US-1.2)",
+    "📈 3. Hiệu quả Bán hàng & Vận hành",
+    "👥 4. Khách hàng Quen & RFM",
+    "🛡️ 5. Bảo hành & Hậu mãi"
 ])
 
 # =============================================================================
-# TAB 1: TỔNG QUAN VẬN HÀNH
+# TAB 1: TỔNG QUAN KHO & DANH MỤC THIẾT BỊ (US-1.1)
 # =============================================================================
-with tab1:
-    st.subheader("1. Chỉ Số Vận Hành Của Hộ Kinh Doanh Cá Thể")
+with tab_inv:
+    render_tab_inventory(inv_service, role=current_role)
+
+# =============================================================================
+# TAB 2: ĐIỀU PHỐI ĐƠN HÀNG & DÒNG HÀNG (US-1.2)
+# =============================================================================
+with tab_flow:
+    render_tab_order_flow(ord_service)
+
+# =============================================================================
+# TAB 3: HIỆU QUẢ BÁN HÀNG & VẬN HÀNH
+# =============================================================================
+with tab_perf:
+    st.subheader("3. Chỉ Số Vận Hành Của Hộ Kinh Doanh Cá Thể")
 
     total_rev = filtered_sales.groupby('invoice_code')['amount_due'].first().sum()
     total_profit = (filtered_sales['line_total'] - (filtered_sales['quantity'] * filtered_sales['cost_price'])).sum()
@@ -209,82 +242,10 @@ with tab1:
         st.plotly_chart(fig_pay, use_container_width=True)
 
 # =============================================================================
-# TAB 2: PHÂN TÍCH TỒN KHO CẢM TÍNH (GUT-FEELING INVENTORY ANALYSIS)
+# TAB 4: KHÁCH HÀNG & PHÂN KHÚC RFM
 # =============================================================================
-with tab2:
-    st.subheader("2. Phân Tích Hiện Tượng Nhập Hàng Theo Cảm Tính (Gut-Feeling Inventory Bias)")
-    st.markdown("""
-    > 🧠 **Góc nhìn Data Analyst:** Ở mô hình Hộ kinh doanh cá thể, chủ tiệm thường nhập hàng dựa trên **sở thích cá nhân** 
-    > hoặc **lời chào mời chiết khấu của đại lý** thay vì phân tích nhu cầu thực tế. Điều này dẫn đến sự phân kỳ nghiêm trọng:
-    > * **Cụm 1 - Ứ đọng vốn (Dead Stock / Overstock):** Hàng giá cao kén khách nhưng nhập quá nhiều $\rightarrow$ Kẹt vốn hàng trăm triệu.
-    > * **Cụm 2 - Đứt gãy nguồn cung (Stockout / OOS):** Hàng bình dân nhu cầu cao nhưng nhập quá ít $\rightarrow$ Hết hàng, mất doanh thu.
-    """)
-
-    # Tính toán vốn tồn kho
-    df_prod_serial = df_products[df_products['has_serial'] == 1].copy()
-    df_prod_serial['capital_tied'] = df_prod_serial['stock_on_hand'] * df_prod_serial['cost_price']
-    total_capital_tied = df_prod_serial['capital_tied'].sum()
-    dead_stock_capital = df_prod_serial[df_prod_serial['inventory_status'] == 'Cảnh báo: Tồn kho quá cao']['capital_tied'].sum()
-    oos_count = len(df_prod_serial[df_prod_serial['stock_on_hand'] == 0])
-
-    stock_kpi1, stock_kpi2, stock_kpi3 = st.columns(3)
-    stock_kpi1.metric("Tổng Vốn Tồn Kho Đang Đọng", f"{total_capital_tied:,.0f} đ", delta="Vốn nằm trong kho")
-    stock_kpi2.metric("Vốn Kẹt Ở Hàng Tồn Quá Cao", f"{dead_stock_capital:,.0f} đ", delta=f"Chiếm {(dead_stock_capital/total_capital_tied)*100:.1f}% tổng vốn", delta_color="inverse")
-    stock_kpi3.metric("Số Mặt Hàng Cháy Hàng (OOS)", f"{oos_count} sản phẩm", delta="Hết sạch hàng để bán", delta_color="inverse")
-
-    st.markdown("---")
-
-    # Ma trận phân tán Tồn kho vs. Tốc độ bán (Scatter Plot)
-    st.markdown("##### 🎯 Ma trận Phân tán: Tồn kho Thực tế vs. Tốc độ Đã bán")
-    fig_scatter = px.scatter(
-        df_prod_serial,
-        x='total_units_sold',
-        y='stock_on_hand',
-        size='capital_tied',
-        color='inventory_status',
-        hover_name='product_name',
-        text='product_name',
-        labels={
-            'total_units_sold': 'Số lượng đã bán (Nhu cầu thực tế)',
-            'stock_on_hand': 'Số lượng tồn kho (Quyết định nhập hàng)',
-            'inventory_status': 'Trạng thái'
-        },
-        color_discrete_map={
-            'Cảnh báo: Tồn kho quá cao': '#E53935',
-            'Cảnh báo: Cần nhập gấp': '#FF9800',
-            'Tồn kho an toàn': '#43A047'
-        },
-        size_max=45
-    )
-    fig_scatter.update_traces(textposition='top center', textfont_size=10)
-    fig_scatter.add_hline(y=10, line_dash="dash", line_color="gray", annotation_text="Ngưỡng tồn trần an toàn (10 máy)")
-    fig_scatter.update_layout(height=450, margin=dict(l=20, r=20, t=30, b=20))
-    st.plotly_chart(fig_scatter, use_container_width=True)
-
-    st.markdown("##### 📋 Bảng Chi Tiết Tồn Kho & Đánh Giá Rủi Ro")
-    display_cols = ['product_name', 'brand', 'sale_price', 'cost_price', 'stock_on_hand', 'total_units_sold', 'capital_tied', 'inventory_status']
-    stock_table = df_prod_serial[display_cols].copy()
-    stock_table.columns = ['Tên thiết bị', 'Hãng', 'Giá bán (đ)', 'Giá vốn (đ)', 'Tồn kho', 'Đã bán', 'Vốn đọng (đ)', 'Trạng thái tồn kho']
-
-    def highlight_status(val):
-        if 'Tồn kho quá cao' in str(val):
-            return 'background-color: #FFCDD2; color: #B71C1C; font-weight: bold;'
-        elif 'Cần nhập gấp' in str(val):
-            return 'background-color: #FFE0B2; color: #E65100; font-weight: bold;'
-        return 'background-color: #C8E6C9; color: #1B5E20;'
-
-    st.dataframe(
-        stock_table.sort_values(by='Vốn đọng (đ)', ascending=False)
-                   .style.map(highlight_status, subset=['Trạng thái tồn kho'])
-                   .format({'Giá bán (đ)': '{:,.0f}', 'Giá vốn (đ)': '{:,.0f}', 'Vốn đọng (đ)': '{:,.0f}'}),
-        use_container_width=True, height=350
-    )
-
-# =============================================================================
-# TAB 3: KHÁCH HÀNG & PHÂN KHÚC RFM
-# =============================================================================
-with tab3:
-    st.subheader("3. Khách Hàng Quen Thuộc & Phân Khúc RFM")
+with tab_rfm:
+    st.subheader("4. Khách Hàng Quen Thuộc & Phân Khúc RFM")
     st.caption("Cửa hàng cá thể chủ yếu phục vụ cư dân và hộ gia đình bán kính 3-5km xung quanh khu vực Cầu Giấy")
 
     def assign_rfm(row):
@@ -345,10 +306,10 @@ with tab3:
     )
 
 # =============================================================================
-# TAB 4: BẢO HÀNH & TRÁCH NHIỆM HẬU MÃI
+# TAB 5: BẢO HÀNH & TRÁCH NHIỆM HẬU MÃI
 # =============================================================================
-with tab4:
-    st.subheader("4. Quản Lý Bảo Hành & Hỗ Trợ Kỹ Thuật Tận Nhà")
+with tab_warranty:
+    st.subheader("5. Quản Lý Bảo Hành & Hỗ Trợ Kỹ Thuật Tận Nhà")
     st.caption("Ưu thế cạnh tranh của Sole Trader: Chủ tiệm trực tiếp hỗ trợ bảo hành và sửa chữa tận nhà cho bà con trong khu vực")
 
     w_col1, w_col2, w_col3 = st.columns(3)

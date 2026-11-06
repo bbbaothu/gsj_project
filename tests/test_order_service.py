@@ -59,9 +59,17 @@ class TestOrderService(unittest.TestCase):
         df_orders = self.service.get_orders_dataframe(status="Chờ xử lý")
         order_code = df_orders.iloc[0]["order_code"]
         
-        res = self.service.cancel_order(order_code, reason="Khách đổi ý hủy mua")
-        self.assertTrue(res["success"])
-        self.assertEqual(res["order_status"], "Đã hủy")
+        try:
+            res = self.service.cancel_order(order_code, reason="Khách đổi ý hủy mua")
+            self.assertTrue(res["success"])
+            self.assertEqual(res["order_status"], "Đã hủy")
+        finally:
+            # Khôi phục trạng thái ban đầu để test mang tính bất biến (idempotent)
+            conn = self.service._get_connection()
+            conn.execute("UPDATE FACT_ORDERS SET status = 'Chờ xử lý', note = NULL WHERE order_code = ?", (order_code,))
+            conn.commit()
+            conn.close()
 
 if __name__ == '__main__':
     unittest.main()
+
