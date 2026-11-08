@@ -5,12 +5,19 @@ DASHBOARD KINH DOANH CỬA HÀNG ĐIỆN MÁY TUẤN HƯNG (SOLE TRADER)
 Mô hình Hộ kinh doanh cá thể: 1 Chi nhánh duy nhất, 1 Người vận hành, Nhập hàng theo Cảm tính
 """
 
+import os
+import sys
 import sqlite3
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+
+# Đảm bảo thư mục gốc dự án luôn nằm trong sys.path để import các module trong src/
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 from src.services.inventory_service import InventoryService
 from src.services.order_service import OrderService
@@ -24,7 +31,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-DB_PATH = "data/retail_dienmay.db"
+DB_PATH = os.path.join(PROJECT_ROOT, "data", "retail_dienmay.db")
 
 @st.cache_resource
 def get_services():
