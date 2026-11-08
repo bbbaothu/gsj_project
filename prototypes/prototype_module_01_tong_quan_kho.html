@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-[#F1F5F9]" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stock Sense - Quản trị Tổng quan Kho Điện Máy &amp; Logistics</title>
+<!-- Material Symbols & Typography -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "background": "#f8f9ff",
+          "on-secondary-container": "#fefcff",
+          "primary-fixed": "#dae2fd",
+          "tertiary-fixed-dim": "#68dba9",
+          "on-background": "#0b1c30",
+          "outline-variant": "#c6c6cd",
+          "primary-container": "#131b2e",
+          "secondary-fixed-dim": "#b4c5ff",
+          "on-tertiary-fixed-variant": "#005137",
+          "on-tertiary": "#ffffff",
+          "on-error": "#ffffff",
+          "tertiary-fixed": "#85f8c4",
+          "primary-fixed-dim": "#bec6e0",
+          "secondary": "#0051d5",
+          "on-secondary-fixed-variant": "#003ea8",
+          "surface-container-highest": "#d3e4fe",
+          "on-primary-container": "#7c839b",
+          "on-error-container": "#93000a",
+          "inverse-surface": "#213145",
+          "surface": "#f8f9ff",
+          "surface-container-low": "#eff4ff",
+          "on-primary-fixed-variant": "#3f465c",
+          "error-container": "#ffdad6",
+          "on-surface": "#0b1c30",
+          "inverse-on-surface": "#eaf1ff",
+          "on-primary-fixed": "#131b2e",
+          "secondary-fixed": "#dbe1ff",
+          "surface-tint": "#565e74",
+          "surface-container-lowest": "#ffffff",
+          "surface-container": "#e5eeff",
+          "surface-dim": "#cbdbf5",
+          "surface-bright": "#f8f9ff",
+          "outline": "#76777d",
+          "surface-variant": "#d3e4fe",
+          "inverse-primary": "#bec6e0",
+          "primary": "#000000",
+          "on-tertiary-container": "#069669",
+          "tertiary": "#000000",
+          "surface-container-high": "#dce9ff",
+          "on-surface-variant": "#45464d",
+          "on-secondary-fixed": "#00174b",
+          "secondary-container": "#316bf3",
+          "on-primary": "#ffffff",
+          "error": "#ba1a1a",
+          "tertiary-container": "#002114",
+          "on-tertiary-fixed": "#002114",
+          "on-secondary": "#ffffff"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-xl": "1.5rem",
+          "margin": "1rem",
+          "space-sm": "0.375rem",
+          "space-lg": "1rem",
+          "gutter": "0.75rem",
+          "space-xs": "0.25rem",
+          "space-md": "0.625rem"
+        },
+        "fontFamily": {
+          "label-sm": ["JetBrains Mono"],
+          "headline-xl": ["Inter"],
+          "body-lg": ["Inter"],
+          "headline-md": ["Inter"],
+          "headline-lg": ["Inter"],
+          "body-md": ["Inter"],
+          "label-md": ["JetBrains Mono"],
+          "body-sm": ["Inter"],
+          "label-lg": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "label-sm": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.02em", "fontWeight": "500" }],
+          "headline-xl": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+          "body-lg": ["0.9375rem", { "lineHeight": "1.375rem", "fontWeight": "400" }],
+          "headline-md": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+          "headline-lg": ["1.375rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "700" }],
+          "body-md": ["0.8125rem", { "lineHeight": "1.125rem", "fontWeight": "400" }],
+          "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0", "fontWeight": "500" }],
+          "body-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
+          "label-lg": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+        }
+      }
+    }
+  }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 2px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="h-full font-body-md text-body-md text-[#0F172A] bg-[#F1F5F9] antialiased overflow-hidden flex flex-col">
+<!-- ================= TOP NAVIGATION BAR (Shared Component Anchor) ================= -->
+<header class="bg-surface-container-lowest text-primary docked full-width top-0 z-40 border-b border-outline-variant h-14 px-4 flex items-center justify-between shrink-0 shadow-none">
+<!-- Left Section: Brand & Warehouse Cluster -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-[#0F172A] text-white flex items-center justify-center rounded">
+<span class="material-symbols-outlined" style="font-size: 20px;">inventory_2</span>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-md font-headline-md font-bold tracking-tight text-on-surface leading-none">Stock Sense</span>
+<span class="font-label-sm text-label-sm text-slate-500 uppercase tracking-wider">Hệ thống Kho B2B</span>
+</div>
+</div>
+<div class="h-5 w-px bg-slate-200"></div>
+<!-- Facility Location Badge -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 border border-slate-300 rounded text-slate-700">
+<span class="material-symbols-outlined text-slate-500" style="font-size: 16px;">warehouse</span>
+<span class="font-body-sm text-body-sm font-semibold">Kho Tổng Miền Nam</span>
+<span class="font-label-sm text-label-sm text-slate-500">(Tân Bình, TP.HCM)</span>
+</div>
+</div>
+<!-- Center Section: High Density Quick Search -->
+<div class="flex-1 max-w-xl mx-6">
+<div class="relative flex items-center">
+<div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full h-8 pl-8 pr-16 bg-[#F8FAFC] border border-slate-300 rounded font-body-sm text-body-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-all" id="globalSearchInput" placeholder="Tìm nhanh SKU, Model, Tên sản phẩm, Số Serial/IMEI..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+<kbd class="px-1.5 py-0.5 font-label-sm text-label-sm bg-slate-200 text-slate-600 rounded border border-slate-300">Ctrl + K</kbd>
+</div>
+</div>
+</div>
+<!-- Right Section: Role RBAC Switcher, Warehouse Selector, Notifications, Profile -->
+<div class="flex items-center gap-3">
+<!-- RBAC Role Switcher Toggle -->
+<div class="flex items-center bg-slate-100 border border-slate-300 rounded p-0.5 text-slate-700" title="Chuyển chế độ xem">
+<button class="flex items-center gap-1 px-2.5 py-1 text-slate-900 bg-white shadow-xs font-semibold rounded font-body-sm text-body-sm transition-all border border-slate-200" id="roleOwnerBtn" onclick="setRole('OWNER')">
+<span class="material-symbols-outlined text-emerald-700" style="font-size: 15px;">visibility</span>
+<span>Chủ tiệm (Giá vốn)</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1 text-slate-500 hover:text-slate-900 font-medium rounded font-body-sm text-body-sm transition-all" id="roleSalesBtn" onclick="setRole('SALES')">
+<span class="material-symbols-outlined text-slate-400" style="font-size: 15px;">visibility_off</span>
+<span>Bán hàng (Ẩn vốn)</span>
+</button>
+</div>
+<!-- Warehouse Selector Dropdown -->
+<div class="relative">
+<button class="h-8 px-2.5 flex items-center gap-1.5 bg-white border border-slate-300 rounded font-body-sm text-body-sm text-slate-800 hover:bg-slate-50">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span>Kho Tổng Tân Bình</span>
+<span class="material-symbols-outlined text-slate-400" style="font-size: 16px;">arrow_drop_down</span>
+</button>
+</div>
+<!-- Urgent Notifications Bell -->
+<div class="relative">
+<button class="h-8 w-8 flex items-center justify-center bg-white border border-slate-300 rounded text-slate-700 hover:bg-slate-50 relative" title="Thông báo khẩn">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 bg-red-600 text-white font-label-sm text-label-sm rounded-full flex items-center justify-center font-bold">5</span>
+</button>
+</div>
+<div class="h-5 w-px bg-slate-200"></div>
+<!-- User Profile -->
+<div class="flex items-center gap-2 pl-1 cursor-pointer">
+<div class="w-8 h-8 rounded bg-slate-800 text-white flex items-center justify-center font-semibold font-body-sm text-body-sm">
+          AN
+        </div>
+<div class="flex flex-col text-left">
+<span class="font-body-sm text-body-sm font-semibold text-slate-900 leading-tight">Nguyễn Văn An</span>
+<span class="font-label-sm text-label-sm text-slate-500">Quản lý Kho Tổng</span>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= MAIN WORKSPACE (SIDE NAV + CONTENT CANVAS) ================= -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Vertical Side Rail (Docked Left) -->
+<aside class="w-56 bg-surface-container-lowest border-r border-outline-variant flex flex-col justify-between py-3 px-2 shrink-0">
+<div class="space-y-4">
+<!-- Sub-Nav Header / Mode Tag -->
+<div class="px-2 pt-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-slate-400">Danh Mục Quản Lý</span>
+<span class="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 font-label-sm text-label-sm rounded">Online</span>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="space-y-0.5">
+<!-- Tổng Quan (Active) -->
+<a class="bg-surface-container-low text-secondary border-l-2 border-secondary font-semibold px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm rounded-r" href="#">
+<span class="material-symbols-outlined text-secondary">dashboard</span>
+<span>Tổng Quan</span>
+</a>
+<a class="text-on-surface-variant hover:bg-slate-100 hover:text-slate-900 px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm transition-colors rounded" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Tồn Kho Chi Tiết</span>
+</a>
+<a class="text-on-surface-variant hover:bg-slate-100 hover:text-slate-900 px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm transition-colors rounded" href="#">
+<span class="material-symbols-outlined">qr_code_scanner</span>
+<span>Quản Lý Serial/IMEI</span>
+</a>
+<a class="text-on-surface-variant hover:bg-slate-100 hover:text-slate-900 px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm transition-colors rounded" href="#">
+<span class="material-symbols-outlined">history</span>
+<span>Lịch Sử Scan</span>
+</a>
+<a class="text-on-surface-variant hover:bg-slate-100 hover:text-slate-900 px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm transition-colors rounded" href="#">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span>Điều Chuyển Kho</span>
+</a>
+<a class="text-on-surface-variant hover:bg-slate-100 hover:text-slate-900 px-3 py-2 flex items-center gap-3 font-body-sm text-body-sm transition-colors rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Thiết Lập</span>
+</a>
+</nav>
+</div>
+<!-- Rail Footer Section & Quick CTA -->
+<div class="space-y-2 border-t border-slate-200 pt-3">
+<button class="w-full h-8 bg-slate-900 hover:bg-slate-800 text-white font-body-sm text-body-sm font-semibold rounded flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">receipt_long</span>
+<span>Xuất Phiếu Kho</span>
+</button>
+<a class="text-slate-500 hover:text-slate-900 px-3 py-1.5 flex items-center gap-3 font-body-sm text-body-sm rounded hover:bg-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span>Trợ Giúp Kỹ Thuật</span>
+</a>
+<a class="text-slate-500 hover:text-slate-900 px-3 py-1.5 flex items-center gap-3 font-body-sm text-body-sm rounded hover:bg-slate-100 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Đăng Xuất</span>
+</a>
+</div>
+</aside>
+<!-- Center Content Canvas (High Density Utilitarian Workspace) -->
+<main class="flex-1 flex flex-col min-w-0 bg-[#F1F5F9] overflow-y-auto custom-scrollbar p-3 gap-3">
+<!-- ================= 4-PILLAR INVENTORY FLOW KPI BANNER ================= -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 shrink-0">
+<!-- Pillar 1: SOH (Tồn Thực Tế - Slate #334155) -->
+<div class="bg-white border border-slate-300 rounded p-3 flex flex-col justify-between hover:border-slate-400 transition-colors shadow-none">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-slate-600 uppercase tracking-wide">SOH · TỒN THỰC TẾ</span>
+<span class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 font-label-sm text-label-sm font-bold rounded">
+              TOTAL SOH
+            </span>
+</div>
+<div class="my-1.5">
+<div class="font-label-lg text-headline-xl font-bold font-mono tracking-tight text-slate-900 cost-val tabular-nums">
+              4.850.000.000 <span class="font-normal font-sans text-body-md text-slate-500">₫</span>
+</div>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-label-md text-label-md font-bold text-slate-800">1.240</span>
+<span class="font-body-sm text-body-sm text-slate-500">thiết bị lưu kho</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 pt-2 text-slate-500 font-body-sm text-body-sm">
+<span>Tổng vốn kiểm kê</span>
+<span class="font-label-sm text-label-sm text-emerald-700 font-semibold flex items-center">
+<span class="material-symbols-outlined" style="font-size: 14px;">trending_up</span> +3.2% t/tháng
+            </span>
+</div>
+</div>
+<!-- Pillar 2: RES (Giữ Đơn / Reserved - Amber #EA580C) -->
+<div class="bg-white border border-amber-200 rounded p-3 flex flex-col justify-between hover:border-amber-300 transition-colors shadow-none">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-amber-900 uppercase tracking-wide">RES · GIỮ ĐƠN CHỜ GIAO</span>
+<span class="px-1.5 py-0.5 bg-amber-50 border border-amber-300 text-amber-800 font-label-sm text-label-sm font-bold rounded">
+              RESERVED
+            </span>
+</div>
+<div class="my-1.5">
+<div class="font-label-lg text-headline-xl font-bold font-mono tracking-tight text-amber-700 cost-val tabular-nums">
+              820.000.000 <span class="font-normal font-sans text-body-md text-amber-600">₫</span>
+</div>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-label-md text-label-md font-bold text-amber-900">185</span>
+<span class="font-body-sm text-body-sm text-slate-500">máy đang giữ đơn</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-amber-50 pt-2 text-slate-500 font-body-sm text-body-sm">
+<span class="text-amber-800 font-medium">12 đơn giữ &gt; 48h cần giục</span>
+<span class="font-label-sm text-label-sm text-amber-700 font-semibold">14.9% tổng SOH</span>
+</div>
+</div>
+<!-- Pillar 3: AVL (Khả Dụng Bán Ngay - Emerald #059669) -->
+<div class="bg-white border border-emerald-200 rounded p-3 flex flex-col justify-between hover:border-emerald-300 transition-colors shadow-none">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-emerald-900 uppercase tracking-wide">AVL · SẴN SÀNG XUẤT BÁN</span>
+<span class="px-1.5 py-0.5 bg-emerald-50 border border-emerald-300 text-emerald-800 font-label-sm text-label-sm font-bold rounded">
+              AVAILABLE
+            </span>
+</div>
+<div class="my-1.5">
+<div class="font-label-lg text-headline-xl font-bold font-mono tracking-tight text-emerald-700 cost-val tabular-nums">
+              4.030.000.000 <span class="font-normal font-sans text-body-md text-emerald-600">₫</span>
+</div>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-label-md text-label-md font-bold text-emerald-900">1.055</span>
+<span class="font-body-sm text-body-sm text-slate-500">máy sẵn quầy &amp; online</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-emerald-50 pt-2 text-slate-500 font-body-sm text-body-sm">
+<span>Hiệu suất phục vụ</span>
+<span class="font-label-sm text-label-sm text-emerald-700 font-semibold">82.5% tỷ lệ sẵn sàng</span>
+</div>
+</div>
+<!-- Pillar 4: INC (Hàng Đang Về / PO - Blue #2563EB) -->
+<div class="bg-white border border-blue-200 rounded p-3 flex flex-col justify-between hover:border-blue-300 transition-colors shadow-none">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm font-semibold text-blue-900 uppercase tracking-wide">INC · ĐANG VỀ (PO INBOUND)</span>
+<span class="px-1.5 py-0.5 bg-blue-50 border border-blue-300 text-blue-800 font-label-sm text-label-sm font-bold rounded">
+              INCOMING PO
+            </span>
+</div>
+<div class="my-1.5">
+<div class="font-label-lg text-headline-xl font-bold font-mono tracking-tight text-blue-700 cost-val tabular-nums">
+              650.000.000 <span class="font-normal font-sans text-body-md text-blue-600">₫</span>
+</div>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-label-md text-label-md font-bold text-blue-900">120</span>
+<span class="font-body-sm text-body-sm text-slate-500">máy đang vận chuyển</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-blue-50 pt-2 text-slate-500 font-body-sm text-body-sm">
+<span>Dự kiến 14:00 hôm nay</span>
+<span class="font-label-sm text-label-sm text-blue-700 font-semibold">PO-2023-889 &amp; 890</span>
+</div>
+</div>
+</section>
+<!-- ================= TOOLBAR & FILTERS CONTROL BAR ================= -->
+<section class="bg-white border border-slate-300 rounded p-2.5 flex flex-col gap-2.5 shrink-0">
+<!-- Top Toolbar: Dropdowns & Action Triggers -->
+<div class="flex flex-wrap items-center justify-between gap-2">
+<!-- Filter Dropdowns Cluster -->
+<div class="flex flex-wrap items-center gap-2">
+<!-- Filter Ngành hàng -->
+<div class="flex items-center bg-[#F8FAFC] border border-slate-300 rounded h-8 px-2 text-slate-700">
+<span class="font-body-sm text-body-sm text-slate-500 mr-1.5">Ngành hàng:</span>
+<select class="bg-transparent font-body-sm text-body-sm font-medium text-slate-900 focus:outline-none cursor-pointer pr-1">
+<option selected="">Tất cả ngành hàng</option>
+<option>Tivi &amp; Màn hình</option>
+<option>Tủ lạnh &amp; Tủ đông</option>
+<option>Máy giặt &amp; Máy sấy</option>
+<option>Điều hòa - Máy lạnh</option>
+<option>Phụ kiện &amp; Âm thanh</option>
+</select>
+</div>
+<!-- Filter Thương hiệu -->
+<div class="flex items-center bg-[#F8FAFC] border border-slate-300 rounded h-8 px-2 text-slate-700">
+<span class="font-body-sm text-body-sm text-slate-500 mr-1.5">Hãng:</span>
+<select class="bg-transparent font-body-sm text-body-sm font-medium text-slate-900 focus:outline-none cursor-pointer pr-1">
+<option selected="">Tất cả hãng</option>
+<option>Samsung</option>
+<option>Sony</option>
+<option>LG Electronics</option>
+<option>Panasonic</option>
+<option>Daikin</option>
+</select>
+</div>
+<!-- Filter Vị trí Kho -->
+<div class="flex items-center bg-[#F8FAFC] border border-slate-300 rounded h-8 px-2 text-slate-700">
+<span class="font-body-sm text-body-sm text-slate-500 mr-1.5">Vị trí:</span>
+<select class="bg-transparent font-body-sm text-body-sm font-medium text-slate-900 focus:outline-none cursor-pointer pr-1">
+<option selected="">Toàn bộ kho &amp; cửa hàng</option>
+<option>Kho Tổng Tân Bình</option>
+<option>Showroom Q.1</option>
+<option>Showroom Q.7</option>
+</select>
+</div>
+<!-- Search In Table -->
+<div class="relative">
+<input class="h-8 pl-7 pr-2 bg-[#F8FAFC] border border-slate-300 rounded font-label-md text-label-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800 w-44" placeholder="Lọc theo mã SKU..." type="text"/>
+<span class="material-symbols-outlined absolute left-2 top-2 text-slate-400" style="font-size: 15px;">filter_alt</span>
+</div>
+</div>
+<!-- Right Action Buttons -->
+<div class="flex items-center gap-2">
+<button class="h-8 px-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-body-sm text-body-sm font-medium rounded flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-slate-600" style="font-size: 16px;">download</span>
+<span>Xuất Excel</span>
+</button>
+<button class="h-8 px-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-body-sm text-body-sm font-medium rounded flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-slate-600" style="font-size: 16px;">barcode_scanner</span>
+<span>Kiểm kê Barcode</span>
+</button>
+<button class="h-8 px-3 bg-[#0F172A] hover:bg-slate-800 text-white font-body-sm text-body-sm font-semibold rounded flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">add_box</span>
+<span>Nhập Lô Hàng (PO)</span>
+</button>
+</div>
+</div>
+<!-- Segmented Condition Tabs -->
+<div class="flex items-center justify-between border-t border-slate-200 pt-2">
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 text-slate-900 bg-slate-100 font-semibold border border-slate-300 rounded font-body-sm text-body-sm flex items-center gap-1.5">
+<span>Tất cả</span>
+<span class="font-label-sm text-label-sm bg-white px-1.5 py-0.2 border border-slate-200 rounded text-slate-700">1.240</span>
+</button>
+<button class="px-2.5 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium rounded font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span>Tồn kho an toàn</span>
+<span class="font-label-sm text-label-sm bg-slate-100 px-1.5 py-0.2 rounded text-slate-600">980</span>
+</button>
+<button class="px-2.5 py-1 text-red-700 hover:bg-red-50 font-medium rounded font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span>Cháy kho (DOS &lt; 3 ngày)</span>
+<span class="font-label-sm text-label-sm bg-red-100 text-red-800 px-1.5 py-0.2 rounded font-bold">18</span>
+</button>
+<button class="px-2.5 py-1 text-amber-800 hover:bg-amber-50 font-medium rounded font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span>Tồn đọng vốn &gt; 90 ngày</span>
+<span class="font-label-sm text-label-sm bg-amber-100 text-amber-900 px-1.5 py-0.2 rounded font-bold">45</span>
+</button>
+<button class="px-2.5 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium rounded font-body-sm text-body-sm flex items-center gap-1.5 transition-colors">
+<span>Đang giữ đơn</span>
+<span class="font-label-sm text-label-sm bg-slate-100 px-1.5 py-0.2 rounded text-slate-600">185</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-slate-500 font-label-sm text-label-sm">
+<span>Hiển thị 6 / 1.240 sản phẩm</span>
+<div class="flex items-center border border-slate-200 rounded">
+<button class="p-1 hover:bg-slate-100 disabled:opacity-30"><span class="material-symbols-outlined" style="font-size: 14px;">chevron_left</span></button>
+<button class="p-1 hover:bg-slate-100"><span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span></button>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= HIGH-DENSITY ELECTRONICS INVENTORY TABLE & DRAWER CONTAINER ================= -->
+<div class="flex-1 flex gap-3 min-h-0">
+<!-- Table Shell -->
+<div class="flex-1 bg-white border border-slate-300 rounded flex flex-col min-w-0 overflow-hidden shadow-none">
+<div class="flex-1 overflow-auto custom-scrollbar">
+<table class="w-full border-collapse text-left font-body-sm text-body-sm">
+<!-- Sticky Header -->
+<thead class="bg-[#F8FAFC] border-b border-slate-300 sticky top-0 z-20 font-label-sm text-label-sm text-slate-600 select-none">
+<tr class="divide-x divide-slate-200">
+<th class="w-8 py-2 px-2 text-center bg-[#F8FAFC]">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</th>
+<th class="py-2 px-2.5 whitespace-nowrap">MÃ SKU</th>
+<th class="py-2 px-2.5 min-w-[220px]">TÊN SẢN PHẨM &amp; MODEL</th>
+<th class="py-2 px-2 whitespace-nowrap">NGÀNH / VỊ TRÍ</th>
+<th class="py-2 px-2 text-right bg-slate-100 text-slate-800 whitespace-nowrap">SOH (TỒN)</th>
+<th class="py-2 px-2 text-right bg-amber-50 text-amber-900 whitespace-nowrap">RES (GIỮ)</th>
+<th class="py-2 px-2 text-right bg-emerald-50 text-emerald-900 whitespace-nowrap">AVL (BÁN)</th>
+<th class="py-2 px-2 text-right bg-blue-50 text-blue-900 whitespace-nowrap">INC (VỀ)</th>
+<th class="py-2 px-2 text-right whitespace-nowrap">GIÁ VỐN ĐƠN VỊ</th>
+<th class="py-2 px-2 text-right whitespace-nowrap">TỔNG TIỀN VỐN</th>
+<th class="py-2 px-2 whitespace-nowrap">TỐC ĐỘ / DOS</th>
+<th class="py-2 px-2 text-center whitespace-nowrap">TRẠNG THÁI</th>
+<th class="py-2 px-2 text-center whitespace-nowrap">THAO TÁC</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 text-slate-800">
+<!-- Row 1: Selected / Highlighted -->
+<tr class="bg-blue-50/50 hover:bg-blue-50/80 transition-colors border-l-4 border-l-blue-600 divide-x divide-slate-200/70" id="row-1">
+<td class="py-2 px-2 text-center">
+<input checked="" class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    TV-SAM-65Q80C
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900 flex items-center gap-1.5">
+<span>Smart Tivi Samsung QLED 4K 65 inch QA65Q80C</span>
+<span class="px-1 py-0.2 bg-slate-200 font-label-sm text-label-sm text-slate-700 rounded">2023</span>
+</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: QA65Q80CAKXXV · Bảo hành 24 tháng</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Tivi QLED</div>
+<div class="font-label-sm text-label-sm text-slate-500">Kho Tân Bình (Kệ A1)</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">24</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">5</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-emerald-700 bg-emerald-50/60 tabular-nums">
+<span class="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 border border-emerald-300">19</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-blue-700 bg-blue-50/40 tabular-nums">10</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    18.500.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    444.000.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-semibold text-slate-800">2.1 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-slate-500">DOS: 9 ngày tồn</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      An toàn
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<button class="h-6 px-2 bg-slate-900 hover:bg-slate-800 text-white rounded font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 mx-auto" onclick="openDrawer('TV-SAM-65Q80C')">
+<span class="material-symbols-outlined" style="font-size: 13px;">qr_code_2</span>
+<span>Xem 24 Serial/IMEI</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 transition-colors divide-x divide-slate-200/70">
+<td class="py-2 px-2 text-center">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    REF-LG-635JS
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900">Tủ lạnh Side-by-side LG Inverter 635L GR-D257JS</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: GR-D257JS · Màu Bạc Titan</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Tủ lạnh lớn</div>
+<div class="font-label-sm text-label-sm text-slate-500">Kho Tân Bình (Kệ B2)</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">12</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">4</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-emerald-700 bg-emerald-50/60 tabular-nums">
+<span class="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 border border-emerald-300">8</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-blue-700 bg-blue-50/40 tabular-nums">5</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    21.200.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    254.400.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-semibold text-slate-800">0.8 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-slate-500">DOS: 10 ngày tồn</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      An toàn
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<button class="h-6 px-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 mx-auto" onclick="openDrawer('REF-LG-635JS')">
+<span class="material-symbols-outlined" style="font-size: 13px;">qr_code_2</span>
+<span>Xem 12 Serial</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Stockout Hazard / Alert -->
+<tr class="hover:bg-red-50/40 transition-colors bg-red-50/20 divide-x divide-slate-200/70">
+<td class="py-2 px-2 text-center">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    WM-PAN-105LV
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900 flex items-center gap-1">
+<span>Máy giặt lồng ngang Panasonic 10.5kg NA-V105FC1LV</span>
+<span class="px-1 py-0.2 bg-red-100 text-red-700 font-label-sm text-label-sm rounded font-bold">HOT</span>
+</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: NA-V105FC1LV · Công nghệ StainMaster+</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Máy giặt</div>
+<div class="font-label-sm text-label-sm text-slate-500">Showroom Q.1</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">8</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">7</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-red-700 bg-red-100/70 tabular-nums">
+<span class="px-1.5 py-0.5 bg-red-200 rounded text-red-900 border border-red-300">1</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-slate-400 bg-blue-50/40 tabular-nums">0</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    12.800.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    102.400.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-bold text-red-700">1.8 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-red-600 font-semibold">DOS: 1.5 ngày (!)</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded font-label-sm text-label-sm font-bold bg-red-100 text-red-800 border border-red-300">
+<span class="material-symbols-outlined" style="font-size: 13px;">warning</span>
+                      Cháy kho
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<div class="flex items-center justify-center gap-1">
+<button class="h-6 px-1.5 bg-red-600 hover:bg-red-700 text-white rounded font-label-sm text-label-sm font-semibold transition-colors">
+                        Tạo PO gấp
+                      </button>
+<button class="h-6 px-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm font-medium" onclick="openDrawer('WM-PAN-105LV')">
+                        Serial
+                      </button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Capital Stagnation / Overstock Warning -->
+<tr class="hover:bg-amber-50/40 transition-colors divide-x divide-slate-200/70">
+<td class="py-2 px-2 text-center">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    AC-DAI-15HP
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900">Điều hòa Daikin Inverter 1.5 HP FTKF35XVMV</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: FTKF35XVMV · Gas R-32 Eco Inverter</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Điều hòa</div>
+<div class="font-label-sm text-label-sm text-slate-500">Kho Tân Bình (Kệ D1)</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">45</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">2</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-emerald-700 bg-emerald-50/60 tabular-nums">
+<span class="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 border border-emerald-300">43</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-slate-400 bg-blue-50/40 tabular-nums">0</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    10.150.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    456.750.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-medium text-amber-900">0.3 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-amber-700 font-semibold">DOS: 143 ngày tồn</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                      Đọng vốn 95 ngày
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<div class="flex items-center justify-center gap-1">
+<button class="h-6 px-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded font-label-sm text-label-sm font-semibold transition-colors">
+                        Đề xuất xả
+                      </button>
+<button class="h-6 px-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm font-medium" onclick="openDrawer('AC-DAI-15HP')">
+                        Serial
+                      </button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 transition-colors divide-x divide-slate-200/70">
+<td class="py-2 px-2 text-center">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    AUD-SNY-S20R
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900">Loa thanh Soundbar Sony HT-S20R 5.1 Kênh</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: HT-S20R · 400W Bluetooth Dolby Digital</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Âm thanh</div>
+<div class="font-label-sm text-label-sm text-slate-500">Showroom Q.7</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">30</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">2</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-emerald-700 bg-emerald-50/60 tabular-nums">
+<span class="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 border border-emerald-300">28</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-blue-700 bg-blue-50/40 tabular-nums">15</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    2.350.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    70.500.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-semibold text-slate-800">3.5 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-slate-500">DOS: 8 ngày tồn</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      An toàn
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<button class="h-6 px-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 mx-auto" onclick="openDrawer('AUD-SNY-S20R')">
+<span class="material-symbols-outlined" style="font-size: 13px;">qr_code_2</span>
+<span>Xem 30 Serial</span>
+</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50 transition-colors divide-x divide-slate-200/70">
+<td class="py-2 px-2 text-center">
+<input class="w-3.5 h-3.5 rounded-sm border-slate-400 text-slate-900 focus:ring-0" type="checkbox"/>
+</td>
+<td class="py-2 px-2.5 font-label-md text-label-md font-bold text-slate-900 whitespace-nowrap">
+                    REF-PAN-322QS
+                  </td>
+<td class="py-2 px-2.5">
+<div class="font-semibold text-slate-900">Tủ lạnh Panasonic Inverter 322L NR-BV360QSVN</div>
+<div class="font-label-sm text-label-sm text-slate-500">Model: NR-BV360QSVN · Ngăn đông mềm Prime Fresh</div>
+</td>
+<td class="py-2 px-2">
+<div class="text-slate-800 font-medium">Tủ lạnh</div>
+<div class="font-label-sm text-label-sm text-slate-500">Kho Tân Bình</div>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-slate-800 tabular-nums">16</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-semibold text-amber-700 bg-amber-50/40 tabular-nums">3</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-bold text-emerald-700 bg-emerald-50/60 tabular-nums">
+<span class="px-1.5 py-0.5 bg-emerald-100 rounded text-emerald-800 border border-emerald-300">13</span>
+</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-medium text-blue-700 bg-blue-50/40 tabular-nums">8</td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono text-slate-700 cost-val tabular-nums">
+                    9.800.000 ₫
+                  </td>
+<td class="py-2 px-2 text-right font-label-md text-label-md font-mono font-bold text-slate-900 cost-val tabular-nums">
+                    156.800.000 ₫
+                  </td>
+<td class="py-2 px-2 whitespace-nowrap">
+<div class="font-label-sm text-label-sm font-semibold text-slate-800">1.2 máy/ngày</div>
+<div class="font-label-sm text-label-sm text-slate-500">DOS: 11 ngày tồn</div>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded font-label-sm text-label-sm font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      An toàn
+                    </span>
+</td>
+<td class="py-2 px-2 text-center whitespace-nowrap">
+<button class="h-6 px-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 mx-auto" onclick="openDrawer('REF-PAN-322QS')">
+<span class="material-symbols-outlined" style="font-size: 13px;">qr_code_2</span>
+<span>Xem 16 Serial</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Bottom Status / Pagination Bar -->
+<div class="bg-[#F8FAFC] border-t border-slate-300 px-3 py-1.5 flex items-center justify-between text-slate-600 font-label-sm text-label-sm">
+<div class="flex items-center gap-4">
+<span>Đang chọn: <strong class="text-slate-900 font-mono">1 SKU</strong> (TV-SAM-65Q80C)</span>
+<span class="text-slate-300">|</span>
+<span class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                Tổng vốn hiển thị: <strong class="text-slate-900 font-mono cost-val">1.479.450.000 ₫</strong>
+</span>
+</div>
+<div class="flex items-center gap-2">
+<span>Trang 1 / 18</span>
+<div class="flex items-center border border-slate-300 rounded bg-white">
+<button class="px-2 py-0.5 hover:bg-slate-100 border-r border-slate-200 disabled:opacity-30">Trước</button>
+<button class="px-2 py-0.5 hover:bg-slate-100">Sau</button>
+</div>
+</div>
+</div>
+</div>
+<!-- ================= SLIDE-OVER DETAIL DRAWER (Serial / IMEI Inspector) ================= -->
+<aside class="w-[410px] bg-white border border-slate-300 rounded flex flex-col shrink-0 overflow-hidden shadow-none transition-all" id="serialDrawer">
+<!-- Drawer Header -->
+<div class="bg-[#0F172A] text-white p-3 flex flex-col gap-2 shrink-0">
+<div class="flex items-start justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-slate-300 tracking-wider uppercase">Kiểm Tra Cá Thể Serial/IMEI</span>
+<h2 class="font-label-lg text-label-lg font-bold font-mono tracking-tight text-white" id="drawerSkuTitle">TV-SAM-65Q80C</h2>
+</div>
+<button class="text-slate-400 hover:text-white transition-colors" onclick="toggleDrawer()" title="Đóng bảng chi tiết">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-slate-300 leading-snug" id="drawerProductName">
+              Smart Tivi Samsung QLED 4K 65 inch QA65Q80C (Kho Tân Bình)
+            </p>
+<!-- Mini 4-Pillar Inventory Flow Pills -->
+<div class="grid grid-cols-4 gap-1.5 pt-1">
+<div class="bg-slate-800/80 border border-slate-700 rounded p-1 text-center">
+<span class="font-label-sm text-label-sm text-slate-400 block">SOH</span>
+<span class="font-label-md text-label-md font-bold text-white font-mono">24</span>
+</div>
+<div class="bg-amber-950/60 border border-amber-800 rounded p-1 text-center">
+<span class="font-label-sm text-label-sm text-amber-300 block">RES</span>
+<span class="font-label-md text-label-md font-bold text-amber-400 font-mono">5</span>
+</div>
+<div class="bg-emerald-950/60 border border-emerald-800 rounded p-1 text-center">
+<span class="font-label-sm text-label-sm text-emerald-300 block">AVL</span>
+<span class="font-label-md text-label-md font-bold text-emerald-400 font-mono">19</span>
+</div>
+<div class="bg-blue-950/60 border border-blue-800 rounded p-1 text-center">
+<span class="font-label-sm text-label-sm text-blue-300 block">INC</span>
+<span class="font-label-md text-label-md font-bold text-blue-400 font-mono">10</span>
+</div>
+</div>
+</div>
+<!-- Drawer Filter / Search Toolbar -->
+<div class="p-2.5 bg-[#F8FAFC] border-b border-slate-200 flex items-center justify-between gap-2 shrink-0">
+<div class="flex items-center gap-1 font-label-sm text-label-sm">
+<button class="px-2 py-0.5 bg-white border border-slate-300 font-bold text-slate-900 rounded">Tất cả (24)</button>
+<button class="px-2 py-0.5 text-slate-600 hover:bg-slate-200 rounded">Khả dụng (19)</button>
+<button class="px-2 py-0.5 text-amber-800 hover:bg-amber-100 rounded">Đang giữ (5)</button>
+</div>
+<button class="text-slate-500 hover:text-slate-800" title="Quét thêm serial">
+<span class="material-symbols-outlined" style="font-size: 18px;">qr_code_scanner</span>
+</button>
+</div>
+<!-- Drawer Serial Cards List (High Density Utilitarian Cards) -->
+<div class="flex-1 overflow-y-auto p-2.5 space-y-2 custom-scrollbar bg-[#F1F5F9]">
+<!-- Serial Card 1: Available (AVL) -->
+<div class="bg-white border border-slate-300 rounded p-2.5 hover:border-slate-400 transition-colors shadow-none">
+<div class="flex items-start justify-between gap-1">
+<div>
+<span class="font-label-sm text-label-sm text-slate-400 block font-sans">Mã Serial cá thể:</span>
+<div class="font-label-md text-label-md font-bold font-mono text-slate-900 flex items-center gap-1.5">
+<span>SN-2023-QA65-08191</span>
+<button class="text-slate-400 hover:text-slate-700" onclick="copyToClipboard('SN-2023-QA65-08191')" title="Sao chép Serial">
+<span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+</button>
+</div>
+</div>
+<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-label-sm text-label-sm font-semibold rounded shrink-0">
+                  Sẵn sàng bán (AVL)
+                </span>
+</div>
+<div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-slate-500 font-body-sm text-body-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400" style="font-size: 14px;">location_on</span>
+                  Vị trí: <strong class="text-slate-700 font-mono">Kệ A1-04 (Tân Bình)</strong>
+</span>
+<span class="font-label-sm text-label-sm text-slate-400">Nhập: 12 ngày trước</span>
+</div>
+</div>
+<!-- Serial Card 2: Reserved normal -->
+<div class="bg-white border border-amber-300 rounded p-2.5 hover:border-amber-400 transition-colors shadow-none">
+<div class="flex items-start justify-between gap-1">
+<div>
+<span class="font-label-sm text-label-sm text-amber-700 block font-sans">Mã Serial cá thể:</span>
+<div class="font-label-md text-label-md font-bold font-mono text-slate-900 flex items-center gap-1.5">
+<span>SN-2023-QA65-08192</span>
+<button class="text-slate-400 hover:text-slate-700" onclick="copyToClipboard('SN-2023-QA65-08192')" title="Sao chép Serial">
+<span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+</button>
+</div>
+</div>
+<span class="px-1.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-300 font-label-sm text-label-sm font-bold rounded shrink-0">
+                  Giữ đơn #ORD-8821
+                </span>
+</div>
+<div class="mt-2 pt-2 border-t border-slate-100 text-slate-600 font-body-sm text-body-sm space-y-1">
+<div class="flex items-center justify-between">
+<span>Khách: <strong class="text-slate-800">Nguyễn Văn Tuấn</strong></span>
+<span class="font-label-sm text-label-sm text-amber-700 font-medium">Giữ: 36h / 48h</span>
+</div>
+<div class="flex items-center justify-between text-slate-500 font-body-sm text-body-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400" style="font-size: 14px;">location_on</span>
+                    Vị trí: <strong class="text-slate-700 font-mono">Kệ A1-04 (Tân Bình)</strong>
+</span>
+<button class="text-blue-700 hover:underline font-body-sm text-body-sm">Xem đơn hàng</button>
+</div>
+</div>
+</div>
+<!-- Serial Card 3: OVERDUE RESERVED HAZARD (Actionable) -->
+<div class="bg-red-50/40 border-2 border-red-400 rounded p-2.5 transition-colors shadow-none">
+<div class="flex items-start justify-between gap-1">
+<div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-red-600" style="font-size: 14px;">error</span>
+<span class="font-label-sm text-label-sm text-red-800 font-bold uppercase">CẢNH BÁO QUÁ HẠN GIỮ</span>
+</div>
+<div class="font-label-md text-label-md font-bold font-mono text-slate-900 flex items-center gap-1.5 mt-0.5">
+<span>SN-2023-QA65-08193</span>
+<button class="text-slate-400 hover:text-slate-700" onclick="copyToClipboard('SN-2023-QA65-08193')" title="Sao chép Serial">
+<span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+</button>
+</div>
+</div>
+<span class="px-1.5 py-0.5 bg-red-100 text-red-800 border border-red-300 font-label-sm text-label-sm font-bold rounded shrink-0">
+                  Quá hạn 4h
+                </span>
+</div>
+<div class="mt-2 pt-2 border-t border-red-200/60 text-slate-700 font-body-sm text-body-sm space-y-1">
+<div class="flex items-center justify-between">
+<span>Đơn: <strong class="font-mono text-slate-900">#ORD-8804</strong> (Trần Minh Quân)</span>
+<span class="font-label-sm text-label-sm text-red-700 font-bold">52 giờ lưu giữ</span>
+</div>
+<p class="font-body-sm text-body-sm text-red-700 italic">
+                  Đã vượt quá hạn mức giữ kho 48h! Đề xuất hủy giữ để trả về tồn AVL bán ngay.
+                </p>
+<div class="pt-1 flex items-center justify-end gap-1.5">
+<button class="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white rounded font-label-sm text-label-sm font-semibold transition-colors">
+                    Hủy giữ đơn này
+                  </button>
+<button class="px-2 py-0.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-label-sm text-label-sm">
+                    Gia hạn 24h
+                  </button>
+</div>
+</div>
+</div>
+<!-- Serial Card 4: Available (AVL) -->
+<div class="bg-white border border-slate-300 rounded p-2.5 hover:border-slate-400 transition-colors shadow-none">
+<div class="flex items-start justify-between gap-1">
+<div>
+<span class="font-label-sm text-label-sm text-slate-400 block font-sans">Mã Serial cá thể:</span>
+<div class="font-label-md text-label-md font-bold font-mono text-slate-900 flex items-center gap-1.5">
+<span>SN-2023-QA65-08194</span>
+<button class="text-slate-400 hover:text-slate-700" onclick="copyToClipboard('SN-2023-QA65-08194')" title="Sao chép Serial">
+<span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+</button>
+</div>
+</div>
+<span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-label-sm text-label-sm font-semibold rounded shrink-0">
+                  Sẵn sàng bán (AVL)
+                </span>
+</div>
+<div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-slate-500 font-body-sm text-body-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-slate-400" style="font-size: 14px;">location_on</span>
+                  Vị trí: <strong class="text-slate-700 font-mono">Kệ A1-05 (Tân Bình)</strong>
+</span>
+<span class="font-label-sm text-label-sm text-slate-400">Nhập: 5 ngày trước</span>
+</div>
+</div>
+</div>
+<!-- Drawer Action Footer (Operational Controls) -->
+<div class="p-2.5 bg-[#F8FAFC] border-t border-slate-300 flex items-center justify-between gap-2 shrink-0">
+<button class="h-8 px-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 font-body-sm text-body-sm font-medium rounded flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">print</span>
+<span>In Barcode</span>
+</button>
+<button class="h-8 px-2.5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 font-body-sm text-body-sm font-medium rounded flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">move_up</span>
+<span>Chuyển Kệ/Kho</span>
+</button>
+<button class="h-8 px-2.5 bg-red-700 hover:bg-red-800 text-white font-body-sm text-body-sm font-semibold rounded flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined" style="font-size: 16px;">cancel</span>
+<span>Hủy Quá Hạn</span>
+</button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<!-- Micro Toast Notification for UI Actions -->
+<div class="fixed bottom-4 right-4 bg-slate-900 text-white font-body-sm text-body-sm px-3 py-2 rounded shadow-lg flex items-center gap-2 transform translate-y-16 opacity-0 transition-all pointer-events-none z-50" id="toast">
+<span class="material-symbols-outlined text-emerald-400" style="font-size: 18px;">check_circle</span>
+<span id="toastMessage">Đã thực hiện thành công</span>
+</div>
+<!-- ================= INLINE UTILITY JAVASCRIPT ================= -->
+<script>
+    // State storage for original cost figures
+    let currentRole = 'OWNER';
+    const costMap = new Map();
+
+    // Cache original cost numbers on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      const costElements = document.querySelectorAll('.cost-val');
+      costElements.forEach((el, index) => {
+        costMap.set(index, el.innerHTML);
+      });
+    });
+
+    // Interactive RBAC Role Switcher: OWNER vs SALES
+    function setRole(role) {
+      currentRole = role;
+      const ownerBtn = document.getElementById('roleOwnerBtn');
+      const salesBtn = document.getElementById('roleSalesBtn');
+      const costElements = document.querySelectorAll('.cost-val');
+
+      if (role === 'SALES') {
+        // Toggle Active button styling
+        salesBtn.className = "flex items-center gap-1 px-2.5 py-1 text-slate-900 bg-white shadow-xs font-semibold rounded font-body-sm text-body-sm transition-all border border-slate-200";
+        ownerBtn.className = "flex items-center gap-1 px-2.5 py-1 text-slate-500 hover:text-slate-900 font-medium rounded font-body-sm text-body-sm transition-all";
+        
+        // Obfuscate / Mask Cost figures for sales personnel
+        costElements.forEach((el) => {
+          el.innerHTML = '****** <span class="font-normal font-sans text-body-md text-slate-400">₫</span>';
+        });
+        showToast("Đã chuyển sang chế độ Bán hàng: Giá vốn đã được bảo mật (****** đ)");
+      } else {
+        // Restore OWNER state
+        ownerBtn.className = "flex items-center gap-1 px-2.5 py-1 text-slate-900 bg-white shadow-xs font-semibold rounded font-body-sm text-body-sm transition-all border border-slate-200";
+        salesBtn.className = "flex items-center gap-1 px-2.5 py-1 text-slate-500 hover:text-slate-900 font-medium rounded font-body-sm text-body-sm transition-all";
+
+        // Restore actual cost figures
+        costElements.forEach((el, index) => {
+          if (costMap.has(index)) {
+            el.innerHTML = costMap.get(index);
+          }
+        });
+        showToast("Đã chuyển sang chế độ Chủ tiệm: Hiển thị đầy đủ giá vốn");
+      }
+    }
+
+    // Toggle and Open Drawer dynamically for SKU
+    function openDrawer(sku) {
+      const drawer = document.getElementById('serialDrawer');
+      const skuTitle = document.getElementById('drawerSkuTitle');
+      const prodName = document.getElementById('drawerProductName');
+
+      skuTitle.innerText = sku;
+      if (sku === 'WM-PAN-105LV') {
+        prodName.innerText = 'Máy giặt lồng ngang Panasonic 10.5kg NA-V105FC1LV (Showroom Q.1)';
+      } else if (sku === 'AC-DAI-15HP') {
+        prodName.innerText = 'Điều hòa Daikin Inverter 1.5 HP FTKF35XVMV (Kho Tân Bình)';
+      } else {
+        prodName.innerText = 'Smart Tivi Samsung QLED 4K 65 inch QA65Q80C (Kho Tân Bình)';
+      }
+
+      drawer.classList.remove('hidden');
+      drawer.style.display = 'flex';
+      showToast(`Đang hiển thị danh sách Serial cho mã SKU: ${sku}`);
+    }
+
+    function toggleDrawer() {
+      const drawer = document.getElementById('serialDrawer');
+      if (drawer.style.display === 'none') {
+        drawer.style.display = 'flex';
+      } else {
+        drawer.style.display = 'none';
+      }
+    }
+
+    // Copy to clipboard helper
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Đã sao chép mã Serial: ${text}`);
+      }).catch(() => {
+        showToast(`Đã chọn mã Serial: ${text}`);
+      });
+    }
+
+    // Lightweight Toast mechanism
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.innerText = message;
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 2500);
+    }
+
+    // Shortcut Ctrl + K Focus Search
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const input = document.getElementById('globalSearchInput');
+        if (input) input.focus();
+      }
+    });
+  </script>
+</body></html>
