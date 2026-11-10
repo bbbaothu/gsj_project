@@ -120,7 +120,7 @@ flowchart TD
    - *Doanh thu dịch vụ mang lại tháng này:* Doanh số phụ kiện và tiền công kỹ thuật thu được từ các cuộc gọi CSKH.
 3. **Bước 3:** Nhân viên chọn một khách hàng cụ thể trên danh sách (ví dụ: *Chị Mai - Đống Đa, đã mua Điều hòa Daikin từ 6 tháng trước*).
 4. **Bước 4:** Hệ thống mở bảng chi tiết thông tin kèm **Kịch bản tư vấn gợi ý tự động (AI Call Script)**:
-   > *"Dạ em chào chị Mai, em là nhân viên tại Điện máy Tuấn Hưng 108 Cầu Giấy ạ. Đợt tháng 4 năm ngoái nhà mình có lắp bộ Điều hòa Daikin Inverter bên em. Đến nay đã tròn 6 tháng sử dụng, sắp vào đợt nắng nóng cao điểm, bên em đang có chương trình tri ân khách quen hỗ trợ vệ sinh lưới lọc và đo áp suất gas miễn phí tiền công cho nhà mình. Em xin phép xếp thợ kỹ thuật qua hỗ trợ chị vào chiều mai lúc 15h được không ạ?"*
+   > *"Dạ em chào chị Mai, em là nhân viên tại Điện máy Anh Tâm 108 Cầu Giấy ạ. Đợt tháng 4 năm ngoái nhà mình có lắp bộ Điều hòa Daikin Inverter bên em. Đến nay đã tròn 6 tháng sử dụng, sắp vào đợt nắng nóng cao điểm, bên em đang có chương trình tri ân khách quen hỗ trợ vệ sinh lưới lọc và đo áp suất gas miễn phí tiền công cho nhà mình. Em xin phép xếp thợ kỹ thuật qua hỗ trợ chị vào chiều mai lúc 15h được không ạ?"*
 5. **Bước 5:** Nhân viên nhấn biểu tượng **"Gọi điện"** (kết nối qua tổng đài ảo hoặc quay số nhanh trên điện thoại) hoặc nhấn **"Gửi Zalo"**.
 6. **Bước 6:** Khách hàng đồng ý đặt lịch vệ sinh bảo dưỡng vào 15h ngày mai.
 7. **Bước 7:** Nhân viên chọn kết quả **"Đồng ý - Đặt lịch dịch vụ"**, chọn giờ hẹn và tên thợ kỹ thuật phụ trách. Hệ thống tự động tạo phiếu dịch vụ và gửi tin nhắn xác nhận cho khách.
@@ -211,7 +211,7 @@ Feature: Nhận diện khách hàng tiềm năng cần chăm sóc định kỳ (
 | Anh Hoàng (C.Giấy| 0977.888.xx| Tủ lạnh Sharp SideBySide| 15/10/2021| 📺 Đổi đời máy 5n| 🟡 Vừa  | [📞 Gọi ngay]|
 |---------------------------------------------------------------------------------------------------------|
 | KHUNG CHI TIẾT CUỘC GỌI [Chị Mai - 0912.345.xxx]:                                                       |
-| Lời thoại gợi ý: "Dạ em chào chị Mai, em là kỹ thuật Điện Máy Tuấn Hưng. Đợt hè năm ngoái nhà mình có   |
+| Lời thoại gợi ý: "Dạ em chào chị Mai, em là kỹ thuật Điện Máy Anh Tâm. Đợt hè năm ngoái nhà mình có   |
 | lắp 2 bộ Daikin bên em. Sắp vào mùa nóng mới, bên em đang có ưu đãi vệ sinh xịt dàn lạnh và kiểm tra gas |
 | tại nhà cho khách quen chỉ 150k/máy. Em xin phép xếp thợ qua làm cho nhà mình vào chiều mai nhé?"        |
 |                                                                                                         |

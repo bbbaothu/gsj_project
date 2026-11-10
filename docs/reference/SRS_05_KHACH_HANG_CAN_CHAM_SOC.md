@@ -183,7 +183,7 @@ DANH SÁCH KHÁCH HÀNG CẦN CHĂM SÓC:
 +-------------------+-------------+--------------------------+------------+--------------------+---------+------------------+
 
 KHUNG TƯ VẤN CUỘC GỌI [Đang chọn: Chị Mai - SĐT: 0912.345.892]:
-* Lời thoại gợi ý: "Dạ em chào chị Mai, em là nhân viên kỹ thuật Điện Máy Tuấn Hưng 108 Cầu Giấy ạ. Đợt hè năm ngoái nhà
+* Lời thoại gợi ý: "Dạ em chào chị Mai, em là nhân viên kỹ thuật Điện Máy Anh Tâm 108 Cầu Giấy ạ. Đợt hè năm ngoái nhà
   mình có lắp 2 bộ Daikin Inverter bên em. Sắp vào mùa nóng mới, bên em đang có ưu đãi vệ sinh xịt dàn lạnh và kiểm tra gas
   tại nhà cho khách quen chỉ 150k/máy. Em xin phép xếp thợ qua làm cho nhà mình vào chiều mai nhé?"
 ------------------------------------------------------------------------------------------------------------------------

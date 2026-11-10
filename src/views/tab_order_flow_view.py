@@ -161,7 +161,7 @@ def render_tab_order_flow(service: OrderService):
             if confirmed_orders:
                 d_order = st.selectbox("Chọn đơn đã xác nhận để xuất xe giao:", confirmed_orders)
                 st.write(f"Đơn hàng được chọn: **{d_order}**")
-                technicians = ["Nguyễn Tuấn Long (NV0003)", "Trần Đình Khang (NV0002)", "Nguyễn Tuấn Hưng (Chủ tiệm)"]
+                technicians = ["Nguyễn Tuấn Long (NV0003)", "Trần Đình Khang (NV0002)", "Nguyễn Anh Tâm (Chủ tiệm)"]
                 st.selectbox("Kỹ thuật viên phụ trách giao lắp:", technicians)
                 st.text_input("Quét mã vạch Serial thực tế:", placeholder="Quét mã SN-...")
                 if st.button("Xác nhận Bốc Hàng & Giao Lắp"):

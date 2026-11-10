@@ -3,8 +3,8 @@
 """
 PIPELINE TẠO DỮ LIỆU GIẢ LẬP (SYNTHETIC DATA) CHO HỘ KINH DOANH CÁ THỂ (SOLE TRADER) ĐIỆN MÁY
 Đặc thù:
-1. 1 chi nhánh duy nhất (Cửa hàng Điện máy Tuấn Hưng).
-2. 1 người duy nhất vận hành (Nguyễn Tuấn Hưng - Chủ tiệm kiêm Bán hàng, Kỹ thuật, Thu ngân, Quản lý).
+1. 1 chi nhánh duy nhất (Cửa hàng Điện máy Anh Tâm).
+2. 1 người duy nhất vận hành (Nguyễn Anh Tâm - Chủ tiệm kiêm Bán hàng, Kỹ thuật, Thu ngân, Quản lý).
 3. Lượng nhập hàng dựa nhiều theo cảm tính (Gut-feeling inventory bias: Overstock hàng kén khách, Stockout hàng bình dân bán chạy).
 """
 
@@ -40,7 +40,7 @@ def insert_master_data():
 
     # 1. DUY NHẤT 1 CHI NHÁNH
     branches = [
-        ('CN01', 'Cửa hàng Điện máy Tuấn Hưng', '0912345678', '108 Cầu Giấy', 'Quan Hoa', 'Cầu Giấy', 'Hà Nội', 1),
+        ('CN01', 'Cửa hàng Điện máy Anh Tâm', '0912345678', '108 Cầu Giấy', 'Quan Hoa', 'Cầu Giấy', 'Hà Nội', 1),
     ]
     cur.executemany("""
         INSERT INTO DIM_BRANCHES (branch_code, branch_name, phone, address, ward, district, province, is_active)
@@ -49,7 +49,7 @@ def insert_master_data():
 
     # 2. DUY NHẤT 1 NGƯỜI VẬN HÀNH (Chủ cửa hàng kiêm mọi chức danh)
     employees = [
-        ('NV0001', 'Nguyễn Tuấn Hưng', '0912345678', 'Chủ cửa hàng & Vận hành', 'Chủ hộ kinh doanh (Kiêm Bán hàng & Kỹ thuật)', 'tuanhung', 'CN01', 25000000, '2020-05-01'),
+        ('NV0001', 'Nguyễn Anh Tâm', '0912345678', 'Chủ cửa hàng & Vận hành', 'Chủ hộ kinh doanh (Kiêm Bán hàng & Kỹ thuật)', 'anhtam', 'CN01', 25000000, '2020-05-01'),
     ]
     cur.executemany("""
         INSERT INTO DIM_EMPLOYEES (employee_code, employee_name, phone, department, title, login_account, branch_code, salary, hire_date)
@@ -92,8 +92,8 @@ def insert_master_data():
         ('MG-TB-85K', '893600400003', 'Máy giặt Toshiba 8.5 kg AW-K905DV(SG)', 'Hàng hóa', 'Điện lạnh > Máy giặt > Máy giặt Toshiba', 'Toshiba', 'AW-K905DV', 'Cái', 45000, 4790000, 3700000, 5, 4, 15, 24, 1, 1, 1, '{"load": "8.5 kg"}'),
 
         # Nhóm 5: Dịch vụ & Phụ kiện (Do chính chủ tiệm đi lắp ráp)
-        ('DV-LAPDAT-ML', '893600900001', 'Gói công thợ lắp đặt điều hòa tiêu chuẩn', 'Dịch vụ', 'Dịch vụ > Lắp đặt > Lắp đặt điều hòa', 'Tuấn Hưng', 'DV-AC', 'Lần', 0, 350000, 50000, 999, 0, 9999, 3, 0, 1, 1, '{"owner_install": true}'),
-        ('DV-TREO-TV', '893600900002', 'Gói công thợ lắp đặt giá treo Tivi tận nhà', 'Dịch vụ', 'Dịch vụ > Lắp đặt > Lắp đặt Tivi', 'Tuấn Hưng', 'DV-TV', 'Lần', 0, 200000, 30000, 999, 0, 9999, 3, 0, 1, 1, '{"owner_install": true}'),
+        ('DV-LAPDAT-ML', '893600900001', 'Gói công thợ lắp đặt điều hòa tiêu chuẩn', 'Dịch vụ', 'Dịch vụ > Lắp đặt > Lắp đặt điều hòa', 'Anh Tâm', 'DV-AC', 'Lần', 0, 350000, 50000, 999, 0, 9999, 3, 0, 1, 1, '{"owner_install": true}'),
+        ('DV-TREO-TV', '893600900002', 'Gói công thợ lắp đặt giá treo Tivi tận nhà', 'Dịch vụ', 'Dịch vụ > Lắp đặt > Lắp đặt Tivi', 'Anh Tâm', 'DV-TV', 'Lần', 0, 200000, 30000, 999, 0, 9999, 3, 0, 1, 1, '{"owner_install": true}'),
         ('PK-GIATREO-55', '893600900003', 'Giá treo Tivi nghiêng cao cấp 43-65 inch', 'Hàng hóa', 'Phụ kiện > Giá treo > Giá treo Tivi', 'Vogel', 'GT-4365', 'Cái', 2500, 390000, 190000, 40, 10, 60, 12, 0, 1, 1, '{"support": "43-65 inch"}'),
         ('PK-ONGDONG-M', '893600900004', 'Ống đồng Thái Lan Toàn Phát bọc bảo ôn (mét)', 'Hàng hóa', 'Vật tư > Ống đồng > Ống đồng điều hòa', 'Toàn Phát', 'OD-610', 'Mét', 300, 180000, 110000, 150, 30, 300, 0, 0, 1, 1, '{"origin": "Thailand"}'),
     ]
@@ -178,7 +178,7 @@ def generate_customers_with_sdv(num_customers=45):
     print(f"    Đã sinh {len(cust_records)} khách hàng quen thuộc địa bàn Cầu Giấy.")
 
 def generate_serials_and_invoices_with_sdv(num_invoices=75):
-    print(f">>> [4/5] Sử dụng SDV để sinh {num_invoices} Hóa đơn bán lẻ (Do 1 chủ tiệm Tuấn Hưng phục vụ)...")
+    print(f">>> [4/5] Sử dụng SDV để sinh {num_invoices} Hóa đơn bán lẻ (Do 1 chủ tiệm Anh Tâm phục vụ)...")
     con = sqlite3.connect(DB_PATH)
     con.execute("PRAGMA foreign_keys = ON;")
     cur = con.cursor()
@@ -279,7 +279,7 @@ def generate_serials_and_invoices_with_sdv(num_invoices=75):
         }]
         total_inv_amount = p_info['sale_price']
 
-        # Kèm công thợ lắp đặt hoặc giá treo do Tuấn Hưng trực tiếp làm
+        # Kèm công thợ lắp đặt hoặc giá treo do Anh Tâm trực tiếp làm
         if 'ML-' in chosen_sku:
             pk = 'DV-LAPDAT-ML'
             pk_info = product_dict[pk]
@@ -324,13 +324,13 @@ def generate_serials_and_invoices_with_sdv(num_invoices=75):
 
         channel = 'Bán trực tiếp' if random.random() < 0.85 else 'Điện thoại'
 
-        # Insert FACT_INVOICES (Seller và Technician đều là NV0001 - Nguyễn Tuấn Hưng)
+        # Insert FACT_INVOICES (Seller và Technician đều là NV0001 - Nguyễn Anh Tâm)
         cur.execute("""
             INSERT INTO FACT_INVOICES (
                 invoice_code, invoice_time, seller_code, technician_code, branch_code, customer_code,
                 sales_channel, pricebook, total_amount, invoice_discount_amount, amount_due,
                 pay_cash, pay_card, pay_transfer, pay_installment, delivery_status, vat_invoice_issued, note
-            ) VALUES (?, ?, 'NV0001', 'NV0001', 'CN01', ?, ?, 'Bảng giá chuẩn', ?, ?, ?, ?, 0.0, ?, 0.0, 'Đã lắp đặt hoàn tất', 0, 'Anh Tuấn Hưng trực tiếp bàn giao & lắp đặt');
+            ) VALUES (?, ?, 'NV0001', 'NV0001', 'CN01', ?, ?, 'Bảng giá chuẩn', ?, ?, ?, ?, 0.0, ?, 0.0, 'Đã lắp đặt hoàn tất', 0, 'Anh Tâm trực tiếp bàn giao & lắp đặt');
         """, (
             inv_code, inv_time, cust_code, channel, total_inv_amount, inv_discount, amount_due, pay_cash, pay_transfer
         ))
@@ -355,7 +355,7 @@ def generate_serials_and_invoices_with_sdv(num_invoices=75):
         invoice_count += 1
 
     con.commit()
-    print(f"    - Đã lập thành công {invoice_count} hóa đơn thực tế do Nguyễn Tuấn Hưng trực tiếp phục vụ.")
+    print(f"    - Đã lập thành công {invoice_count} hóa đơn thực tế do Nguyễn Anh Tâm trực tiếp phục vụ.")
 
     # Mô phỏng 2-3 ca bảo hành được chủ tiệm hỗ trợ tận nhà
     cur.execute("SELECT warranty_id, serial_number FROM FACT_WARRANTIES ORDER BY RANDOM() LIMIT 3;")

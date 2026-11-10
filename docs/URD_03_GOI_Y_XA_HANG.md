@@ -273,7 +273,7 @@ flowchart TD
 1. **Bước 1:** Người dùng chọn tab **"So sánh Giá thị trường & Định giá"** trong phân hệ Gợi ý xả hàng.
 2. **Bước 2:** Chọn sản phẩm cần định giá (ví dụ: *Điều hòa Panasonic 1.5HP Inverter*).
 3. **Bước 3:** Hệ thống hiển thị bảng so sánh đối đầu (Head-to-head comparison):
-   - Giá hiện tại của cửa hàng Tuấn Hưng: `14.200.000 đ`.
+   - Giá hiện tại của cửa hàng Điện máy Anh Tâm: `14.200.000 đ`.
    - Giá Điện Máy Xanh đang bán: `14.890.000 đ`.
    - Giá MediaMart đang bán: `13.990.000 đ`.
    - Giá đại lý trực tuyến rẻ nhất: `13.500.000 đ`.

@@ -120,10 +120,10 @@ df_sales, df_products, df_rfm, df_warranties = load_data()
 # SIDEBAR: THÔNG TIN HỘ KINH DOANH CÁ THỂ
 # -----------------------------------------------------------------------------
 st.sidebar.image("https://img.icons8.com/color/96/small-business.png", width=64)
-st.sidebar.title("🏪 Điện Máy Tuấn Hưng")
+st.sidebar.title("🏪 Điện Máy Anh Tâm")
 st.sidebar.markdown("**Mô hình:** Hộ kinh doanh cá thể *(Sole Trader)*")
 st.sidebar.markdown("""
-* **Chủ hộ kinh doanh:** Nguyễn Tuấn Hưng
+* **Chủ hộ kinh doanh:** Nguyễn Anh Tâm
 * **Vai trò:** Chủ tiệm kiêm Bán hàng, Thu ngân, Giao hàng & Lắp ráp kỹ thuật
 * **Địa điểm:** 108 Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội
 * **Chi nhánh:** Duy nhất 1 cửa hàng
@@ -136,7 +136,7 @@ max_date = df_sales['sale_date'].max().date()
 date_range = st.sidebar.date_input("Khoảng thời gian bán hàng:", value=(min_date, max_date), min_value=min_date, max_value=max_date)
 
 # Bộ lọc Thương hiệu
-brands_list = ['Tất cả'] + sorted([b for b in df_sales['brand'].dropna().unique() if b != 'Tuấn Hưng'])
+brands_list = ['Tất cả'] + sorted([b for b in df_sales['brand'].dropna().unique() if b != 'Anh Tâm'])
 selected_brand = st.sidebar.selectbox("Lọc theo Thương hiệu:", brands_list)
 
 filtered_sales = df_sales.copy()
@@ -162,9 +162,9 @@ st.sidebar.caption(f"⚡ Đã ghi nhận **{filtered_sales['invoice_code'].nuniq
 # -----------------------------------------------------------------------------
 # HEADER
 # -----------------------------------------------------------------------------
-st.title("🏪 BÁO CÁO HOẠT ĐỘNG KINH DOANH - ĐIỆN MÁY TUẤN HƯNG")
+st.title("🏪 BÁO CÁO HOẠT ĐỘNG KINH DOANH - ĐIỆN MÁY ANH TÂM")
 st.markdown("""
-> **Đặc tả mô hình Sole Trader:** Cửa hàng vận hành độc lập bởi **1 chủ tiệm duy nhất** (Nguyễn Tuấn Hưng), 
+> **Đặc tả mô hình Sole Trader:** Cửa hàng vận hành độc lập bởi **1 chủ tiệm duy nhất** (Nguyễn Anh Tâm), 
 > **1 chi nhánh duy nhất**, và **lượng nhập hàng chịu ảnh hưởng nặng từ cảm tính chủ quan** (Gut-feeling inventory bias).
 """)
 
@@ -299,7 +299,7 @@ with tab_rfm:
         fig_rfm_pie.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=320, showlegend=False)
         st.plotly_chart(fig_rfm_pie, use_container_width=True)
 
-    st.markdown("##### 📞 Sổ Danh Bạ Khách Hàng (Dành cho Anh Tuấn Hưng chăm sóc định kỳ)")
+    st.markdown("##### 📞 Sổ Danh Bạ Khách Hàng (Dành cho Anh Tâm chăm sóc định kỳ)")
     st.dataframe(
         df_rfm_calc[['customer_code', 'customer_name', 'phone', 'recency_days', 'frequency', 'monetary', 'segment']]
             .sort_values(by='monetary', ascending=False)
@@ -326,7 +326,7 @@ with tab_warranty:
 
     w_col1.metric("Tổng Phiếu Bảo Hành e-Warranty", f"{total_w} phiếu", delta="Đã kích hoạt cho khách")
     w_col2.metric("Còn Hạn Bảo Hành", f"{active_w} máy", delta="Trong thời gian cam kết")
-    w_col3.metric("Đang Xử Lý Sửa Chữa / Hỗ Trợ", f"{claimed_w} ca", delta="Anh Hưng đang xử lý tận nhà")
+    w_col3.metric("Đang Xử Lý Sửa Chữa / Hỗ Trợ", f"{claimed_w} ca", delta="Anh Tâm đang xử lý tận nhà")
 
     st.markdown("---")
     st.markdown("##### 🛠️ Danh sách Khách hàng đang cần hỗ trợ Bảo hành / Sửa chữa")
@@ -338,4 +338,4 @@ with tab_warranty:
     st.dataframe(claims, use_container_width=True, height=200)
 
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Cửa hàng Điện máy Tuấn Hưng | 108 Cầu Giấy, Hà Nội | Hệ thống PoS KiotViet x SQLite Data Warehouse</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: gray;'>Cửa hàng Điện máy Anh Tâm | 108 Cầu Giấy, Hà Nội | Hệ thống PoS KiotViet x SQLite Data Warehouse</div>", unsafe_allow_html=True)

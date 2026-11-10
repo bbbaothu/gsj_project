@@ -231,7 +231,7 @@ BẢNG RADAR ĐỐI ĐẦU GIÁ THỊ TRƯỜNG (Cập nhật lúc 07:30 Sáng n
 | 1. Điện Máy Xanh (ĐMX)        |    10.490.000 đ  | Bằng giá niêm yết     | Bao công lắp đặt + Tặng 1 năm bảo hành     |
 | 2. MediaMart                  |     9.890.000 đ  | Rẻ hơn 600.000 đ      | Chưa bao gồm vật tư ống đồng               |
 | 3. Đại lý Điện máy Online     |     9.350.000 đ  | Rẻ hơn 1.140.000 đ    | Giá bán online tại kho, tự vận chuyển      |
-| 4. Giá vốn cửa hàng Tuấn Hưng |     8.200.000 đ  | Ngưỡng sàn hòa vốn    | Dư địa giảm tối đa: 1.150.000 đ để có lãi |
+| 4. Giá vốn cửa hàng Anh Tâm  |     8.200.000 đ  | Ngưỡng sàn hòa vốn    | Dư địa giảm tối đa: 1.150.000 đ để có lãi |
 +-------------------------------+------------------+-----------------------+--------------------------------------------+
 
 KẾT QUẢ TÍNH TOÁN GIÁ GỢI Ý TỪ HỆ THỐNG:

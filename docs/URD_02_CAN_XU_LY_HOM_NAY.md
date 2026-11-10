@@ -17,7 +17,7 @@
 
 ### 1.1. Bối cảnh phân hệ
 Trong ngành bán lẻ điện máy, hàng hóa có tốc độ biến động giá trị và suy giảm nhu cầu rất nhanh theo chu kỳ công nghệ và mùa vụ thời tiết (ví dụ: điều hòa bán chạy vào mùa hè từ tháng 4 đến tháng 8, quạt sưởi và bình nóng lạnh bán chạy vào mùa đông từ tháng 10 đến tháng 1). 
-Đối với các hộ kinh doanh và cửa hàng điện máy cá thể (như Điện Máy Tuấn Hưng), chủ tiệm kiêm nhiệm nhiều vai trò nên không có thời gian rà soát hàng ngàn SKU mỗi ngày. Nếu không có hệ thống tự động sàng lọc và đưa ra các "việc cần làm ngay" (Action Items), cửa hàng sẽ đối mặt với 2 rủi ro tài chính nghiêm trọng:
+Đối với các hộ kinh doanh và cửa hàng điện máy cá thể (như Điện Máy Anh Tâm), chủ tiệm kiêm nhiệm nhiều vai trò nên không có thời gian rà soát hàng ngàn SKU mỗi ngày. Nếu không có hệ thống tự động sàng lọc và đưa ra các "việc cần làm ngay" (Action Items), cửa hàng sẽ đối mặt với 2 rủi ro tài chính nghiêm trọng:
 1. **Ứ đọng vốn ở hàng bán chậm / hết mùa:** Hàng hóa nằm kho quá lâu bị mất giá, model mới của hãng ra mắt khiến model cũ trở thành hàng tồn chết (Dead Stock).
 2. **Đứt gãy dòng tiền do cháy hàng (Stockout):** Hàng bán chạy hết đột ngột mà không có kế hoạch nhập bổ sung trước, dẫn đến mất khách hàng vào tay đối thủ và sụt giảm doanh thu.
 

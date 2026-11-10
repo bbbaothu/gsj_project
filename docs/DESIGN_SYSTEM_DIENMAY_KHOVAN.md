@@ -416,7 +416,7 @@ Bạn có thể lưu đoạn mã sau thành file `.html` độc lập và mở t
         <div class="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center font-mono font-bold text-slate-950 text-lg shadow-sm">SS</div>
         <div>
           <h1 class="text-base font-bold tracking-tight leading-none text-white">STOCK SENSE</h1>
-          <span class="text-xs text-slate-400">Điện Máy Tuấn Hưng • Kho Tổng 108 Cầu Giấy</span>
+          <span class="text-xs text-slate-400">Điện Máy Anh Tâm • Kho Tổng 108 Cầu Giấy</span>
         </div>
       </div>
       

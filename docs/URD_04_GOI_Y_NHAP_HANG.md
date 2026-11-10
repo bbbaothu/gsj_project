@@ -16,7 +16,7 @@
 ## 1. TỔNG QUAN & PHẠM VI (INTRODUCTION & SCOPE)
 
 ### 1.1. Bối cảnh nghiệp vụ
-Trong mô hình kinh doanh cửa hàng điện máy cá thể (Sole Trader) như Điện Máy Tuấn Hưng, việc nhập hàng trước đây gần như phụ thuộc $100\%$ vào **kinh nghiệm cá nhân và trực giác chủ quan (Gut-feeling inventory bias)** hoặc chịu tác động từ **lời mời chào chiết khấu / thúc ép doanh số của nhân viên kinh doanh từ Hãng sản xuất**. Hậu quả thực tế là:
+Trong mô hình kinh doanh cửa hàng điện máy cá thể (Sole Trader) như Điện Máy Anh Tâm, việc nhập hàng trước đây gần như phụ thuộc $100\%$ vào **kinh nghiệm cá nhân và trực giác chủ quan (Gut-feeling inventory bias)** hoặc chịu tác động từ **lời mời chào chiết khấu / thúc ép doanh số của nhân viên kinh doanh từ Hãng sản xuất**. Hậu quả thực tế là:
 1. **Ôm hàng sai phân khúc:** Nhập quá nhiều các dòng máy cao cấp (Tivi OLED 55 - 65 inch, Tủ lạnh dung tích lớn trên 500L) vì mức chiết khấu trên từng máy hấp dẫn, nhưng nhu cầu khách địa phương thấp khiến vốn bị chôn chặt hàng trăm triệu đồng.
 2. **Cháy hàng phân khúc bình dân:** Các dòng máy điều hòa 9.000 BTU giá rẻ, tivi 43 inch, máy giặt 8kg có nhu cầu cực lớn vào đầu mùa nhưng lại nhập quá dè dặt, dẫn đến hết hàng liên tục, khách bỏ sang chuỗi lớn khác mua.
 3. **Quản lý dòng tiền nhập hàng (Cashflow Crunch):** Đặt hàng vượt quá khả năng thanh toán tiền mặt tức thời, dẫn đến nợ gối đầu nhà phân phối chịu lãi suất phạt.
