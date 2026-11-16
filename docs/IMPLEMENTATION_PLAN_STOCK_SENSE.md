@@ -465,10 +465,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 4: TDD PHÂN HỆ 04 - GỢI Ý NHẬP HÀNG & TỰ ĐỘNG TẠO PO (`US-4.1` - SMART REPLENISHMENT & PO GENERATOR)
-**Thời lượng dự kiến:** 1.0 ngày | **Tài liệu tham chiếu:** [docs/SRS_04_GOI_Y_NHAP_HANG.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_04_GOI_Y_NHAP_HANG.md)
+### GIAI ĐOẠN 4: TDD PHÂN HỆ 04 - GỢI Ý NHẬP HÀNG & TỰ ĐỘNG TẠO PO (`US-4.1` - SMART REPLENISHMENT & PO GENERATOR) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/SRS_04_GOI_Y_NHAP_HANG.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_04_GOI_Y_NHAP_HANG.md)
 
-#### Task 6: TDD Lớp Nghiệp vụ `ReplenishmentService` (`src/services/replenishment_service.py` & `tests/test_replenishment_service.py`)
+#### Task 6: TDD Lớp Nghiệp vụ `ReplenishmentService` (`src/services/replenishment_service.py` & `tests/test_replenishment_service.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - `FR-REP-01`: Dự báo nhu cầu tiêu thụ thích ứng $Demand_{T, i} = (0.70 \times RR_{14, i} + 0.30 \times RR_{30, i}) \times T \times S_{\text{factor}, i}$ cho chu kỳ $T = 14$ hoặc $T = 30$ ngày.
@@ -491,7 +491,7 @@ flowchart LR
     - `create_grouped_purchase_orders(selected_items: List[Dict[str, Any]], role: str = "ROLE_OWNER") -> Dict[str, Any]`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED): Viết bộ kiểm thử `tests/test_replenishment_service.py`**
+  - [x] **Step 1 (RED): Viết bộ kiểm thử `tests/test_replenishment_service.py`**
     ```python
     import os
     import unittest
@@ -531,21 +531,21 @@ flowchart LR
             grouped = self.service.preview_po_grouping(sample_items)
             self.assertEqual(len(grouped), 2)  # Gom thành 2 đơn PO: Casper (2 SKU) và Aqua (1 SKU)
     ```
-  - [ ] **Step 2: Chạy test để xác nhận trạng thái RED**
+  - [x] **Step 2: Chạy test để xác nhận trạng thái RED**
     - Run: `.venv/bin/python -m unittest tests/test_replenishment_service.py -v`
     - Expected: `FAIL / ModuleNotFoundError`.
-  - [ ] **Step 3 (GREEN): Lập trình `src/services/replenishment_service.py`**
+  - [x] **Step 3 (GREEN): Lập trình `src/services/replenishment_service.py`**
     - Cài đặt đầy đủ thuật toán dự báo, tính `Confidence Score`, làm tròn `MOQ`, cân đối ngân sách và transaction tạo đơn PO mới (kèm rollback test hoặc dọn dẹp bản ghi test).
-  - [ ] **Step 4: Chạy test để xác nhận trạng thái GREEN**
+  - [x] **Step 4: Chạy test để xác nhận trạng thái GREEN**
     - Run: `.venv/bin/python -m unittest tests/test_replenishment_service.py -v`
     - Expected: `OK`.
-  - [ ] **Step 5: Commit Task 6**
+  - [x] **Step 5: Commit Task 6**
     ```bash
     git add src/services/replenishment_service.py tests/test_replenishment_service.py
     git commit -m "feat(mod04): implement ReplenishmentService and PO grouping with TDD"
     ```
 
-#### Task 7: Lập trình Giao diện Module 04 trên Streamlit (`src/views/tab_replenishment_view.py`)
+#### Task 7: Lập trình Giao diện Module 04 trên Streamlit (`src/views/tab_replenishment_view.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - Thanh điều khiển chu kỳ dự báo (`14 ngày` / `30 ngày`), hạn mức ngân sách nhập hàng (`Budget Cap`) và lọc theo Hãng.
@@ -557,11 +557,11 @@ flowchart LR
   - Consumes: `ReplenishmentService` từ `src/services/replenishment_service.py`.
   - Produces: `render_tab_replenishment(rep_service: ReplenishmentService, role: str = "ROLE_OWNER") -> None`.
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Hiện thực hóa `render_tab_replenishment` trong `src/views/tab_replenishment_view.py`**
-  - [ ] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
+  - [x] **Step 1: Hiện thực hóa `render_tab_replenishment` trong `src/views/tab_replenishment_view.py`**
+  - [x] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
     - Run: `.venv/bin/python -c "import src.views.tab_replenishment_view" && .venv/bin/python -m unittest discover tests`
     - Expected: `OK`.
-  - [ ] **Step 3: Commit Task 7**
+  - [x] **Step 3: Commit Task 7**
     ```bash
     git add src/views/tab_replenishment_view.py
     git commit -m "feat(mod04-ui): add Streamlit view for Smart Replenishment & PO Generator"
