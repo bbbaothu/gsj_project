@@ -9,6 +9,12 @@ PRAGMA foreign_keys = ON;
 -- ----------------------------------------------------------------------------
 -- 1. BẢNG CHI NHÁNH / KHO HÀNG (DIM_BRANCHES)
 -- ----------------------------------------------------------------------------
+DROP TABLE IF EXISTS FACT_COMMISSION_LEDGER;
+DROP TABLE IF EXISTS FACT_SERVICE_APPOINTMENTS;
+DROP TABLE IF EXISTS SYS_CRM_INTERACTION_LOG;
+DROP TABLE IF EXISTS FACT_CLEARANCE_CAMPAIGNS;
+DROP TABLE IF EXISTS EXT_MARKET_PRICES;
+DROP TABLE IF EXISTS SYS_ALERT_SNOOZE_LOG;
 DROP TABLE IF EXISTS FACT_WARRANTIES;
 DROP TABLE IF EXISTS FACT_INVOICE_SERIALS;
 DROP TABLE IF EXISTS FACT_INVOICES_LINES;
@@ -105,6 +111,12 @@ CREATE TABLE DIM_PRODUCTS (
     has_serial INTEGER NOT NULL DEFAULT 1 CHECK (has_serial IN (0, 1)), -- 1: Quản lý theo Serial/IMEI, 0: Hàng phụ kiện/dịch vụ
     is_direct_sale INTEGER NOT NULL DEFAULT 1 CHECK (is_direct_sale IN (0, 1)), -- Cho phép bán trực tiếp tại POS
     is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)), -- Đang kinh doanh
+    lead_time_days INTEGER NOT NULL DEFAULT 3 CHECK (lead_time_days >= 1), -- Thời gian giao hàng chuẩn của NCC (ngày)
+    moq INTEGER NOT NULL DEFAULT 1 CHECK (moq >= 1),    -- Số lượng đặt hàng tối thiểu (MOQ)
+    pack_size INTEGER NOT NULL DEFAULT 1 CHECK (pack_size >= 1), -- Quy cách đóng thùng/kiện chẵn
+    seasonality TEXT NOT NULL DEFAULT 'YEAR_ROUND' CHECK (seasonality IN ('SUMMER', 'WINTER', 'YEAR_ROUND')), -- Tính mùa vụ
+    lifecycle_status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (lifecycle_status IN ('ACTIVE', 'EOL')), -- Vòng đời sản phẩm
+    map_price REAL NOT NULL DEFAULT 0.0 CHECK (map_price >= 0), -- Giá bán công khai tối thiểu theo cam kết hãng (MAP)
     specifications TEXT,                                -- Thông số kỹ thuật (JSON string: công suất, kích thước màn hình, inverter...)
     created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime'))
 );
@@ -509,3 +521,104 @@ BEGIN
         0
     );
 END;
+
+-- ============================================================================
+-- 14. CÁC BẢNG NGHIỆP VỤ MỞ RỘNG CHO MODULE 02 - 06 (STOCK SENSE V2)
+-- ============================================================================
+
+-- M2 (FR-ACT-04): Nhật ký tạm hoãn cảnh báo tồn kho (Snooze Log)
+CREATE TABLE IF NOT EXISTS SYS_ALERT_SNOOZE_LOG (
+    snooze_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_code TEXT NOT NULL,
+    snooze_days INTEGER NOT NULL CHECK (snooze_days IN (7, 14, 30)),
+    snooze_until TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    created_by TEXT NOT NULL DEFAULT 'NV0001',
+    is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+    created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    FOREIGN KEY (product_code) REFERENCES DIM_PRODUCTS(product_code) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_snooze_product ON SYS_ALERT_SNOOZE_LOG(product_code, is_active);
+
+-- M3 (FR-CLR-05): Radar đối chiếu giá thị trường & đối thủ cạnh tranh
+CREATE TABLE IF NOT EXISTS EXT_MARKET_PRICES (
+    market_price_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_code TEXT NOT NULL,
+    competitor_name TEXT NOT NULL,
+    competitor_price REAL NOT NULL CHECK (competitor_price >= 0),
+    promo_note TEXT,
+    crawled_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    FOREIGN KEY (product_code) REFERENCES DIM_PRODUCTS(product_code) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_market_prices_product ON EXT_MARKET_PRICES(product_code);
+
+-- M3 (FR-CLR-01..04): Chiến dịch xả hàng thông minh
+CREATE TABLE IF NOT EXISTS FACT_CLEARANCE_CAMPAIGNS (
+    campaign_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_code TEXT NOT NULL,
+    tactic_code TEXT NOT NULL CHECK (tactic_code IN ('PA1', 'PA2', 'PA3', 'PA4')),
+    target_qty INTEGER NOT NULL CHECK (target_qty > 0),
+    clearance_price REAL NOT NULL CHECK (clearance_price >= 0),
+    promo_cost_per_unit REAL NOT NULL DEFAULT 0.0 CHECK (promo_cost_per_unit >= 0),
+    expected_profit REAL NOT NULL DEFAULT 0.0,
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('DRAFT', 'SIMULATED', 'PENDING_APPROVAL', 'ACTIVE', 'COMPLETED', 'CANCELLED')),
+    approved_by TEXT,
+    created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    FOREIGN KEY (product_code) REFERENCES DIM_PRODUCTS(product_code) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE INDEX IF NOT EXISTS idx_clearance_product ON FACT_CLEARANCE_CAMPAIGNS(product_code, status);
+
+-- M5 (FR-CRM-03..04): Nhật ký tương tác CSKH & Kiểm soát Cooldown 30 ngày
+CREATE TABLE IF NOT EXISTS SYS_CRM_INTERACTION_LOG (
+    interaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_code TEXT NOT NULL,
+    product_code TEXT NOT NULL,
+    serial_number TEXT,
+    trigger_type TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT 'CALL' CHECK (channel IN ('CALL', 'ZALO_ZNS')),
+    outcome TEXT NOT NULL,
+    cooldown_until TEXT NOT NULL,
+    note TEXT,
+    created_by TEXT NOT NULL DEFAULT 'NV0001',
+    created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    FOREIGN KEY (customer_code) REFERENCES DIM_CUSTOMERS(customer_code) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (product_code) REFERENCES DIM_PRODUCTS(product_code) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE INDEX IF NOT EXISTS idx_crm_log_customer ON SYS_CRM_INTERACTION_LOG(customer_code, cooldown_until);
+
+-- M5 (FR-CRM-05): Lịch hẹn Kỹ thuật viên bảo dưỡng / lắp đặt tại nhà
+CREATE TABLE IF NOT EXISTS FACT_SERVICE_APPOINTMENTS (
+    appointment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_code TEXT NOT NULL,
+    product_code TEXT NOT NULL,
+    serial_number TEXT,
+    technician_code TEXT NOT NULL,
+    appointment_date TEXT NOT NULL,
+    time_slot TEXT NOT NULL,
+    service_name TEXT NOT NULL,
+    expected_fee REAL NOT NULL DEFAULT 0.0 CHECK (expected_fee >= 0),
+    status TEXT NOT NULL DEFAULT 'WORK_ASSIGNED' CHECK (status IN ('CONVERTED_BOOKING', 'WORK_ASSIGNED', 'WORK_DONE', 'CANCELLED')),
+    note TEXT,
+    created_at TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
+    FOREIGN KEY (customer_code) REFERENCES DIM_CUSTOMERS(customer_code) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (product_code) REFERENCES DIM_PRODUCTS(product_code) ON UPDATE CASCADE ON DELETE RESTRICT,
+    FOREIGN KEY (technician_code) REFERENCES DIM_EMPLOYEES(employee_code) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE INDEX IF NOT EXISTS idx_appt_tech_slot ON FACT_SERVICE_APPOINTMENTS(technician_code, appointment_date, time_slot);
+
+-- M6 (FR-PRF-04): Sổ hoa hồng bán kèm Phụ kiện & Dịch vụ
+CREATE TABLE IF NOT EXISTS FACT_COMMISSION_LEDGER (
+    ledger_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    employee_code TEXT NOT NULL,
+    period_label TEXT NOT NULL DEFAULT 'Tháng 10-11/2026',
+    accessory_sales REAL NOT NULL DEFAULT 0.0 CHECK (accessory_sales >= 0),
+    accessory_profit REAL NOT NULL DEFAULT 0.0,
+    service_sales REAL NOT NULL DEFAULT 0.0 CHECK (service_sales >= 0),
+    service_profit REAL NOT NULL DEFAULT 0.0,
+    commission_amount REAL NOT NULL DEFAULT 0.0 CHECK (commission_amount >= 0),
+    status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED')),
+    approved_at TEXT,
+    approved_by TEXT,
+    FOREIGN KEY (employee_code) REFERENCES DIM_EMPLOYEES(employee_code) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_comm_emp_period ON FACT_COMMISSION_LEDGER(employee_code, period_label);

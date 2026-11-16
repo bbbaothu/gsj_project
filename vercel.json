@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/prototypes/prototype_module_01_tong_quan_kho.html"
+    },
+    {
+      "source": "/prototype",
+      "destination": "/prototypes/prototype_module_01_tong_quan_kho.html"
+    }
+  ]
+}

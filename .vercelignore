@@ -1,0 +1,14 @@
+.venv/
+.agents/
+.streamlit/
+data/
+docs/
+design-system/
+src/
+tests/
+skills-lock.json
+requirements.txt
+.python-version
+*.pyc
+__pycache__/
+.DS_Store
