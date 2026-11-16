@@ -354,10 +354,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 3: TDD PHÂN HỆ 03 - GỢI Ý XẢ HÀNG & ĐỊNH GIÁ CẠNH TRANH (`US-3.1` & `US-3.2` - SMART CLEARANCE & PRICING RADAR)
-**Thời lượng dự kiến:** 1.0 ngày | **Tài liệu tham chiếu:** [docs/SRS_03_GOI_Y_XA_HANG.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_03_GOI_Y_XA_HANG.md)
+### GIAI ĐOẠN 3: TDD PHÂN HỆ 03 - GỢI Ý XẢ HÀNG & ĐỊNH GIÁ CẠNH TRANH (`US-3.1` & `US-3.2` - SMART CLEARANCE & PRICING RADAR) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/SRS_03_GOI_Y_XA_HANG.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_03_GOI_Y_XA_HANG.md)
 
-#### Task 4: TDD Lớp Nghiệp vụ `ClearanceService` (`src/services/clearance_service.py` & `tests/test_clearance_service.py`)
+#### Task 4: TDD Lớp Nghiệp vụ `ClearanceService` (`src/services/clearance_service.py` & `tests/test_clearance_service.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - `FR-CLR-01`: Tính lượng hàng cần xả mục tiêu $Q_{\text{clear}}$ ($SOH$ nếu EOL/Trái mùa; $\max(0, SOH - max\_stock)$ nếu đọng vốn) và tổng vốn lưu động dự kiến thu hồi $\sum (Q_{\text{clear}} \times cost\_price)$.
@@ -382,7 +382,7 @@ flowchart LR
     - `approve_clearance_campaign(product_code: str, tactic_code: str, target_qty: int, clearance_price: float, role: str = "ROLE_OWNER") -> Dict[str, Any]`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED): Viết bộ kiểm thử `tests/test_clearance_service.py`**
+  - [x] **Step 1 (RED): Viết bộ kiểm thử `tests/test_clearance_service.py`**
     ```python
     import os
     import unittest
@@ -427,20 +427,20 @@ flowchart LR
             self.assertFalse(res["success"])
             self.assertEqual(res["error_code"], "ERR_CLR_001")
     ```
-  - [ ] **Step 2: Chạy test để xác nhận trạng thái RED**
+  - [x] **Step 2: Chạy test để xác nhận trạng thái RED**
     - Run: `.venv/bin/python -m unittest tests/test_clearance_service.py -v`
     - Expected: `FAIL / ModuleNotFoundError`.
-  - [ ] **Step 3 (GREEN): Lập trình `src/services/clearance_service.py`**
-  - [ ] **Step 4: Chạy test để xác nhận trạng thái GREEN**
+  - [x] **Step 3 (GREEN): Lập trình `src/services/clearance_service.py`**
+  - [x] **Step 4: Chạy test để xác nhận trạng thái GREEN**
     - Run: `.venv/bin/python -m unittest tests/test_clearance_service.py -v`
     - Expected: `OK` (100% test cases Pass).
-  - [ ] **Step 5: Commit Task 4**
+  - [x] **Step 5: Commit Task 4**
     ```bash
     git add src/services/clearance_service.py tests/test_clearance_service.py
     git commit -m "feat(mod03): implement ClearanceService and pricing radar with TDD"
     ```
 
-#### Task 5: Lập trình Giao diện Module 03 trên Streamlit (`src/views/tab_clearance_view.py`)
+#### Task 5: Lập trình Giao diện Module 03 trên Streamlit (`src/views/tab_clearance_view.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - Hiển thị 4 Thẻ KPI xả hàng + Dải 4 thẻ sản phẩm ứng viên xả tồn (cho phép click chọn hoặc tự động nhận SKU chuyển sang từ Module 02 qua `st.session_state["selected_clearance_sku"]`).
@@ -453,11 +453,11 @@ flowchart LR
   - Consumes: `ClearanceService` từ `src/services/clearance_service.py`.
   - Produces: `render_tab_clearance(clearance_service: ClearanceService, role: str = "ROLE_OWNER") -> None`.
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Hiện thực hóa `render_tab_clearance` trong `src/views/tab_clearance_view.py`**
-  - [ ] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
+  - [x] **Step 1: Hiện thực hóa `render_tab_clearance` trong `src/views/tab_clearance_view.py`**
+  - [x] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
     - Run: `.venv/bin/python -c "import src.views.tab_clearance_view" && .venv/bin/python -m unittest discover tests`
     - Expected: `OK`.
-  - [ ] **Step 3: Commit Task 5**
+  - [x] **Step 3: Commit Task 5**
     ```bash
     git add src/views/tab_clearance_view.py
     git commit -m "feat(mod03-ui): add Streamlit view for Smart Clearance & Pricing Radar"
