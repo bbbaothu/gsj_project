@@ -240,10 +240,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 2: TDD PHÂN HỆ 02 - CẦN XỬ LÝ HÔM NAY (`US-2.1` & `US-2.2` - ACTIONABLE DAILY ALERTS)
-**Thời lượng dự kiến:** 1.0 ngày | **Tài liệu tham chiếu:** [docs/SRS_02_CAN_XU_LY_HOM_NAY.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_02_CAN_XU_LY_HOM_NAY.md)
+### GIAI ĐOẠN 2: TDD PHÂN HỆ 02 - CẦN XỬ LÝ HÔM NAY (`US-2.1` & `US-2.2` - ACTIONABLE DAILY ALERTS) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/SRS_02_CAN_XU_LY_HOM_NAY.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_02_CAN_XU_LY_HOM_NAY.md)
 
-#### Task 2: TDD Lớp Nghiệp vụ `AlertService` (`src/services/alert_service.py` & `tests/test_alert_service.py`)
+#### Task 2: TDD Lớp Nghiệp vụ `AlertService` (`src/services/alert_service.py` & `tests/test_alert_service.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - `FR-ACT-01`: Tính 4 chỉ số KPI tác chiến đầu ngày (Tổng vốn kẹt ở hàng chậm, Số SKU tồn chết/vượt trần, Số SKU sắp hết mùa vụ, Số SKU nguy cơ cháy hàng kèm doanh thu mất dự kiến/ngày; ẩn vốn kẹt khi `role == "ROLE_SALES"`).
@@ -265,7 +265,7 @@ flowchart LR
     - `snooze_alert(product_code: str, snooze_days: int, reason: str, role: str = "ROLE_OWNER", ref_date: str = "2026-11-04") -> Dict[str, Any]`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED): Viết bộ kiểm thử `tests/test_alert_service.py` bao phủ 5 ca kiểm thử cốt lõi**
+  - [x] **Step 1 (RED): Viết bộ kiểm thử `tests/test_alert_service.py` bao phủ 5 ca kiểm thử cốt lõi**
     ```python
     import os
     import unittest
@@ -317,21 +317,21 @@ flowchart LR
             unauth_res = self.service.snooze_alert("TV-LG-55C3", 14, "Giữ hàng trưng bày sự kiện cuối năm", role="ROLE_SALES")
             self.assertFalse(unauth_res["success"])
     ```
-  - [ ] **Step 2: Chạy test để xác nhận trạng thái RED**
+  - [x] **Step 2: Chạy test để xác nhận trạng thái RED**
     - Run: `.venv/bin/python -m unittest tests/test_alert_service.py -v`
     - Expected: `FAIL / ModuleNotFoundError: No module named 'src.services.alert_service'`.
-  - [ ] **Step 3 (GREEN): Lập trình `src/services/alert_service.py`**
+  - [x] **Step 3 (GREEN): Lập trình `src/services/alert_service.py`**
     - Cài đặt đầy đủ các công thức $RR_{30}$, $DSI$, $RR_7$, $DOS$, khử báo động giả `In-Transit` và ghi/khôi phục `SYS_ALERT_SNOOZE_LOG`.
-  - [ ] **Step 4: Chạy test để xác nhận trạng thái GREEN**
+  - [x] **Step 4: Chạy test để xác nhận trạng thái GREEN**
     - Run: `.venv/bin/python -m unittest tests/test_alert_service.py -v`
     - Expected: `OK` (100% test cases Pass).
-  - [ ] **Step 5: Commit Task 2**
+  - [x] **Step 5: Commit Task 2**
     ```bash
     git add src/services/alert_service.py tests/test_alert_service.py
     git commit -m "feat(mod02): implement AlertService with TDD"
     ```
 
-#### Task 3: Lập trình Giao diện Module 02 trên Streamlit (`src/views/tab_alerts_view.py`)
+#### Task 3: Lập trình Giao diện Module 02 trên Streamlit (`src/views/tab_alerts_view.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - Hiển thị 4 Thẻ KPI tác chiến đầu ngày + 2 Biểu đồ trực quan (Biểu đồ Phân bổ vốn kẹt theo mặt hàng & Biểu đồ Đường băng tồn kho `DOS` so với ngưỡng `Lead Time 3 ngày`).
@@ -342,11 +342,11 @@ flowchart LR
   - Consumes: `AlertService` từ `src/services/alert_service.py`.
   - Produces: `render_tab_alerts(alert_service: AlertService, role: str = "ROLE_OWNER") -> None`.
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Hiện thực hóa `render_tab_alerts` trong `src/views/tab_alerts_view.py`**
-  - [ ] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
+  - [x] **Step 1: Hiện thực hóa `render_tab_alerts` trong `src/views/tab_alerts_view.py`**
+  - [x] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
     - Run: `.venv/bin/python -c "import src.views.tab_alerts_view" && .venv/bin/python -m unittest discover tests`
     - Expected: `OK` không lỗi cú pháp hoặc import.
-  - [ ] **Step 3: Commit Task 3**
+  - [x] **Step 3: Commit Task 3**
     ```bash
     git add src/views/tab_alerts_view.py
     git commit -m "feat(mod02-ui): add Streamlit view for Actionable Daily Alerts"
