@@ -58,11 +58,11 @@
 | Phân hệ (Module) | Mã User Story & SRS | Chức năng cốt lõi (Core Features) | Biểu đồ & Tương tác đặc thù (theo Prototype) | Trạng thái |
 | :--- | :--- | :--- | :--- | :---: |
 | **Module 01: Tổng quan kho** | `US-1.1`, `US-1.2`<br>[SRS_01](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_01_TONG_QUAN_KHO.md) | • 4 trụ cột tồn kho ($SOH, RES, AVL, INC$)<br>• Tra cứu Serial/IMEI & Kiểm tra $\Delta = 0$<br>• Điều phối đơn giữ cọc, trả góp & quá hạn 48h | • Biểu đồ Scatter 4 góc phần tư (Tồn kho vs Tốc độ bán)<br>• Ma trận dòng hàng 4 trạng thái & Expander hủy/xuất đơn | ✅ **ĐÃ HOÀN THÀNH** |
-| **Module 02: Cần xử lý hôm nay** | `US-2.1`, `US-2.2`<br>[SRS_02](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_02_CAN_XU_LY_HOM_NAY.md) | • Sàng lọc hàng chậm ($DSI > 60$), hết mùa, vượt trần<br>• Dự báo đứt hàng ($DOS = AVL / RR_7$ vs $Lead\,Time$)<br>• Khử báo động giả khi $INC > 0$ & Snooze cảnh báo | • Biểu đồ Phân bổ vốn kẹt + Biểu đồ Runway DOS vs LT<br>• Nút chuyển 1 chạm sang Xả hàng (M3) / Nhập hàng (M4)<br>• Modal/Form Tạm hoãn cảnh báo 7/14/30 ngày | ⏳ **KẾ HOẠCH MỚI** |
-| **Module 03: Gợi ý xả hàng** | `US-3.1`, `US-3.2`<br>[SRS_03](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_03_GOI_Y_XA_HANG.md) | • Tính lượng xả mục tiêu $Q_{\text{clear}}$ & Vốn thu hồi<br>• Động cơ 4 kịch bản khuyến mại (PA1–PA4)<br>• Simulator dòng tiền & Radar giá đối thủ + $PAI$ | • Dải 4 thẻ SKU đề xuất xả theo ngành hàng<br>• Biểu đồ So sánh Vốn thu hồi & Lãi ròng 4 chiến thuật<br>• Bảng Radar đối chiếu giá ĐMX, MediaMart, Online Min | ⏳ **KẾ HOẠCH MỚI** |
-| **Module 04: Gợi ý nhập hàng** | `US-4.1`<br>[SRS_04](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_04_GOI_Y_NHAP_HANG.md) | • Dự báo thích ứng $Demand_T$ (`RR14/RR30`, $S_{\text{factor}}$)<br>• Tính $Safety\,Stock$, $Q_{\text{suggested}}$, độ tin cậy $CV$<br>• Kiểm soát trần ngân sách, MOQ & Gom PO theo Hãng | • Biểu đồ Nhu cầu dự báo vs Tồn kho + Phân bổ ngân sách<br>• Bảng đề xuất nhập 4 trụ cột có chỉnh số lượng<br>• Modal Xem trước gom đơn PO theo Hãng & Xuất Excel | ⏳ **KẾ HOẠCH MỚI** |
-| **Module 05: Khách cần chăm sóc** | `US-5.1`<br>[SRS_05](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md) | • Quét 5 Điểm chạm vàng (Bảo dưỡng ĐH, Lõi RO, BH...)<br>• Chấm điểm `Priority Score` & Chặn spam 30 ngày<br>• Sinh AI Call Script cá nhân hóa & Đặt lịch thợ | • Biểu đồ Phễu 5 Điểm chạm + Tiến độ cuộc gọi/doanh thu<br>• Bảng hàng đợi khách hàng + Khung kịch bản gọi thoại<br>• Form chốt lịch hẹn phân công Kỹ thuật viên tận nhà | ⏳ **KẾ HOẠCH MỚI** |
-| **Module 06: Hiệu quả kinh doanh** | `US-6.1`<br>[SRS_06](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_06_HIEU_QUA_KINH_DOANH.md) | • Theo dõi Vốn gốc thu hồi & Lãi gộp hợp nhất<br>• Động cơ tính Tỷ lệ bán kèm ($Attach\,Rate\,\%$)<br>• Tính & duyệt hoa hồng bán kèm (`15% PK + 20% DV`) | • Biểu đồ Thác nước (`Waterfall`) phân rã 4 nguồn lãi<br>• Biểu đồ Ngang Attach-Rate theo ngành vs Chuẩn 60%/70%<br>• Bảng ngành hàng & Bảng xếp hạng/duyệt chi hoa hồng | ⏳ **KẾ HOẠCH MỚI** |
+| **Module 02: Cần xử lý hôm nay** | `US-2.1`, `US-2.2`<br>[SRS_02](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_02_CAN_XU_LY_HOM_NAY.md) | • Sàng lọc hàng chậm ($DSI > 60$), hết mùa, vượt trần<br>• Dự báo đứt hàng ($DOS = AVL / RR_7$ vs $Lead\,Time$)<br>• Khử báo động giả khi $INC > 0$ & Snooze cảnh báo | • Biểu đồ Phân bổ vốn kẹt + Biểu đồ Runway DOS vs LT<br>• Nút chuyển 1 chạm sang Xả hàng (M3) / Nhập hàng (M4)<br>• Modal/Form Tạm hoãn cảnh báo 7/14/30 ngày | ✅ **ĐÃ HOÀN THÀNH** |
+| **Module 03: Gợi ý xả hàng** | `US-3.1`, `US-3.2`<br>[SRS_03](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_03_GOI_Y_XA_HANG.md) | • Tính lượng xả mục tiêu $Q_{\text{clear}}$ & Vốn thu hồi<br>• Động cơ 4 kịch bản khuyến mại (PA1–PA4)<br>• Simulator dòng tiền & Radar giá đối thủ + $PAI$ | • Dải 4 thẻ SKU đề xuất xả theo ngành hàng<br>• Biểu đồ So sánh Vốn thu hồi & Lãi ròng 4 chiến thuật<br>• Bảng Radar đối chiếu giá ĐMX, MediaMart, Online Min | ✅ **ĐÃ HOÀN THÀNH** |
+| **Module 04: Gợi ý nhập hàng** | `US-4.1`<br>[SRS_04](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_04_GOI_Y_NHAP_HANG.md) | • Dự báo thích ứng $Demand_T$ (`RR14/RR30`, $S_{\text{factor}}$)<br>• Tính $Safety\,Stock$, $Q_{\text{suggested}}$, độ tin cậy $CV$<br>• Kiểm soát trần ngân sách, MOQ & Gom PO theo Hãng | • Biểu đồ Nhu cầu dự báo vs Tồn kho + Phân bổ ngân sách<br>• Bảng đề xuất nhập 4 trụ cột có chỉnh số lượng<br>• Modal Xem trước gom đơn PO theo Hãng & Xuất Excel | ✅ **ĐÃ HOÀN THÀNH** |
+| **Module 05: Khách cần chăm sóc** | `US-5.1`<br>[SRS_05](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md) | • Quét 5 Điểm chạm vàng (Bảo dưỡng ĐH, Lõi RO, BH...)<br>• Chấm điểm `Priority Score` & Chặn spam 30 ngày<br>• Sinh AI Call Script cá nhân hóa & Đặt lịch thợ | • Biểu đồ Phễu 5 Điểm chạm + Tiến độ cuộc gọi/doanh thu<br>• Bảng hàng đợi khách hàng + Khung kịch bản gọi thoại<br>• Form chốt lịch hẹn phân công Kỹ thuật viên tận nhà | ✅ **ĐÃ HOÀN THÀNH** |
+| **Module 06: Hiệu quả kinh doanh** | `US-6.1`<br>[SRS_06](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_06_HIEU_QUA_KINH_DOANH.md) | • Theo dõi Vốn gốc thu hồi & Lãi gộp hợp nhất<br>• Động cơ tính Tỷ lệ bán kèm ($Attach\,Rate\,\%$)<br>• Tính & duyệt hoa hồng bán kèm (`15% PK + 20% DV`) | • Biểu đồ Thác nước (`Waterfall`) phân rã 4 nguồn lãi<br>• Biểu đồ Ngang Attach-Rate theo ngành vs Chuẩn 60%/70%<br>• Bảng ngành hàng & Bảng xếp hạng/duyệt chi hoa hồng | ✅ **ĐÃ HOÀN THÀNH** |
 
 ---
 
@@ -798,10 +798,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 7: TÍCH HỢP MASTER HUB 6 MODULE, ĐỒNG BỘ DESIGN SYSTEM & KIỂM THỬ TÍCH HỢP TOÀN DIỆN
-**Thời lượng dự kiến:** 0.5 ngày | **Tài liệu tham chiếu:** [docs/DESIGN_SYSTEM_DIENMAY_KHOVAN.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/DESIGN_SYSTEM_DIENMAY_KHOVAN.md) & [prototypes/stock_sense_dashboard.html](file:///Users/doanphambaothu/Documents/gsj_project/prototypes/stock_sense_dashboard.html)
+### GIAI ĐOẠN 7: TÍCH HỢP MASTER HUB 6 MODULE, ĐỒNG BỘ DESIGN SYSTEM & KIỂM THỬ TÍCH HỢP TOÀN DIỆN [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 0.5 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/DESIGN_SYSTEM_DIENMAY_KHOVAN.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/DESIGN_SYSTEM_DIENMAY_KHOVAN.md) & [prototypes/stock_sense_dashboard.html](file:///Users/doanphambaothu/Documents/gsj_project/prototypes/stock_sense_dashboard.html)
 
-#### Task 12: Đồng bộ Design System (`src/views/styles.py`) & Tái cấu trúc Master Entry Point (`src/app_dashboard.py`)
+#### Task 12: Đồng bộ Design System (`src/views/styles.py`) & Tái cấu trúc Master Entry Point (`src/app_dashboard.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - Tạo module `src/views/styles.py` cung cấp hàm `inject_stock_sense_styles()` nhúng bộ CSS chuẩn **Stock Sense Industrial Utilitarian** (font chữ `Space Grotesk`, `Inter`, `JetBrains Mono`, bảng màu `#0F172A`, `#2563EB`, `#059669`, `#D97706`, `#DC2626`, style cho KPI Card, Badge trạng thái và bảng dữ liệu mật độ cao).
@@ -821,16 +821,16 @@ flowchart LR
   - Modify: [src/app_dashboard.py](file:///Users/doanphambaothu/Documents/gsj_project/src/app_dashboard.py)
 
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Tạo `src/views/styles.py` với CSS tokens và helper components**
-  - [ ] **Step 2: Cập nhật `src/app_dashboard.py` kết nối 6 Module qua Sidebar navigation**
-  - [ ] **Step 3: Kiểm tra khởi chạy ứng dụng Streamlit headless và kiểm tra mã trạng thái HTTP 200**
-  - [ ] **Step 4: Commit Task 12**
+  - [x] **Step 1: Tạo `src/views/styles.py` với CSS tokens và helper components**
+  - [x] **Step 2: Cập nhật `src/app_dashboard.py` kết nối 6 Module qua Sidebar navigation**
+  - [x] **Step 3: Kiểm tra khởi chạy ứng dụng Streamlit headless và kiểm tra mã trạng thái HTTP 200**
+  - [x] **Step 4: Commit Task 12**
     ```bash
     git add src/views/styles.py src/app_dashboard.py
     git commit -m "feat(master-ui): integrate all 6 modules into unified Stock Sense Streamlit dashboard"
     ```
 
-#### Task 13: Kiểm thử Tích hợp Toàn diện 6 Module (`tests/test_master_integration.py`)
+#### Task 13: Kiểm thử Tích hợp Toàn diện 6 Module (`tests/test_master_integration.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - Kiểm thử tích hợp xuyên suốt cả 6 Module (`End-to-End Service Integration`):
@@ -840,11 +840,11 @@ flowchart LR
 * **Files:**
   - Create: `tests/test_master_integration.py`
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1: Viết `tests/test_master_integration.py` kiểm tra liên thông 6 Module**
-  - [ ] **Step 2: Chạy toàn bộ Test Suite của dự án**
+  - [x] **Step 1: Viết `tests/test_master_integration.py` kiểm tra liên thông 6 Module**
+  - [x] **Step 2: Chạy toàn bộ Test Suite của dự án**
     - Run: `.venv/bin/python -m unittest discover tests -v`
-    - Expected: 100% bài kiểm thử trên cả 9 file test (`test_inventory_service`, `test_order_service`, `test_dashboard_integration`, `test_schema_and_seed_v2`, `test_alert_service`, `test_clearance_service`, `test_replenishment_service`, `test_crm_service`, `test_master_integration`) đều `PASSED` trong $< 1.0\text{s}$.
-  - [ ] **Step 3: Commit Task 13 & Cập nhật trạng thái hoàn thành vào Plan**
+    - Expected: 100% bài kiểm thử trên cả 10 file test (`39/39` tests) đều `PASSED` (`OK`).
+  - [x] **Step 3: Commit Task 13 & Cập nhật trạng thái hoàn thành vào Plan**
     ```bash
     git add tests/test_master_integration.py docs/IMPLEMENTATION_PLAN_STOCK_SENSE.md
     git commit -m "test(e2e): add full 6-module integration test suite"
