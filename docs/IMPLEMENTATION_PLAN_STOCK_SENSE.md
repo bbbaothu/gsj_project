@@ -569,10 +569,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 5: TDD PHÂN HỆ 05 - KHÁCH HÀNG CẦN CHĂM SÓC & SMART CRM (`US-5.1` - CUSTOMER RETENTION & SMART CRM)
-**Thời lượng dự kiến:** 1.0 ngày | **Tài liệu tham chiếu:** [docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md)
+### GIAI ĐOẠN 5: TDD PHÂN HỆ 05 - KHÁCH HÀNG CẦN CHĂM SÓC & SMART CRM (`US-5.1` - CUSTOMER RETENTION & SMART CRM) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_05_KHACH_HANG_CAN_CHAM_SOC.md)
 
-#### Task 8: TDD Lớp Nghiệp vụ `CrmService` (`src/services/crm_service.py` & `tests/test_crm_service.py`)
+#### Task 8: TDD Lớp Nghiệp vụ `CrmService` (`src/services/crm_service.py` & `tests/test_crm_service.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - `FR-CRM-01`: Động cơ quét 5 Điểm chạm Chăm sóc Định kỳ (`Care Triggers Engine`):
@@ -599,7 +599,7 @@ flowchart LR
     - `record_interaction_and_book_service(customer_code: str, product_code: str, serial_number: str, trigger_type: str, outcome: str, appointment_date: Optional[str] = None, time_slot: Optional[str] = None, technician_code: Optional[str] = None, expected_fee: float = 150_000, note: str = "", ref_date: str = "2026-11-10") -> Dict[str, Any]`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED): Viết bộ kiểm thử `tests/test_crm_service.py`**
+  - [x] **Step 1 (RED): Viết bộ kiểm thử `tests/test_crm_service.py`**
     ```python
     import os
     import unittest
@@ -647,20 +647,20 @@ flowchart LR
             )
             self.assertTrue(res1["success"])
     ```
-  - [ ] **Step 2: Chạy test để xác nhận trạng thái RED**
+  - [x] **Step 2: Chạy test để xác nhận trạng thái RED**
     - Run: `.venv/bin/python -m unittest tests/test_crm_service.py -v`
     - Expected: `FAIL / ModuleNotFoundError`.
-  - [ ] **Step 3 (GREEN): Lập trình `src/services/crm_service.py`**
-  - [ ] **Step 4: Chạy test để xác nhận trạng thái GREEN**
+  - [x] **Step 3 (GREEN): Lập trình `src/services/crm_service.py`**
+  - [x] **Step 4: Chạy test để xác nhận trạng thái GREEN**
     - Run: `.venv/bin/python -m unittest tests/test_crm_service.py -v`
     - Expected: `OK`.
-  - [ ] **Step 5: Commit Task 8**
+  - [x] **Step 5: Commit Task 8**
     ```bash
     git add src/services/crm_service.py tests/test_crm_service.py
     git commit -m "feat(mod05): implement CrmService care triggers and booking with TDD"
     ```
 
-#### Task 9: Lập trình Giao diện Module 05 trên Streamlit (`src/views/tab_crm_view.py`)
+#### Task 9: Lập trình Giao diện Module 05 trên Streamlit (`src/views/tab_crm_view.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - 4 Thẻ KPI CSKH (Khách cần liên hệ hôm nay, Hạn bảo dưỡng Điều hòa, Cơ hội bán chéo & sắp hết BH, Doanh số CSKH tháng này) + Thanh trạng thái chặn spam 30 ngày.
@@ -672,11 +672,11 @@ flowchart LR
   - Consumes: `CrmService` từ `src/services/crm_service.py`.
   - Produces: `render_tab_crm(crm_service: CrmService, role: str = "ROLE_OWNER") -> None`.
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Hiện thực hóa `render_tab_crm` trong `src/views/tab_crm_view.py`**
-  - [ ] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
+  - [x] **Step 1: Hiện thực hóa `render_tab_crm` trong `src/views/tab_crm_view.py`**
+  - [x] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
     - Run: `.venv/bin/python -c "import src.views.tab_crm_view" && .venv/bin/python -m unittest discover tests`
     - Expected: `OK`.
-  - [ ] **Step 3: Commit Task 9**
+  - [x] **Step 3: Commit Task 9**
     ```bash
     git add src/views/tab_crm_view.py
     git commit -m "feat(mod05-ui): add Streamlit view for Customer Retention & Smart CRM"
