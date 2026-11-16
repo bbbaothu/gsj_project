@@ -684,10 +684,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 6: TDD PHÂN HỆ 06 - HIỆU QUẢ KINH DOANH & THÁC NƯỚC LỢI NHUẬN (`US-6.1` - BUSINESS PERFORMANCE & PROFIT WATERFALL)
-**Thời lượng dự kiến:** 1.0 ngày | **Tài liệu tham chiếu:** [docs/SRS_06_HIEU_QUA_KINH_DOANH.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_06_HIEU_QUA_KINH_DOANH.md)
+### GIAI ĐOẠN 6: TDD PHÂN HỆ 06 - HIỆU QUẢ KINH DOANH & THÁC NƯỚC LỢI NHUẬN (`US-6.1` - BUSINESS PERFORMANCE & PROFIT WATERFALL) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tài liệu tham chiếu:** [docs/SRS_06_HIEU_QUA_KINH_DOANH.md](file:///Users/doanphambaothu/Documents/gsj_project/docs/SRS_06_HIEU_QUA_KINH_DOANH.md)
 
-#### Task 10: TDD Lớp Nghiệp vụ `PerformanceService` (`src/services/performance_service.py` & `tests/test_performance_service.py`)
+#### Task 10: TDD Lớp Nghiệp vụ `PerformanceService` (`src/services/performance_service.py` & `tests/test_performance_service.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - `FR-PRF-01`: Tính 4 thẻ KPI tài chính hợp nhất (Tổng doanh thu & Vốn gốc thu hồi về két, Lợi nhuận gộp hợp nhất, Doanh số bán kèm Phụ kiện + Dịch vụ, Tỷ lệ gắn kèm `Attach-Rate %` toàn cửa hàng; ẩn toàn bộ số liệu vốn gốc & lãi gộp khi `role == "ROLE_SALES"`).
@@ -711,7 +711,7 @@ flowchart LR
     - `export_financial_summary_csv() -> bytes`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED): Viết bộ kiểm thử `tests/test_performance_service.py`**
+  - [x] **Step 1 (RED): Viết bộ kiểm thử `tests/test_performance_service.py`**
     ```python
     import os
     import unittest
@@ -759,20 +759,20 @@ flowchart LR
                 expected_comm = round(s["acc_profit"] * 0.15 + s["srv_profit"] * 0.20, 0)
                 self.assertAlmostEqual(s["commission_amount"], expected_comm, delta=1000)
     ```
-  - [ ] **Step 2: Chạy test để xác nhận trạng thái RED**
+  - [x] **Step 2: Chạy test để xác nhận trạng thái RED**
     - Run: `.venv/bin/python -m unittest tests/test_performance_service.py -v`
     - Expected: `FAIL / ModuleNotFoundError`.
-  - [ ] **Step 3 (GREEN): Lập trình `src/services/performance_service.py`**
-  - [ ] **Step 4: Chạy test để xác nhận trạng thái GREEN**
+  - [x] **Step 3 (GREEN): Lập trình `src/services/performance_service.py`**
+  - [x] **Step 4: Chạy test để xác nhận trạng thái GREEN**
     - Run: `.venv/bin/python -m unittest tests/test_performance_service.py -v`
     - Expected: `OK`.
-  - [ ] **Step 5: Commit Task 10**
+  - [x] **Step 5: Commit Task 10**
     ```bash
     git add src/services/performance_service.py tests/test_performance_service.py
     git commit -m "feat(mod06): implement PerformanceService waterfall and attach-rate with TDD"
     ```
 
-#### Task 11: Lập trình Giao diện Module 06 trên Streamlit (`src/views/tab_performance_view.py`)
+#### Task 11: Lập trình Giao diện Module 06 trên Streamlit (`src/views/tab_performance_view.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - 4 Thẻ KPI tài chính hợp nhất + Nút tải Báo cáo Tài chính (`.csv` / `.xlsx`).
@@ -786,11 +786,11 @@ flowchart LR
   - Consumes: `PerformanceService` từ `src/services/performance_service.py`.
   - Produces: `render_tab_performance(perf_service: PerformanceService, role: str = "ROLE_OWNER") -> None`.
 * **Cách thức triển khai (How-to):**
-  - [ ] **Step 1: Hiện thực hóa `render_tab_performance` trong `src/views/tab_performance_view.py`**
-  - [ ] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
+  - [x] **Step 1: Hiện thực hóa `render_tab_performance` trong `src/views/tab_performance_view.py`**
+  - [x] **Step 2: Kiểm tra import và chạy lại toàn bộ unittest**
     - Run: `.venv/bin/python -c "import src.views.tab_performance_view" && .venv/bin/python -m unittest discover tests`
     - Expected: `OK`.
-  - [ ] **Step 3: Commit Task 11**
+  - [x] **Step 3: Commit Task 11**
     ```bash
     git add src/views/tab_performance_view.py
     git commit -m "feat(mod06-ui): add Streamlit view for Business Performance & Waterfall"
