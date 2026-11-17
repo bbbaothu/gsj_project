@@ -1,5 +1,8 @@
 """
-TDD Test Suite cho Giai đoạn 4: Module 03 Gợi ý xả hàng & Định giá cạnh tranh trên Plotly Dash.
+TDD Test Suite cho Module 03 (Parity V2):
+Khớp 100% Ảnh 2 — Inline Cashflow Bar trong thẻ PA1-PA4 (bỏ m3-tactic-chart),
+Simulator Presets (Khớp giá đối thủ, Cắt lỗ -5% vốn), Thang định vị giá & Sàn vốn,
+Radar mất mạng (ERR_CLR_003), nút Áp dụng giá gợi ý và Nhận định chiến lược từ Hệ thống.
 """
 import os
 import unittest
@@ -33,13 +36,24 @@ def _collect_ids(component) -> set:
     return ids
 
 
+def _collect_text(component) -> str:
+    if component is None:
+        return ""
+    if isinstance(component, (str, int, float, bool)):
+        return str(component)
+    children = getattr(component, "children", None)
+    if isinstance(children, (list, tuple)):
+        return " ".join(_collect_text(c) for c in children)
+    return _collect_text(children)
+
+
 class TestDashM3Clearance(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.services = _build_m3_services()
 
-    def test_m3_landmark_ids_match_prototype(self):
-        """Kiểm tra Panel M3 và 2 Modals (In tem xả đỏ, Chiến dịch) đủ ID chuẩn Prototype."""
+    def test_m3_landmark_ids_match_image2_and_remove_tactic_chart(self):
+        """Kiểm tra Panel M3 khớp Ảnh 2: bỏ m3-tactic-chart, đủ Presets, Price Ruler, Radar nút đồng bộ & Strategic Insight."""
         panel = build_m3_panel(self.services, active=False)
         modals = build_m3_modals()
         ids = _collect_ids(panel) | _collect_ids(modals)
@@ -54,29 +68,75 @@ class TestDashM3Clearance(unittest.TestCase):
             "m3CapitalProtectionBanner",
             "m3-discount-slider",
             "m3-qty-input",
+            "btn-m3-qty-dec",
+            "btn-m3-qty-inc",
+            "btn-m3-preset-default",
+            "btn-m3-preset-match-comp",
+            "btn-m3-preset-cut-loss",
             "m3SimBoxRevenue",
             "m3SimBoxCapital",
             "m3SimBoxPromoCost",
             "m3SimBoxNetProfit",
-            "m3-tactic-chart",
+            "btn-m3-toggle-offline",
+            "m3Err003Banner",
             "m3CompetitorListContainer",
+            "m3PricePositionRuler",
             "m3SuggestedPriceHero",
+            "m3SyncRadarPriceBtn",
+            "btn-m3-open-price-tag",
+            "m3StrategicInsightBox",
             "m3SaleTagModal",
             "m3CampaignModal",
             "btn-m3-approve-pos",
         ):
-            self.assertIn(req_id, ids, f"Thiếu ID '{req_id}' trong Module 3 Dash")
+            self.assertIn(req_id, ids, f"Thiếu ID '{req_id}' trong Module 3 Dash V2")
 
-    def test_m3_simulator_loss_warning_and_rbac_masking(self):
-        """Kiểm tra Simulator dòng tiền PA2, cảnh báo cắt lỗ 25% và bảo mật ROLE_SALES."""
+        self.assertNotIn("m3-tactic-chart", ids, "Phải bỏ biểu đồ m3-tactic-chart riêng vì đã tích hợp vào từng phương án PA1-PA4")
+
+        txt = _collect_text(panel)
+        for label in (
+            "1. CHỌN KỊCH BẢN KHUYẾN MẠI XẢ HÀNG",
+            "2. RADAR GIÁ THỊ TRƯỜNG",
+            "Thang định vị giá & Sàn vốn",
+            "GIÁ XẢ GỢI Ý TỐI ƯU",
+            "Nhận định chiến lược từ Hệ thống",
+            "Mặc định",
+            "Khớp giá đối thủ",
+            "Cắt lỗ (-5% vốn)",
+        ):
+            self.assertIn(label, txt, f"Thiếu nhãn giao diện Ảnh 2 '{label}'")
+
+        self.assertNotIn("Mã SKU", txt)
+
+    def test_m3_inline_bars_presets_radar_offline_and_rbac_masking(self):
+        """Kiểm tra thanh dòng tiền inline trong PA1-PA4, mô phỏng cắt lỗ -5%, giả lập mất mạng và bảo mật ROLE_SALES."""
         ws_ok = render_m3_workspace(self.services, sku="TV-LG-55C3", tactic_code="PA2", target_qty=10, extra_disc=0.0, role="ROLE_OWNER")
-        self.assertIn("225,0 tr", str(ws_ok["sim_capital"]))
+        tactics_html = str(ws_ok["tactic_cards"])
+        self.assertIn("Vốn thu hồi", str(ws_ok.get("legend_label", "Vốn thu hồi")))
+        self.assertIn("bg-emerald-500", tactics_html, "Mỗi thẻ PA1-PA4 phải nhúng trực tiếp thanh Lãi gộp ròng")
+        self.assertIn("bg-slate-800", tactics_html, "Mỗi thẻ PA1-PA4 phải nhúng trực tiếp thanh Vốn thu hồi")
+        self.assertIn("225,00 tr", str(ws_ok["sim_capital"]))
+        self.assertIn("Nhận định chiến lược", str(ws_ok["strategic_insight"]))
         self.assertEqual(ws_ok["cap_protect_style"]["display"], "none")
         self.assertEqual(ws_ok["sales_lock_style"]["display"], "none")
 
-        ws_loss = render_m3_workspace(self.services, sku="TV-LG-55C3", tactic_code="PA1", target_qty=10, extra_disc=25.0, role="ROLE_OWNER")
+        # Mô phỏng cắt lỗ -5% vốn qua price_override hoặc giảm sâu
+        ws_loss = render_m3_workspace(
+            self.services,
+            sku="TV-LG-55C3",
+            tactic_code="PA1",
+            target_qty=10,
+            extra_disc=25.0,
+            role="ROLE_OWNER",
+        )
         self.assertEqual(ws_loss["cap_protect_style"]["display"], "flex")
 
+        # Chế độ giả lập mất mạng ERR_CLR_003
+        ws_offline = render_m3_workspace(self.services, sku="TV-LG-55C3", offline_mode=True, role="ROLE_OWNER")
+        self.assertEqual(ws_offline["err003_style"]["display"], "flex")
+        self.assertIn("Dữ liệu tham chiếu nội bộ", str(ws_offline["competitor_rows"]))
+
+        # Bảo mật ROLE_SALES
         ws_sales = render_m3_workspace(self.services, sku="TV-LG-55C3", tactic_code="PA2", target_qty=10, extra_disc=0.0, role="ROLE_SALES")
         self.assertEqual(ws_sales["kpi_recovery"], "****** đ")
         self.assertEqual(ws_sales["sim_capital"], "****** đ")
