@@ -1,5 +1,7 @@
 """
-TDD Kiểm thử Phân hệ 05 trên Plotly Dash: Khách hàng cần chăm sóc, Cooldown 30d, AI Call Script & Đặt lịch thợ.
+TDD Kiểm thử Phân hệ 05 (Parity V2):
+Bỏ Donut ưu tiên (m5PriorityChart) & top chart row, đặt Pie Chart Doanh thu 5 Dịch vụ CSKH (14/30/90 ngày)
+trên Hồ sơ cuộc gọi bên cột phải, Cột trái 7:5 có header/filter cố định & vùng cuộn dọc cân đối chiều cao.
 """
 import sqlite3
 import unittest
@@ -42,10 +44,10 @@ def _collect_text(component, chunks=None):
 
 
 class TestDashM5Crm(unittest.TestCase):
-    """Kiểm tra bố cục 7:5, AI Call Script, Cooldown ERR_CRM_001 & Trùng lịch thợ ERR_CRM_002."""
+    """Kiểm tra bố cục 7:5 M5 V2, Pie doanh thu 5 dịch vụ theo kỳ, thuần Việt & Cooldown/Lịch thợ."""
 
-    def test_m5_landmark_ids_match_prototype(self):
-        """Kiểm tra Panel M5 đủ các ID KPI, bảng hàng đợi, hồ sơ tác chiến & m5CycleModal."""
+    def test_m5_landmark_ids_pie_revenue_and_balanced_layout(self):
+        """Kiểm tra bỏ m5PriorityChart, có m5ServiceRevenuePie + lọc 14/30/90 ngày + cột trái cuộn dọc cân phải."""
         from src.dash_app.pages.m5_crm import build_m5_panel
 
         panel = build_m5_panel(is_active=True)
@@ -57,7 +59,13 @@ class TestDashM5Crm(unittest.TestCase):
             "m5Kpi-maintenance",
             "m5Kpi-crosssell",
             "m5Kpi-done",
+            "m5QueueScrollBox",
             "m5CustomerTableBody",
+            "m5ServiceRevenuePie",
+            "m5RevPeriod14",
+            "m5RevPeriod30",
+            "m5RevPeriod90",
+            "m5CallOpsCard",
             "m5PanelCustomerName",
             "m5PanelAddressDevice",
             "m5PanelCallScript",
@@ -70,18 +78,36 @@ class TestDashM5Crm(unittest.TestCase):
             "m5PrimarySaveBtn",
             "m5CycleModal",
         ]:
-            self.assertIn(req_id, ids, f"Thiếu landmark ID M5: {req_id}")
+            self.assertIn(req_id, ids, f"Thiếu landmark ID M5 V2: {req_id}")
 
-    def test_m5_workspace_script_and_charts(self):
-        """Kiểm tra render danh sách khách hàng ưu tiên, AI Call Script Điện Máy Anh Tâm & biểu đồ 5 Điểm chạm."""
+        self.assertNotIn("m5PriorityChart", ids, "Phải loại bỏ biểu đồ Donut ưu tiên (m5PriorityChart)")
+        self.assertNotIn("m5TriggersChart", ids, "Phải thay biểu đồ top bằng Pie doanh thu 5 dịch vụ trên cột phải")
+
+        panel_str = str(panel)
+        self.assertIn("overflow-y-auto", panel_str)
+        txt = " ".join(_collect_text(panel))
+        for banned in ("Cooldown", "AI Call Script", "Smart CRM", "Care Triggers"):
+            self.assertNotIn(banned, txt, f"Không để từ chuyên ngành tiếng Anh '{banned}' trên UI M5")
+
+    def test_m5_service_revenue_pie_periods_and_order_count_hover(self):
+        """Kiểm tra Pie chart Doanh thu 5 dịch vụ theo kỳ 14/30/90 ngày & Hover hiện số lượng đơn hàng."""
         from src.dash_app.callbacks.m5_callbacks import render_m5_workspace
 
         svc = CrmService(DB_PATH)
-        ws = render_m5_workspace(svc, role="ROLE_OWNER")
-        self.assertGreater(len(ws["queue_records"]), 0)
-        self.assertIn("Điện Máy Anh Tâm", ws["call_script"])
-        self.assertIn("Điện Máy Anh Tâm", ws["zalo_zns"])
-        self.assertGreater(len(ws["fig_triggers"].data), 0)
+        ws14 = render_m5_workspace(svc, rev_period_days=14, role="ROLE_OWNER")
+        ws90 = render_m5_workspace(svc, rev_period_days=90, role="ROLE_OWNER")
+
+        self.assertGreater(len(ws90["queue_records"]), 0)
+        self.assertIn("Điện Máy Anh Tâm", ws90["call_script"])
+        self.assertIn("Điện Máy Anh Tâm", ws90["zalo_zns"])
+
+        fig14 = ws14["fig_service_pie"]
+        fig90 = ws90["fig_service_pie"]
+        self.assertEqual(fig90.data[0].type, "pie")
+        self.assertGreater(sum(fig90.data[0].values), sum(fig14.data[0].values), "Doanh thu 90 ngày phải lớn hơn 14 ngày")
+        cd = fig90.data[0].customdata
+        self.assertEqual(len(cd[0]), 4, "Customdata Pie M5 phải gồm 4 trường (Nhóm dịch vụ, Số đơn, Doanh thu, %)")
+        self.assertIn("Số lượng đơn", fig90.data[0].hovertemplate or "")
 
     def test_m5_cooldown_conflict_and_booking_persistence(self):
         """Kiểm tra lưu chốt lịch thợ, chặn trùng giờ KTV (ERR_CRM_002) & chặn gọi trùng (ERR_CRM_001)."""
@@ -90,7 +116,7 @@ class TestDashM5Crm(unittest.TestCase):
         svc = CrmService(DB_PATH)
         ws = render_m5_workspace(svc, include_cooldown=False)
         records = [r for r in ws["queue_records"] if not r["in_cooldown"]]
-        self.assertGreaterEqual(len(records), 2, "Cần ít nhất 2 khách hàng ngoài vùng Cooldown để test")
+        self.assertGreaterEqual(len(records), 2, "Cần ít nhất 2 khách hàng ngoài vùng bảo vệ 30 ngày để test")
 
         cust1 = records[0]
         cust2 = records[1]
@@ -102,7 +128,6 @@ class TestDashM5Crm(unittest.TestCase):
         created_interaction_ids = []
         created_appt_ids = []
         try:
-            # 1. Đặt lịch hợp lệ cho khách 1
             res1 = submit_m5_outcome(
                 svc,
                 customer_code=cust1["customer_code"],
@@ -119,7 +144,6 @@ class TestDashM5Crm(unittest.TestCase):
             if res1.get("appointment_id"):
                 created_appt_ids.append(res1["appointment_id"])
 
-            # 2. Đặt trùng lịch KTV cùng ngày/giờ cho khách 2 -> ERR_CRM_002
             res2 = submit_m5_outcome(
                 svc,
                 customer_code=cust2["customer_code"],
@@ -134,7 +158,6 @@ class TestDashM5Crm(unittest.TestCase):
             self.assertFalse(res2["success"])
             self.assertEqual(res2["error_code"], "ERR_CRM_002")
 
-            # 3. Gọi lại khách 1 trong vùng Cooldown 30 ngày -> ERR_CRM_001
             res3 = submit_m5_outcome(
                 svc,
                 customer_code=cust1["customer_code"],

@@ -1,5 +1,6 @@
 """
-Callbacks Module 05: Hàng đợi Smart CRM 5 Điểm chạm, AI Call Script, Zalo ZNS & Đặt lịch thợ tận nhà.
+Callbacks Module 05 (Parity V2): Hàng đợi Chăm sóc khách hàng 5 điểm chạm,
+Pie Chart Doanh thu 5 Dịch vụ CSKH theo kỳ 14/30/90 ngày + Hover số đơn, Kịch bản tư vấn & Chốt lịch thợ.
 """
 from typing import Any, Dict, List, Optional
 import dash
@@ -7,7 +8,7 @@ from dash import ALL, Input, Output, State, html, no_update
 import plotly.graph_objects as go
 
 from src.dash_app.components.charts import apply_stock_sense_layout, empty_figure
-from src.dash_app.components.layout_shell import format_vnd_compact, format_vnd_full
+from src.dash_app.components.layout_shell import format_vnd_compact
 
 OUTCOME_MAP = {
     "booked": "CONVERTED_BOOKING",
@@ -15,6 +16,8 @@ OUTCOME_MAP = {
     "noanswer": "NO_ANSWER",
     "declined": "DECLINED",
 }
+
+M5_REV_PIE_COLORS = ["#2563EB", "#059669", "#F59E0B", "#7C3AED", "#0EA5E9"]
 
 
 def render_m5_workspace(
@@ -26,9 +29,10 @@ def render_m5_workspace(
     appointment_date: str = "2026-11-18",
     time_slot: str = "14:00 - 15:30",
     technician_code: Optional[str] = None,
+    rev_period_days: int = 30,
     role: str = "ROLE_OWNER",
 ) -> Dict[str, Any]:
-    """Dựng KPIs, 2 Biểu đồ Plotly, Bảng hàng đợi khách hàng và Panel Script/Booking."""
+    """Dựng KPIs, Pie Doanh thu 5 dịch vụ theo kỳ, Bảng hàng đợi cuộn dọc và Panel Tác chiến."""
     crm_svc = services_or_svc["crm"] if isinstance(services_or_svc, dict) else services_or_svc
     kpis = crm_svc.get_crm_kpis()
     df_all = crm_svc.get_care_queue_dataframe(trigger_filter="Tất cả", include_cooldown=include_cooldown)
@@ -58,7 +62,7 @@ def render_m5_workspace(
         in_cd = bool(active_row["in_cooldown"])
         cd_until = str(active_row["cooldown_until"] or "")
         valid_badge = (
-            f"🛡️ Đang Cooldown đến {cd_until}"
+            f"🛡️ Tạm nghỉ liên hệ đến {cd_until}"
             if in_cd
             else "✓ Hợp lệ (Chưa gọi trong 30 ngày)"
         )
@@ -116,7 +120,7 @@ def render_m5_workspace(
             else "hover:bg-slate-50/80 cursor-pointer transition"
         )
         cd_tag = (
-            html.Span("Cooldown 30d", className="ml-1.5 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold")
+            html.Span("Nghỉ 30 ngày", className="ml-1.5 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold")
             if r["in_cooldown"]
             else None
         )
@@ -134,7 +138,13 @@ def render_m5_workspace(
                                 ],
                                 className="flex flex-wrap items-center",
                             ),
-                            html.Div(f"{r['phone']} · {r['priority_badge']} ({r['priority_score']}đ)", className="text-[11px] text-slate-500 mt-0.5 tabular-nums"),
+                            html.Div(
+                                [
+                                    html.Span(r["phone"], className="font-code"),
+                                    html.Span(f" · {r['priority_badge']} ({r['priority_score']}đ)"),
+                                ],
+                                className="text-[11px] text-slate-500 mt-0.5 tabular-nums",
+                            ),
                         ],
                     ),
                     html.Td(
@@ -158,9 +168,9 @@ def render_m5_workspace(
                                 id={"type": "m5-select-customer", "cust": r["customer_code"]},
                                 n_clicks=0,
                                 className=(
-                                    "px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-600 text-white cursor-pointer"
+                                    "px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-600 text-white cursor-pointer whitespace-nowrap"
                                     if is_sel
-                                    else "px-2.5 py-1 rounded-md text-[11px] font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer"
+                                    else "px-2.5 py-1 rounded-md text-[11px] font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 cursor-pointer whitespace-nowrap"
                                 ),
                             )
                         ],
@@ -196,46 +206,52 @@ def render_m5_workspace(
             & (appts_df["status"] != "CANCELLED")
         ]
         if not hit.empty:
-            conflict_msg = f"Thợ {tech_name} đã có lịch hẹn lúc {time_slot} ngày {appointment_date} (ERR_CRM_002)!"
+            conflict_msg = f"Thợ {tech_name} đã có lịch hẹn lúc {time_slot} ngày {appointment_date}!"
 
-    # Charts
-    if df_all.empty:
-        fig_triggers = empty_figure("Chưa có dữ liệu điểm chạm CSKH", height=220)
-        fig_priority = empty_figure("Chưa có dữ liệu ưu tiên", height=220)
+    # Pie Chart Doanh thu 5 Dịch vụ CSKH theo Kỳ (14d / 30d / 90d) + Hover Số lượng đơn
+    period_int = int(rev_period_days or 30)
+    rev_rows = crm_svc.get_service_revenue_breakdown(period_days=period_int)
+    non_zero = [r for r in rev_rows if float(r["total_revenue"]) > 0]
+    if not non_zero:
+        fig_service_pie = empty_figure(f"Chưa phát sinh doanh thu dịch vụ trong {period_int} ngày qua", height=210)
     else:
-        trig_s = df_all["trigger_label"].value_counts()
-        fig_triggers = go.Figure()
-        fig_triggers.add_bar(
-            y=list(trig_s.index),
-            x=[int(v) for v in trig_s.values],
-            orientation="h",
-            marker_color=["#2563EB", "#059669", "#F59E0B", "#6366F1", "#0EA5E9"][: len(trig_s)],
-            text=[int(v) for v in trig_s.values],
-            textposition="outside",
-        )
-        fig_triggers.update_yaxes(autorange="reversed")
-        apply_stock_sense_layout(fig_triggers, height=220, margin=dict(l=140, r=24, t=12, b=24))
-
-        prio_counts = df_all["priority_tier"].value_counts().to_dict()
-        labels = ["Cao", "Trung bình", "Thấp", "Cooldown 30d"]
-        vals = [
-            int(prio_counts.get("Cao", prio_counts.get("CAO", 0))),
-            int(prio_counts.get("Vừa", prio_counts.get("Trung bình", prio_counts.get("TRUNG_BINH", 0)))),
-            int(prio_counts.get("Thấp", prio_counts.get("THAP", 0))),
-            int(kpis["cooldown_blocked_count"]),
-        ]
-        fig_priority = go.Figure(
-            data=[
-                go.Pie(
-                    labels=labels,
-                    values=vals,
-                    hole=0.58,
-                    marker=dict(colors=["#E11D48", "#F59E0B", "#059669", "#94A3B8"]),
-                    textinfo="label+value",
-                )
+        labels = [r["service_group"] for r in non_zero]
+        values = [float(r["total_revenue"]) for r in non_zero]
+        customdata = [
+            [
+                r["service_group"],
+                int(r["order_count"]),
+                format_vnd_compact(r["total_revenue"], "ROLE_OWNER"),
+                f"{r['share_pct']:.1f}%",
             ]
+            for r in non_zero
+        ]
+        fig_service_pie = go.Figure(
+            go.Pie(
+                labels=labels,
+                values=values,
+                customdata=customdata,
+                hole=0.32,
+                marker=dict(colors=M5_REV_PIE_COLORS[: len(non_zero)], line=dict(color="#FFFFFF", width=2)),
+                textinfo="percent",
+                insidetextfont=dict(color="#FFFFFF", size=11),
+                hovertemplate=(
+                    "<b>%{customdata[0]}</b><br>"
+                    "Doanh thu kỳ: <b>%{customdata[2]}</b> (%{percent})<br>"
+                    "Số lượng đơn dịch vụ: <b>%{customdata[1]} đơn</b>"
+                    "<extra></extra>"
+                ),
+            )
         )
-        apply_stock_sense_layout(fig_priority, height=220, margin=dict(l=12, r=12, t=12, b=12))
+        fig_service_pie.update_layout(
+            showlegend=True,
+            legend=dict(orientation="v", yanchor="middle", y=0.5, xanchor="left", x=1.02, font=dict(size=10)),
+            margin=dict(l=8, r=130, t=8, b=8),
+        )
+        apply_stock_sense_layout(fig_service_pie, height=210)
+
+    rev_btn_act = "px-2 py-1 rounded text-[11px] font-bold bg-slate-900 text-white cursor-pointer"
+    rev_btn_idle = "px-2 py-1 rounded text-[11px] font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 cursor-pointer"
 
     return {
         "queue_records": queue_records,
@@ -245,7 +261,7 @@ def render_m5_workspace(
         "default_service": script["default_service"],
         "header_badge": f"{kpis['due_today_count']} KHÁCH CẦN GỌI HÔM NAY",
         "kpi_pending_val": f"{kpis['due_today_count']} khách hàng",
-        "kpi_pending_foot": f"Chặn gọi trùng Cooldown: {kpis['cooldown_blocked_count']} · Đã ghi nhận: {kpis['interactions_logged_count']}",
+        "kpi_pending_foot": f"Chống gọi trùng: {kpis['cooldown_blocked_count']} · Đã ghi nhận: {kpis['interactions_logged_count']}",
         "kpi_maint_val": f"{kpis['ac_maint_due_count']} hộ gia đình",
         "kpi_cross_val": f"{kpis['cross_or_warranty_count']} cơ hội bán",
         "kpi_done_badge": f"{kpis['booked_appointments_count']} lịch thợ",
@@ -264,8 +280,12 @@ def render_m5_workspace(
         "tech_options": tech_options,
         "active_tech": active_tech,
         "conflict_msg": conflict_msg,
-        "fig_triggers": fig_triggers,
-        "fig_priority": fig_priority,
+        "fig_service_pie": fig_service_pie,
+        "rev_period_classes": {
+            14: rev_btn_act if period_int == 14 else rev_btn_idle,
+            30: rev_btn_act if period_int == 30 else rev_btn_idle,
+            90: rev_btn_act if period_int == 90 else rev_btn_idle,
+        },
     }
 
 
@@ -301,8 +321,23 @@ def submit_m5_outcome(
 
 
 def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
-    """Đăng ký callbacks tương tác cho Module 05 Smart CRM."""
+    """Đăng ký callbacks tương tác cho Module 05 (Parity V2)."""
     crm_svc = services["crm"]
+
+    @app.callback(
+        Output("store-m5-rev-period", "data"),
+        Input("m5RevPeriod14", "n_clicks"),
+        Input("m5RevPeriod30", "n_clicks"),
+        Input("m5RevPeriod90", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def select_m5_rev_period(_14, _30, _90):
+        tid = dash.ctx.triggered_id or ""
+        if tid == "m5RevPeriod14":
+            return 14
+        if tid == "m5RevPeriod90":
+            return 90
+        return 30
 
     @app.callback(
         Output("store-m5-trigger", "data"),
@@ -365,10 +400,10 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         ctx = dash.callback_context
         tid = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
         chosen = tid.replace("m5OutcomeCard-", "") if tid.startswith("m5OutcomeCard-") else "booked"
-        sel_booked = "rounded-xl border-2 border-blue-600 bg-blue-50/25 p-3 cursor-pointer transition"
-        idle_booked = "rounded-xl border border-slate-200 bg-white p-3 cursor-pointer transition"
-        sel_row = "rounded-xl border-2 border-blue-600 bg-blue-50/25 px-3 py-2.5 cursor-pointer transition flex items-center justify-between gap-2"
-        idle_row = "rounded-xl border border-slate-200 hover:border-slate-300 bg-white px-3 py-2.5 cursor-pointer transition flex items-center justify-between gap-2"
+        sel_booked = "rounded-xl border-2 border-blue-600 bg-blue-50/25 p-2.5 cursor-pointer transition"
+        idle_booked = "rounded-xl border border-slate-200 bg-white p-2.5 cursor-pointer transition"
+        sel_row = "rounded-xl border-2 border-blue-600 bg-blue-50/25 px-3 py-2 cursor-pointer transition flex items-center justify-between gap-2"
+        idle_row = "rounded-xl border border-slate-200 hover:border-slate-300 bg-white px-3 py-2 cursor-pointer transition flex items-center justify-between gap-2"
         return (
             chosen,
             sel_booked if chosen == "booked" else idle_booked,
@@ -403,8 +438,10 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Output("m5ServicePackageInput", "value"),
         Output("m5TechConflictBanner", "className"),
         Output("m5TechConflictDesc", "children"),
-        Output("m5TriggersChart", "figure"),
-        Output("m5PriorityChart", "figure"),
+        Output("m5ServiceRevenuePie", "figure"),
+        Output("m5RevPeriod14", "className"),
+        Output("m5RevPeriod30", "className"),
+        Output("m5RevPeriod90", "className"),
         Input("store-m5-trigger", "data"),
         Input("store-m5-include-cooldown", "data"),
         Input("m5SearchInput", "value"),
@@ -412,12 +449,13 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Input("m5AppointmentDate", "value"),
         Input("m5AppointmentSlot", "value"),
         Input("m5TechnicianSelect", "value"),
+        Input("store-m5-rev-period", "data"),
         Input("store-m5-refresh", "data"),
         Input("m5ScanTriggersBtn", "n_clicks"),
         Input("store-role", "data"),
     )
     def sync_m5_workspace(
-        trig, include_cd, search_txt, sel_cust, appt_date, appt_slot, tech_code, _ref, _scan, role
+        trig, include_cd, search_txt, sel_cust, appt_date, appt_slot, tech_code, rev_days, _ref, _scan, role
     ):
         res = render_m5_workspace(
             crm_svc,
@@ -428,6 +466,7 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
             appointment_date=appt_date or "2026-11-18",
             time_slot=appt_slot or "14:00 - 15:30",
             technician_code=tech_code,
+            rev_period_days=int(rev_days or 30),
             role=role or "ROLE_OWNER",
         )
         cd_cls = (
@@ -436,10 +475,11 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
             else "hidden p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2"
         )
         conf_cls = (
-            "p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-[11px] flex items-start gap-2"
+            "p-2 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-[11px] flex items-start gap-2"
             if res["conflict_msg"]
-            else "hidden p-2.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-[11px] flex items-start gap-2"
+            else "hidden p-2 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-[11px] flex items-start gap-2"
         )
+        rc = res["rev_period_classes"]
         return (
             res["header_badge"],
             res["kpi_pending_val"],
@@ -466,8 +506,10 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
             res["default_service"],
             conf_cls,
             res["conflict_msg"],
-            res["fig_triggers"],
-            res["fig_priority"],
+            res["fig_service_pie"],
+            rc[14],
+            rc[30],
+            rc[90],
         )
 
     @app.callback(
@@ -515,8 +557,8 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
                 channel="ZALO_ZNS",
             )
             if res.get("success"):
-                return (cur_ref or 0) + 1, {"open": True, "message": f"Đã gửi tin Zalo ZNS tới {active['customer_name']} ({active['phone']})!", "kind": "success"}
-            return no_update, {"open": True, "message": res.get("error", "Không thể gửi Zalo ZNS."), "kind": "error"}
+                return (cur_ref or 0) + 1, {"open": True, "message": f"Đã gửi tin Zalo tới {active['customer_name']} ({active['phone']})!", "kind": "success"}
+            return no_update, {"open": True, "message": res.get("error", "Không thể gửi tin Zalo."), "kind": "error"}
 
         res = submit_m5_outcome(
             crm_svc,
@@ -532,7 +574,7 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         )
         if res.get("success"):
             return (cur_ref or 0) + 1, {"open": True, "message": res["message"], "kind": "success"}
-        return no_update, {"open": True, "message": res.get("error", "Lỗi lưu nhật ký CRM"), "kind": "error"}
+        return no_update, {"open": True, "message": res.get("error", "Lỗi lưu nhật ký chăm sóc khách hàng"), "kind": "error"}
 
     @app.callback(
         Output("m5CycleModal", "className"),

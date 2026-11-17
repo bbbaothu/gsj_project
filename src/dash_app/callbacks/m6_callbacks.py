@@ -1,5 +1,6 @@
 """
-Callbacks Module 06: Biểu đồ Thác nước Lợi nhuận, Attach-Rate 60%/70%, Duyệt chi hoa hồng & Xuất CSV.
+Callbacks Module 06 (Parity V2): Biểu đồ Thác nước Lợi nhuận, Tỷ lệ bán kèm 60%/70%,
+Tùy chỉnh Chính sách Thưởng & Xếp hạng trực tiếp (#1-#3), Duyệt chi hoa hồng & Xuất CSV.
 """
 from typing import Any, Dict, List
 import dash
@@ -13,14 +14,29 @@ from src.dash_app.components.layout_shell import format_vnd_compact, format_vnd_
 def render_m6_workspace(
     services_or_svc: Any,
     period: str = "T10_11",
+    acc_rate_pct: float = 15.0,
+    srv_rate_pct: float = 20.0,
+    hot_bonus_per_case: float = 50_000.0,
+    sort_by: str = "commission",
     role: str = "ROLE_OWNER",
 ) -> Dict[str, Any]:
-    """Dựng 4 KPI Cards, Waterfall Plotly, Attach-Rate Chart, Bảng ngành hàng & Bảng Hoa hồng nhân sự."""
+    """Dựng 4 KPI Cards, Waterfall Plotly, Tỷ lệ bán kèm, Chính sách thưởng động & Thẻ nhân sự."""
     perf_svc = services_or_svc["performance"] if isinstance(services_or_svc, dict) else services_or_svc
     kpis = perf_svc.get_performance_kpis(role=role)
     wf = perf_svc.get_profit_waterfall_data(role=role)
     df_cat = perf_svc.get_category_attach_rate_dataframe(role=role)
-    staff_list = perf_svc.get_staff_commission_list(role=role)
+
+    # Trạng thái đã duyệt chi từ bảng sổ hoa hồng
+    ledger_rows = perf_svc.get_staff_commission_list(role=role)
+    status_by_emp = {r["employee_code"]: r["status"] for r in ledger_rows}
+
+    dyn = perf_svc.calculate_dynamic_commission_ranking(
+        acc_rate_pct=float(acc_rate_pct),
+        srv_rate_pct=float(srv_rate_pct),
+        hot_bonus_per_case=float(hot_bonus_per_case),
+        sort_by=sort_by or "commission",
+        role=role,
+    )
 
     # 1. Waterfall Chart
     if role == "ROLE_SALES":
@@ -57,7 +73,7 @@ def render_m6_workspace(
         fig_waterfall.update_yaxes(title_text="VNĐ")
         apply_stock_sense_layout(fig_waterfall, height=280, margin=dict(l=46, r=16, t=28, b=36))
 
-    # 2. Attach-Rate Horizontal Bar Chart (with vertical lines at 60% and 70%)
+    # 2. Biểu đồ ngang Tỷ lệ bán kèm theo ngành hàng (đường chuẩn 60% & mục tiêu 70%)
     if df_cat.empty:
         fig_attach = empty_figure("Chưa có dữ liệu tỷ lệ bán kèm", height=190)
     else:
@@ -101,7 +117,7 @@ def render_m6_workspace(
                         [
                             html.Div(
                                 [
-                                    html.Span(f"{rate:.1f}%", className="font-bold text-slate-800"),
+                                    html.Span(f"{rate:.1f}%", className="font-bold text-slate-800 font-code"),
                                     html.Span("Đạt mục tiêu" if rate >= 70 else "Dưới 70%", className="text-[11px] text-slate-500"),
                                 ],
                                 className="flex items-center justify-between text-[11px] mb-1",
@@ -115,7 +131,7 @@ def render_m6_workspace(
                     ),
                     html.Td(
                         [
-                            html.Div(sales_txt, className="font-bold text-slate-900"),
+                            html.Div(sales_txt, className="font-bold text-slate-900 font-code"),
                             html.Div(prof_txt, className="text-[11px] text-emerald-600 cost-val"),
                         ],
                         className="py-2.5 px-2 text-right",
@@ -128,12 +144,14 @@ def render_m6_workspace(
             )
         )
 
-    # 4. Staff Commission Cards
-    total_fund = sum(float(s["commission_amount"]) for s in staff_list)
+    # 4. Staff Commission Cards từ calculate_dynamic_commission_ranking
+    is_sales = role == "ROLE_SALES"
+    total_fund_val = float(dyn["total_fund"] or 0.0)
     staff_cards: List[Any] = []
-    for idx, s in enumerate(staff_list, start=1):
-        is_approved = s["status"] == "APPROVED"
-        comm_txt = "****** đ" if role == "ROLE_SALES" else format_vnd_full(s["commission_amount"], role)
+    for idx, s in enumerate(dyn["staff"], start=1):
+        emp_code = s["employee_code"]
+        is_approved = status_by_emp.get(emp_code, s["status"]) == "APPROVED"
+        comm_txt = "****** đ" if is_sales else format_vnd_full(s["dynamic_commission"], role)
         card_cls = (
             "p-4 rounded-xl border-2 border-amber-300/80 bg-amber-50/20 flex flex-col justify-between gap-3"
             if idx == 1
@@ -147,7 +165,7 @@ def render_m6_workspace(
                         [
                             html.Div(
                                 [
-                                    html.Span(f"#{idx}", className="px-2 py-0.5 rounded-full bg-slate-900 text-white text-[10px] font-bold mr-2"),
+                                    html.Span(f"#{idx}", className="px-2 py-0.5 rounded-full bg-slate-900 text-white text-[10px] font-bold mr-2 font-code"),
                                     html.Strong(s["employee_name"], className="text-sm text-slate-900"),
                                 ],
                                 className="flex items-center",
@@ -162,7 +180,10 @@ def render_m6_workspace(
                     html.Div(
                         [
                             html.Div(s["title"], className="text-slate-500"),
-                            html.Div(f"PK: {format_vnd_compact(s['accessory_sales'], 'ROLE_OWNER')} · DV: {format_vnd_compact(s['service_sales'], 'ROLE_OWNER')}", className="text-[11px] text-slate-600 mt-1 tabular-nums"),
+                            html.Div(
+                                f"Phụ kiện: {format_vnd_compact(s['accessory_sales'], 'ROLE_OWNER')} · Dịch vụ: {format_vnd_compact(s['service_sales'], 'ROLE_OWNER')} · {s['estimated_cases']} ca",
+                                className="text-[11px] text-slate-600 mt-1 tabular-nums",
+                            ),
                         ]
                     ),
                     html.Div(
@@ -170,17 +191,17 @@ def render_m6_workspace(
                             html.Div(
                                 [
                                     html.Span("Hoa hồng:", className="text-slate-400 mr-1"),
-                                    html.Strong(comm_txt, className="font-mono text-sm text-emerald-700 cost-val"),
+                                    html.Strong(comm_txt, className="font-code text-sm text-emerald-700 cost-val"),
                                 ]
                             ),
                             html.Button(
-                                "Đã chi ✓" if is_approved else ("🔒 Quản lý" if role == "ROLE_SALES" else "✓ Duyệt chi"),
-                                id={"type": "m6-approve-emp", "emp": s["employee_code"]},
+                                "Đã chi ✓" if is_approved else ("🔒 Quản lý" if is_sales else "✓ Duyệt chi"),
+                                id={"type": "m6-approve-emp", "emp": emp_code},
                                 n_clicks=0,
-                                disabled=is_approved or role == "ROLE_SALES",
+                                disabled=is_approved or is_sales,
                                 className=(
                                     "px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 text-slate-400 cursor-not-allowed"
-                                    if (is_approved or role == "ROLE_SALES")
+                                    if (is_approved or is_sales)
                                     else "px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-900 hover:bg-slate-800 text-white cursor-pointer"
                                 ),
                             ),
@@ -191,11 +212,16 @@ def render_m6_workspace(
             )
         )
 
-    profit_str = "****** đ" if role == "ROLE_SALES" else f"+{format_vnd_full(kpis['net_gross_profit'], role)}"
-    cap_str = "****** đ" if role == "ROLE_SALES" else format_vnd_full(kpis["recovered_capital"], role)
-    margin_str = "**%" if role == "ROLE_SALES" else f"{kpis['gross_margin_pct']:.1f}%"
-    share_str = "**%" if role == "ROLE_SALES" else f"{kpis['attached_profit_share_pct']:.1f}%"
-    fund_str = "QUỸ CHI: ****** đ" if role == "ROLE_SALES" else f"QUỸ CHI: {format_vnd_full(total_fund, role)}"
+    profit_str = "****** đ" if is_sales else f"+{format_vnd_full(kpis['net_gross_profit'], role)}"
+    cap_str = "****** đ" if is_sales else format_vnd_full(kpis["recovered_capital"], role)
+    margin_str = "**%" if is_sales else f"{kpis['gross_margin_pct']:.1f}%"
+    share_str = "**%" if is_sales else f"{kpis['attached_profit_share_pct']:.1f}%"
+    fund_badge_str = "QUỸ CHI: ****** đ" if is_sales else f"QUỸ CHI: {dyn['display_total_fund']}"
+    bonus_disp_str = dyn["display_total_fund"]
+    policy_summary = (
+        f"Chính sách hiện hành: Phụ kiện {dyn['acc_rate_pct']:.0f}% + Dịch vụ {dyn['srv_rate_pct']:.0f}% "
+        f"+ Thưởng nóng {int(dyn['hot_bonus_per_case'] // 1000)}k/ca · Duyệt chi chỉ dành cho Chủ cửa hàng"
+    )
 
     total_core = int(df_cat["core_orders"].sum()) if not df_cat.empty else 0
     total_att = int(df_cat["attached_orders"].sum()) if not df_cat.empty else 0
@@ -203,28 +229,33 @@ def render_m6_workspace(
     return {
         "header_badge": f"{kpis['invoice_count']} hóa đơn thực tế",
         "kpi_rev": format_vnd_full(kpis["total_revenue"], "ROLE_OWNER"),
-        "kpi_rev_sub": f"Vốn gốc quay về két: {cap_str} ({kpis['invoice_count']} HĐ)",
+        "kpi_rev_sub": f"Vốn gốc quay về két: {cap_str} ({kpis['invoice_count']} hóa đơn)",
         "kpi_profit": profit_str,
         "kpi_profit_sub": f"Biên lãi gộp tổng: {margin_str} · Lãi ròng thực tế",
         "kpi_attach_rev": format_vnd_full(kpis["attached_sales"], "ROLE_OWNER"),
-        "kpi_attach_sub": f"Đóng góp {share_str} tổng lợi nhuận gộp từ PK & Công thợ",
+        "kpi_attach_sub": f"Đóng góp {share_str} tổng lợi nhuận gộp từ Phụ kiện & Công thợ",
         "kpi_attach_rate": f"{kpis['overall_attach_rate_pct']:.1f}%",
         "kpi_attach_orders": f"({total_att} / {total_core} hóa đơn)",
         "kpi_target_badge": "Vượt chuẩn 60%" if kpis["overall_attach_rate_pct"] >= 60 else "Dưới chuẩn 60%",
         "insight_text": (
-            f"Insight đắt giá: Phụ kiện & Công thợ đóng góp tới {share_str} LỢI NHUẬN GỘP toàn cửa hàng! Đẩy mạnh bán kèm nhóm Tủ lạnh & Máy giặt."
+            f"Nhận định nổi bật: Phụ kiện & Công thợ đóng góp tới {share_str} LỢI NHUẬN GỘP toàn cửa hàng! Đẩy mạnh bán kèm nhóm Tủ lạnh & Máy giặt."
         ),
         "fig_waterfall": fig_waterfall,
         "fig_attach": fig_attach,
         "category_rows": cat_rows,
-        "staff_fund_badge": fund_str,
+        "staff_fund_badge": fund_badge_str,
+        "total_fund_value": total_fund_val,
+        "total_bonus_fund_display": bonus_disp_str,
+        "policy_summary_text": policy_summary,
+        "policy_controls_disabled": is_sales,
+        "policy_lock_style": {"display": "block" if is_sales else "none"},
         "staff_cards": staff_cards,
-        "approve_disabled": role == "ROLE_SALES",
+        "approve_disabled": is_sales,
     }
 
 
 def generate_m6_csv(perf_svc: Any) -> bytes:
-    """Xuất CSV báo cáo tổng hợp Hiệu quả kinh doanh & Attach-Rate."""
+    """Xuất CSV báo cáo tổng hợp Hiệu quả kinh doanh & Tỷ lệ bán kèm."""
     return perf_svc.export_financial_summary_csv()
 
 
@@ -238,8 +269,39 @@ def submit_m6_approve_commission(
 
 
 def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
-    """Đăng ký callbacks tương tác cho Module 06 Hiệu quả kinh doanh."""
+    """Đăng ký callbacks tương tác cho Module 06 (Parity V2)."""
     perf_svc = services["performance"]
+
+    @app.callback(
+        Output("store-m6-policy", "data"),
+        Output("m6PolicyAccRateInput", "value"),
+        Output("m6PolicySrvRateInput", "value"),
+        Output("m6PolicyHotBonusInput", "value"),
+        Output("m6PolicySortSelect", "value"),
+        Input("btn-m6-apply-policy", "n_clicks"),
+        Input("btn-m6-reset-policy", "n_clicks"),
+        State("m6PolicyAccRateInput", "value"),
+        State("m6PolicySrvRateInput", "value"),
+        State("m6PolicyHotBonusInput", "value"),
+        State("m6PolicySortSelect", "value"),
+        State("store-role", "data"),
+        prevent_initial_call=True,
+    )
+    def on_m6_policy_update(_apply, _reset, acc_val, srv_val, hot_val, sort_val, role):
+        if (role or "ROLE_OWNER") == "ROLE_SALES":
+            return no_update, no_update, no_update, no_update, no_update
+        tid = dash.ctx.triggered_id
+        if tid == "btn-m6-reset-policy":
+            pol = {"acc_rate_pct": 15.0, "srv_rate_pct": 20.0, "hot_bonus_per_case": 50_000.0, "sort_by": "commission"}
+            return pol, 15, 20, 50000, "commission"
+        if tid == "btn-m6-apply-policy":
+            acc = max(5.0, min(30.0, float(acc_val if acc_val is not None else 15.0)))
+            srv = max(5.0, min(35.0, float(srv_val if srv_val is not None else 20.0)))
+            hot = max(0.0, min(200_000.0, float(hot_val if hot_val is not None else 50_000.0)))
+            sb = sort_val or "commission"
+            pol = {"acc_rate_pct": acc, "srv_rate_pct": srv, "hot_bonus_per_case": hot, "sort_by": sb}
+            return pol, acc, srv, hot, sb
+        return no_update, no_update, no_update, no_update, no_update
 
     @app.callback(
         Output("m6HeaderInvoiceBadge", "children"),
@@ -257,14 +319,34 @@ def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Output("m6AttachRateChart", "figure"),
         Output("m6CategoryTableBody", "children"),
         Output("m6StaffFundBadge", "children"),
+        Output("m6TotalBonusFundDisplay", "children"),
+        Output("m6PolicySummaryText", "children"),
         Output("m6StaffCommissionCards", "children"),
         Output("m6ApproveAllBonusBtn", "disabled"),
+        Output("m6PolicyAccRateInput", "disabled"),
+        Output("m6PolicySrvRateInput", "disabled"),
+        Output("m6PolicyHotBonusInput", "disabled"),
+        Output("m6PolicySortSelect", "disabled"),
+        Output("btn-m6-apply-policy", "disabled"),
+        Output("btn-m6-reset-policy", "disabled"),
+        Output("m6PolicySalesLockNote", "style"),
         Input("m6PeriodSelect", "value"),
+        Input("store-m6-policy", "data"),
         Input("store-m6-refresh", "data"),
         Input("store-role", "data"),
     )
-    def sync_m6_workspace(period, _ref, role):
-        res = render_m6_workspace(perf_svc, period=period or "T10_11", role=role or "ROLE_OWNER")
+    def sync_m6_workspace(period, policy_data, _ref, role):
+        pol = policy_data or {}
+        res = render_m6_workspace(
+            perf_svc,
+            period=period or "T10_11",
+            acc_rate_pct=float(pol.get("acc_rate_pct", 15.0)),
+            srv_rate_pct=float(pol.get("srv_rate_pct", 20.0)),
+            hot_bonus_per_case=float(pol.get("hot_bonus_per_case", 50_000.0)),
+            sort_by=pol.get("sort_by", "commission"),
+            role=role or "ROLE_OWNER",
+        )
+        dis = res["policy_controls_disabled"]
         return (
             res["header_badge"],
             res["kpi_rev"],
@@ -281,8 +363,17 @@ def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
             res["fig_attach"],
             res["category_rows"],
             res["staff_fund_badge"],
+            res["total_bonus_fund_display"],
+            res["policy_summary_text"],
             res["staff_cards"],
             res["approve_disabled"],
+            dis,
+            dis,
+            dis,
+            dis,
+            dis,
+            dis,
+            res["policy_lock_style"],
         )
 
     @app.callback(

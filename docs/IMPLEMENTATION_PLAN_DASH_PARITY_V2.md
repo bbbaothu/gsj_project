@@ -60,8 +60,8 @@
 | **3. Module 02: Cần xử lý hôm nay** | `m2_alerts.py`<br>`m2_callbacks.py` | • Đổi bar chart Vốn kẹt sang **Pie chart dải Vàng–Cam–Đỏ–Nâu đỏ** + Tooltip 4 thông tin<br>• Bỏ graph Đường băng tồn kho vs Thời gian hãng giao<br>• Cấu trúc bảng 7 cột y hệt Ảnh 1/Prototype + **trượt ngang trong ô (`.cell-hscroll`)** | ✅ **ĐÃ HOÀN THÀNH** |
 | **4. Module 03: Gợi ý xả hàng** | `clearance_service.py`<br>`m3_clearance.py`<br>`m3_callbacks.py` | • Bỏ chart So sánh 4 chiến thuật riêng $\rightarrow$ **nhúng thanh dòng tiền vào từng Phương án PA1–PA4**<br>• Đồng bộ **100% Ảnh 2**: Header lý do, Slider Giá/SL, nút Khớp giá đối thủ, Cắt lỗ `-5%`<br>• Radar Giá: nút `Giả lập mất mạng`, **Thang định vị giá & Sàn vốn**, Box `..90k` + **Nhận định chiến lược** | ✅ **ĐÃ HOÀN THÀNH** |
 | **5. Module 04: Gợi ý nhập hàng** | `data/retail_dienmay.db`<br>`replenishment_service.py`<br>`m4_replenishment.py`, `m4_callbacks.py` | • Bỏ 2 biểu đồ dự báo & phân bổ theo Hãng<br>• Tinh chỉnh/bổ sung điều kiện & vận tốc dữ liệu để có **5–6 mã đề xuất nhập** nhiều hãng<br>• Cột Nhu cầu dùng **sọc pastel chéo (`.gap-pattern`)** ở phần thiếu; màu badge theo từng hãng | ✅ **ĐÃ HOÀN THÀNH** |
-| **6. Module 05: Chăm sóc khách hàng** | `crm_service.py`<br>`m5_crm.py`<br>`m5_callbacks.py` | • Đổi chart 5 điểm chạm thành **Pie chart % Doanh thu CSKH** + lọc `14 ngày / 30 ngày / 3 tháng` + Hover số đơn<br>• Bỏ chart Donut ưu tiên; chuyển Pie chart lên **phía trên Hồ sơ cuộc gọi** bên cột phải<br>• Cột trái 7 phần: **Header + Bộ lọc cố định + Bảng trượt dọc** có chiều cao cân bằng cột phải | ⏳ **KẾ HOẠCH** |
-| **7. Module 06: Hiệu quả kinh doanh** | `performance_service.py`<br>`m6_performance.py`<br>`m6_callbacks.py` | • Thêm khối **Điều chỉnh Chính sách Thưởng** (`% Phụ kiện`, `% Dịch vụ`, `Thưởng nóng/ca`, `Tiêu chí xếp hạng`) tính lại xếp hạng & tiền thưởng trực tiếp trong thẻ nhân viên | ⏳ **KẾ HOẠCH** |
+| **6. Module 05: Chăm sóc khách hàng** | `crm_service.py`<br>`m5_crm.py`<br>`m5_callbacks.py` | • Đổi chart 5 điểm chạm thành **Pie chart % Doanh thu CSKH** + lọc `14 ngày / 30 ngày / 3 tháng` + Hover số đơn<br>• Bỏ chart Donut ưu tiên; chuyển Pie chart lên **phía trên Hồ sơ cuộc gọi** bên cột phải<br>• Cột trái 7 phần: **Header + Bộ lọc cố định + Bảng trượt dọc** có chiều cao cân bằng cột phải | ✅ **ĐÃ HOÀN THÀNH** |
+| **7. Module 06: Hiệu quả kinh doanh** | `performance_service.py`<br>`m6_performance.py`<br>`m6_callbacks.py` | • Thêm khối **Điều chỉnh Chính sách Thưởng** (`% Phụ kiện`, `% Dịch vụ`, `Thưởng nóng/ca`, `Tiêu chí xếp hạng`) tính lại xếp hạng & tiền thưởng trực tiếp trong thẻ nhân viên | ✅ **ĐÃ HOÀN THÀNH** |
 
 ---
 
@@ -271,11 +271,11 @@ Mọi màn hình từ M1 đến M6 đều tuân thủ ánh xạ sau để chủ 
   - Modify: `src/dash_app/pages/m5_crm.py`, `src/dash_app/callbacks/m5_callbacks.py`, `tests/test_dash_m5.py`
   - Modify: `src/dash_app/pages/m6_performance.py`, `src/dash_app/callbacks/m6_callbacks.py`, `tests/test_dash_m6.py`
 * **Cách thức triển khai (TDD):**
-  - [ ] **Step 1 (RED):** Cập nhật `tests/test_dash_m5.py` (Pie Chart doanh thu dịch vụ + đổi kỳ `14/30/90 ngày`, bỏ Donut, bố cục 7:5 cột phải có Pie + Call Panel, cột trái có vùng cuộn riêng `overflow-y-auto`) và `tests/test_dash_m6.py` (đổi `% PK / % DV / Thưởng nóng / Tiêu chí xếp hạng` tính lại đúng Quỹ chi & thứ hạng; khóa với `ROLE_SALES`).
-  - [ ] **Step 2:** Chạy `tests/test_dash_m5.py tests/test_dash_m6.py` xác nhận **RED**.
-  - [ ] **Step 3 (GREEN):** Lập trình nâng cấp M5 & M6.
-  - [ ] **Step 4:** Chạy `tests/test_dash_m5.py tests/test_dash_m6.py` xác nhận **GREEN**.
-  - [ ] **Step 5:** Cập nhật Plan & Commit (`feat(dash-m5-m6): upgrade M5 service revenue pie + balanced sticky queue and M6 editable bonus policy`).
+  - [x] **Step 1 (RED):** Cập nhật `tests/test_dash_m5.py` (Pie Chart doanh thu dịch vụ + đổi kỳ `14/30/90 ngày`, bỏ Donut, bố cục 7:5 cột phải có Pie + Call Panel, cột trái có vùng cuộn riêng `overflow-y-auto`) và `tests/test_dash_m6.py` (đổi `% PK / % DV / Thưởng nóng / Tiêu chí xếp hạng` tính lại đúng Quỹ chi & thứ hạng; khóa với `ROLE_SALES`).
+  - [x] **Step 2:** Chạy `tests/test_dash_m5.py tests/test_dash_m6.py` xác nhận **RED**.
+  - [x] **Step 3 (GREEN):** Lập trình nâng cấp M5 & M6.
+  - [x] **Step 4:** Chạy `tests/test_dash_m5.py tests/test_dash_m6.py` xác nhận **GREEN**.
+  - [x] **Step 5:** Cập nhật Plan & Commit (`feat(dash-m5-m6): upgrade M5 service revenue pie + balanced sticky queue and M6 editable bonus policy`).
 
 ---
 
