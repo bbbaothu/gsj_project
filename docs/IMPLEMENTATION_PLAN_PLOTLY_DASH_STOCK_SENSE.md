@@ -59,7 +59,7 @@
 | **Panel M3: Gợi ý xả hàng** (`panel-m3`, `m3SaleTagModal`, `m3CampaignModal`) | `pages/m3_clearance.py`<br>`callbacks/m3_callbacks.py` | • Header + 4 KPI Cards cao (`min-h-[146px]`) + Dải chọn 4 thẻ SKU ứng viên (`m3SkuSelectorGrid`)<br>• Cột trái 7 phần: 4 Kịch bản `PA1–PA4` (thẻ radio nổi bật Đề xuất tối ưu) + Simulator dòng tiền live (Slider giảm thêm + SL xả + 4 ô kết quả + Cảnh báo `MAP` / Cắt lỗ)<br>• Cột phải 5 phần: Biểu đồ so sánh Dòng tiền 4 chiến thuật + Bảng Radar đối chiếu ĐMX/MediaMart/Online + Hero Giá gợi ý làm tròn `..90k` ($PAI$) + `m3SaleTagModal` In tem giá xả đỏ | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M4: Gợi ý nhập hàng** (`panel-m4`, `m4SupplierDrawer`, `poPreviewModal`, `m4PoLifecycleModal`) | `pages/m4_replenishment.py`<br>`callbacks/m4_callbacks.py` | • Header + Bộ chuyển chu kỳ `14 ngày / 30 ngày` + Dropdown chỉnh nhanh Trần ngân sách (`150/200/250/350 tr`) + Nút Tự động cân đối<br>• 4 KPI Cards kèm thanh tiến độ giải ngân ngân sách + Biểu đồ Dự báo nhu cầu vs Hiện có & Phân bổ theo Hãng<br>• Bảng chỉnh sửa số lượng đặt mua + Card nhà cung cấp (`m4SupplierCardsContainer`) + `m4SupplierDrawer` + `poPreviewModal` gom PO theo Hãng & Xuất CSV | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M5: Khách cần chăm sóc** (`panel-m5`, `m5CycleModal`) | `pages/m5_crm.py`<br>`callbacks/m5_callbacks.py` | • Header có badge `Chống gọi trùng 30 ngày` + 4 KPI Cards bấm lọc nhanh (`m5Kpi-pending`..`m5Kpi-done`)<br>• Biểu đồ Phễu 5 Điểm chạm Vàng & Cơ cấu Ưu tiên<br>• Khối làm việc 7:5 — Trái: Pills Trigger + Bảng KH ưu tiên; Phải: Khung địa chỉ/máy, Cảnh báo Cooldown, AI Call Script, Zalo ZNS Mock & Form 4 kết quả cuộc gọi (`booked/callback/noanswer/declined`) + Check trùng lịch KTV (`ERR_CRM_002`) | ✅ **ĐÃ HOÀN THÀNH** |
-| **Panel M6: Hiệu quả kinh doanh** (`panel-m6`) | `pages/m6_performance.py`<br>`callbacks/m6_callbacks.py` | • Header bộ lọc kỳ đánh giá + Xuất CSV + 4 KPI Cards 3 dòng<br>• Tầng giữa 6:6: Biểu đồ Thác nước Lợi nhuận (`Waterfall`) + Bảng Chi tiết Bán kèm theo 4 Ngành hàng (kèm Insight đắt giá)<br>• Tầng dưới: Biểu đồ Attach-Rate vs `Chuẩn 60%` / `Mục tiêu 70%` + Bảng Xếp hạng & Nút Duyệt chi Hoa hồng nhân sự (`15% PK + 20% DV`) | ⏳ **KẾ HOẠCH MỚI** |
+| **Panel M6: Hiệu quả kinh doanh** (`panel-m6`) | `pages/m6_performance.py`<br>`callbacks/m6_callbacks.py` | • Header bộ lọc kỳ đánh giá + Xuất CSV + 4 KPI Cards 3 dòng<br>• Tầng giữa 6:6: Biểu đồ Thác nước Lợi nhuận (`Waterfall`) + Bảng Chi tiết Bán kèm theo 4 Ngành hàng (kèm Insight đắt giá)<br>• Tầng dưới: Biểu đồ Attach-Rate vs `Chuẩn 60%` / `Mục tiêu 70%` + Bảng Xếp hạng & Nút Duyệt chi Hoa hồng nhân sự (`15% PK + 20% DV`) | ✅ **ĐÃ HOÀN THÀNH** |
 
 ---
 
@@ -351,11 +351,11 @@ flowchart LR
   - Create: `src/dash_app/pages/m6_performance.py`, `src/dash_app/callbacks/m6_callbacks.py`, `tests/test_dash_m6.py`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED):** Viết `tests/test_dash_m6.py` kiểm tra render biểu đồ Waterfall khớp `net_gross_profit`, ẩn an toàn khi `ROLE_SALES`, duyệt hoa hồng chỉ cho `ROLE_OWNER` kèm rollback, và xuất file CSV có dữ liệu `Attach_Rate_Pct`.
-  - [ ] **Step 2:** Chạy `tests/test_dash_m6.py` xác nhận **RED**.
-  - [ ] **Step 3 (GREEN):** Lập trình `m6_performance.py` và `m6_callbacks.py`.
-  - [ ] **Step 4:** Chạy `tests/test_dash_m6.py` xác nhận **GREEN**.
-  - [ ] **Step 5:** Cập nhật Plan & Commit Giai đoạn 7 (`feat(dash-m6): implement Module 06 Waterfall, Attach-Rate and Commission Approval in Dash`).
+  - [x] **Step 1 (RED):** Viết `tests/test_dash_m6.py` kiểm tra render biểu đồ Waterfall khớp `net_gross_profit`, ẩn an toàn khi `ROLE_SALES`, duyệt hoa hồng chỉ cho `ROLE_OWNER` kèm rollback, và xuất file CSV có dữ liệu `Attach_Rate_Pct`.
+  - [x] **Step 2:** Chạy `tests/test_dash_m6.py` xác nhận **RED**.
+  - [x] **Step 3 (GREEN):** Lập trình `m6_performance.py` và `m6_callbacks.py`.
+  - [x] **Step 4:** Chạy `tests/test_dash_m6.py` xác nhận **GREEN**. (`Ran 3 tests in 1.343s - OK`)
+  - [x] **Step 5:** Cập nhật Plan & Commit Giai đoạn 7 (`feat(dash-m6): implement Module 06 Waterfall, Attach-Rate and Commission Approval in Dash`).
 
 ---
 
