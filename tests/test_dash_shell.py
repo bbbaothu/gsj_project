@@ -130,6 +130,32 @@ class TestDashShell(unittest.TestCase):
         self.assertNotIn("22,500,000", text_sales)
         self.assertIn("******", text_sales)
 
+    def test_v2_typography_css_brand_badges_and_plain_vietnamese(self):
+        """Kiểm tra CSS tiện ích V2, helper màu riêng từng Hãng, tên sản phẩm ngắn & tiếng Việt thuần."""
+        from src.dash_app.components.layout_shell import get_brand_badge_class, get_short_product_name
+
+        css_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src", "assets", "stock_sense.css"))
+        with open(css_path, "r", encoding="utf-8") as f:
+            css_text = f.read()
+        for cls_name in (".gap-pattern", ".frozen-striped-bar", ".cell-hscroll", ".font-code"):
+            self.assertIn(cls_name, css_text, f"Thiếu lớp CSS '{cls_name}' trong stock_sense.css")
+
+        brands = ["Daikin", "Sony", "Casper", "Toshiba", "LG", "Samsung", "Panasonic"]
+        badge_classes = [get_brand_badge_class(b) for b in brands]
+        self.assertEqual(len(set(badge_classes)), len(brands), "Mỗi hãng phải có 1 lớp màu badge riêng biệt")
+        for b_cls in badge_classes:
+            self.assertIn("bg-", b_cls)
+            self.assertIn("text-", b_cls)
+            self.assertIn("border-", b_cls)
+
+        short_oled = get_short_product_name("Smart Tivi OLED LG 4K 55 inch 55C3PSA", "TV-LG-55C3")
+        self.assertLessEqual(len(short_oled), 22)
+        self.assertIn("LG", short_oled)
+
+        shell_str = str(build_app_shell(self.services))
+        self.assertNotIn("Mã SKU", shell_str)
+        self.assertIn("Mã sản phẩm", shell_str)
+
 
 if __name__ == "__main__":
     unittest.main()

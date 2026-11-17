@@ -28,6 +28,59 @@ ROLE_BTN_IDLE_CLASS = (
     "px-2.5 py-1 rounded-md font-medium text-slate-500 hover:text-slate-900 transition cursor-pointer whitespace-nowrap"
 )
 
+BRAND_BADGE_MAP: Dict[str, str] = {
+    "Daikin": "bg-sky-50 text-sky-700 border border-sky-200",
+    "Sony": "bg-indigo-50 text-indigo-700 border border-indigo-200",
+    "Casper": "bg-amber-50 text-amber-800 border border-amber-200",
+    "Toshiba": "bg-teal-50 text-teal-700 border border-teal-200",
+    "LG": "bg-rose-50 text-rose-700 border border-rose-200",
+    "Samsung": "bg-blue-50 text-blue-700 border border-blue-200",
+    "Panasonic": "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    "Aqua": "bg-cyan-50 text-cyan-800 border border-cyan-200",
+    "Electrolux": "bg-purple-50 text-purple-700 border border-purple-200",
+    "Sanaky": "bg-slate-100 text-slate-700 border border-slate-200",
+}
+
+SHORT_PRODUCT_NAME_MAP: Dict[str, str] = {
+    "TV-LG-55C3": 'Tivi LG OLED 55C3',
+    "ML-PN-XPU12": "ĐH Panasonic 1.5HP",
+    "TL-SS-647L": "Tủ lạnh Samsung 647L",
+    "TV-SS-55AU7": "Tivi Samsung 55AU7",
+    "MG-LG-FV1409": "Máy giặt LG 9kg",
+    "TL-PN-322L": "Tủ lạnh Pana 322L",
+    "TV-SN-55X80K": "Tivi Sony 55X80K",
+    "ML-DK-FTKB25": "ĐH Daikin 1HP",
+    "TV-CS-43FG6": 'Tivi Casper 43"',
+    "ML-CS-TC09": "ĐH Casper 1HP",
+    "TL-AQ-180L": "Tủ lạnh Aqua 180L",
+    "MG-TB-85K": "Máy giặt Toshiba 8.5",
+}
+
+
+def get_brand_badge_class(brand: Optional[str]) -> str:
+    """Trả về lớp CSS màu pastel đặc trưng cho từng hãng sản xuất."""
+    key = (brand or "").strip()
+    return BRAND_BADGE_MAP.get(key, "bg-slate-100 text-slate-700 border border-slate-200")
+
+
+def get_short_product_name(product_name: str, product_code: str = "") -> str:
+    """Rút gọn tên sản phẩm tiếng Việt gọn gàng để hiển thị trên biểu đồ không đè chữ."""
+    code = (product_code or "").strip()
+    if code in SHORT_PRODUCT_NAME_MAP:
+        return SHORT_PRODUCT_NAME_MAP[code]
+    raw = (product_name or code).strip()
+    replacements = [
+        ("Smart Tivi OLED ", "Tivi OLED "),
+        ("Smart Tivi ", "Tivi "),
+        ("Điều hòa ", "ĐH "),
+        ("Tủ lạnh ", "Tủ "),
+        ("Máy giặt ", "MG "),
+        (" Inverter", ""),
+    ]
+    for old, new in replacements:
+        raw = raw.replace(old, new)
+    return raw if len(raw) <= 22 else f"{raw[:20].rstrip()}…"
+
 
 def format_vnd_compact(value: Optional[float], role: str = "ROLE_OWNER") -> str:
     """Định dạng tiền tệ rút gọn chuẩn Prototype (1,30 tỷ / 929,6 tr) kèm bảo mật ROLE_SALES."""
@@ -106,8 +159,8 @@ def build_sidebar(services: Dict[str, Any], active_tab: str = "m1") -> html.Asid
         )
 
     quick_items = [
-        ("btn-quick-serial", "Đối soát Serial / IMEI", "ph-qr-code"),
-        ("btn-quick-po", "Đơn nhập & Giữ cọc", "ph-file-text"),
+        ("btn-quick-serial", "Đối soát Số máy / IMEI", "ph-qr-code"),
+        ("btn-quick-po", "Phiếu nhập & Giữ cọc", "ph-file-text"),
         ("btn-quick-threshold", "Thiết lập định mức", "ph-sliders"),
     ]
     quick_lis = [
@@ -255,7 +308,7 @@ def build_topbar(role: str = "ROLE_OWNER") -> html.Header:
                     html.Span(
                         [
                             html.I(className="ph ph-magnifying-glass text-slate-400 text-sm shrink-0"),
-                            html.Span("Tra cứu nhanh Serial, Hóa đơn...", className="truncate"),
+                            html.Span("Tra cứu nhanh Số máy, Hóa đơn...", className="truncate"),
                         ],
                         className="inline-flex items-center gap-2 min-w-0",
                     ),
@@ -341,7 +394,7 @@ def build_quick_search_modal() -> html.Div:
                             id="quickSearchInput",
                             type="text",
                             debounce=True,
-                            placeholder="Tìm nhanh theo Mã SKU, Serial (SN-...), hoặc Mã đơn (DH...)...",
+                            placeholder="Tìm nhanh theo Mã sản phẩm, Số máy (SN-...), hoặc Mã đơn (DH...)...",
                             className="w-full text-xs text-slate-900 placeholder-slate-400 focus:outline-none border-0 bg-transparent",
                         ),
                         html.Button(

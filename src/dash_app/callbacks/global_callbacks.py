@@ -128,7 +128,7 @@ def handle_quick_search_query(query_text: Optional[str], services: Dict[str, Any
             )
 
     if not items:
-        return [html.Div("Không tìm thấy SKU, Serial hoặc Đơn hàng phù hợp.", className="py-6 text-center text-slate-400")]
+        return [html.Div("Không tìm thấy Sản phẩm, Số máy hoặc Đơn hàng phù hợp.", className="py-6 text-center text-slate-400")]
     return items
 
 
