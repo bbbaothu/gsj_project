@@ -58,7 +58,7 @@
 | **Panel M2: Cần xử lý hôm nay** (`panel-m2`, `m2DecisionDrawer`, `snoozeModal`, `m2ThresholdModal`) | `pages/m2_alerts.py`<br>`callbacks/m2_callbacks.py` | • Header 1 dòng có pulse-dot đỏ + Badges cảnh báo + Nút Xuất CSV & Ngưỡng cảnh báo<br>• 4 KPI Cards tối giản 3 dòng click lọc 2 chiều + 2 Biểu đồ (Phân bổ vốn kẹt & Runway `DOS` vs `Lead Time`)<br>• Bộ lọc 6 Pills + Bảng 7 cột + Khung khôi phục mã đã Hoãn<br>• `m2DecisionDrawer` + `snoozeModal` (`ERR_ACT_003`) + nút chuyển M3/M4 | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M3: Gợi ý xả hàng** (`panel-m3`, `m3SaleTagModal`, `m3CampaignModal`) | `pages/m3_clearance.py`<br>`callbacks/m3_callbacks.py` | • Header + 4 KPI Cards cao (`min-h-[146px]`) + Dải chọn 4 thẻ SKU ứng viên (`m3SkuSelectorGrid`)<br>• Cột trái 7 phần: 4 Kịch bản `PA1–PA4` (thẻ radio nổi bật Đề xuất tối ưu) + Simulator dòng tiền live (Slider giảm thêm + SL xả + 4 ô kết quả + Cảnh báo `MAP` / Cắt lỗ)<br>• Cột phải 5 phần: Biểu đồ so sánh Dòng tiền 4 chiến thuật + Bảng Radar đối chiếu ĐMX/MediaMart/Online + Hero Giá gợi ý làm tròn `..90k` ($PAI$) + `m3SaleTagModal` In tem giá xả đỏ | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M4: Gợi ý nhập hàng** (`panel-m4`, `m4SupplierDrawer`, `poPreviewModal`, `m4PoLifecycleModal`) | `pages/m4_replenishment.py`<br>`callbacks/m4_callbacks.py` | • Header + Bộ chuyển chu kỳ `14 ngày / 30 ngày` + Dropdown chỉnh nhanh Trần ngân sách (`150/200/250/350 tr`) + Nút Tự động cân đối<br>• 4 KPI Cards kèm thanh tiến độ giải ngân ngân sách + Biểu đồ Dự báo nhu cầu vs Hiện có & Phân bổ theo Hãng<br>• Bảng chỉnh sửa số lượng đặt mua + Card nhà cung cấp (`m4SupplierCardsContainer`) + `m4SupplierDrawer` + `poPreviewModal` gom PO theo Hãng & Xuất CSV | ✅ **ĐÃ HOÀN THÀNH** |
-| **Panel M5: Khách cần chăm sóc** (`panel-m5`, `m5CycleModal`) | `pages/m5_crm.py`<br>`callbacks/m5_callbacks.py` | • Header có badge `Chống gọi trùng 30 ngày` + 4 KPI Cards bấm lọc nhanh (`m5Kpi-*`)<br>• Biểu đồ Phễu 5 Điểm chạm Vàng & Cơ cấu Ưu tiên<br>• Khối làm việc 7:5 — Trái: Pills Trigger + Bảng KH ưu tiên; Phải: Khung địa chỉ/máy, Cảnh báo Cooldown, AI Call Script, Zalo ZNS Mock & Form 4 kết quả cuộc gọi (`booked/callback/noanswer/declined`) + Check trùng lịch KTV (`ERR_CRM_002`) | ⏳ **KẾ HOẠCH MỚI** |
+| **Panel M5: Khách cần chăm sóc** (`panel-m5`, `m5CycleModal`) | `pages/m5_crm.py`<br>`callbacks/m5_callbacks.py` | • Header có badge `Chống gọi trùng 30 ngày` + 4 KPI Cards bấm lọc nhanh (`m5Kpi-pending`..`m5Kpi-done`)<br>• Biểu đồ Phễu 5 Điểm chạm Vàng & Cơ cấu Ưu tiên<br>• Khối làm việc 7:5 — Trái: Pills Trigger + Bảng KH ưu tiên; Phải: Khung địa chỉ/máy, Cảnh báo Cooldown, AI Call Script, Zalo ZNS Mock & Form 4 kết quả cuộc gọi (`booked/callback/noanswer/declined`) + Check trùng lịch KTV (`ERR_CRM_002`) | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M6: Hiệu quả kinh doanh** (`panel-m6`) | `pages/m6_performance.py`<br>`callbacks/m6_callbacks.py` | • Header bộ lọc kỳ đánh giá + Xuất CSV + 4 KPI Cards 3 dòng<br>• Tầng giữa 6:6: Biểu đồ Thác nước Lợi nhuận (`Waterfall`) + Bảng Chi tiết Bán kèm theo 4 Ngành hàng (kèm Insight đắt giá)<br>• Tầng dưới: Biểu đồ Attach-Rate vs `Chuẩn 60%` / `Mục tiêu 70%` + Bảng Xếp hạng & Nút Duyệt chi Hoa hồng nhân sự (`15% PK + 20% DV`) | ⏳ **KẾ HOẠCH MỚI** |
 
 ---
@@ -325,11 +325,11 @@ flowchart LR
   - Create: `src/dash_app/pages/m5_crm.py`, `src/dash_app/callbacks/m5_callbacks.py`, `tests/test_dash_m5.py`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED):** Viết `tests/test_dash_m5.py` kiểm tra click chọn khách hàng sinh đúng `AI Call Script` của **Điện Máy Anh Tâm**, chọn thẻ `booked` đặt lịch bị trùng giờ KTV báo lỗi `ERR_CRM_002`, gọi lại khách đang Cooldown báo lỗi `ERR_CRM_001`, và lưu thành công khi hợp lệ (kèm rollback SQLite).
-  - [ ] **Step 2:** Chạy `tests/test_dash_m5.py` xác nhận **RED**.
-  - [ ] **Step 3 (GREEN):** Lập trình `m5_crm.py` và `m5_callbacks.py`.
-  - [ ] **Step 4:** Chạy `tests/test_dash_m5.py` xác nhận **GREEN**.
-  - [ ] **Step 5:** Cập nhật Plan & Commit Giai đoạn 6 (`feat(dash-m5): implement Module 05 Smart CRM, Call Script and Booking UI in Dash`).
+  - [x] **Step 1 (RED):** Viết `tests/test_dash_m5.py` kiểm tra click chọn khách hàng sinh đúng `AI Call Script` của **Điện Máy Anh Tâm**, chọn thẻ `booked` đặt lịch bị trùng giờ KTV báo lỗi `ERR_CRM_002`, gọi lại khách đang Cooldown báo lỗi `ERR_CRM_001`, và lưu thành công khi hợp lệ (kèm rollback SQLite).
+  - [x] **Step 2:** Chạy `tests/test_dash_m5.py` xác nhận **RED**.
+  - [x] **Step 3 (GREEN):** Lập trình `m5_crm.py` và `m5_callbacks.py`.
+  - [x] **Step 4:** Chạy `tests/test_dash_m5.py` xác nhận **GREEN**. (`Ran 3 tests in 1.589s - OK`)
+  - [x] **Step 5:** Cập nhật Plan & Commit Giai đoạn 6 (`feat(dash-m5): implement Module 05 Smart CRM, Call Script and Booking UI in Dash`).
 
 ---
 
