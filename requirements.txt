@@ -1,5 +1,6 @@
-# Production dependencies for Streamlit Community Cloud (src/app_dashboard.py)
+# Production dependencies for Stock Sense ERP Dashboard
 # Offline synthetic-data packages (sdv, ctgan, torch) are intentionally excluded for fast cloud builds.
+dash>=2.17.0,<3.0.0
 streamlit>=1.42.0,<=1.50.0
 pandas>=2.2.0,<3.0.0
 numpy>=1.26.0,<3.0.0

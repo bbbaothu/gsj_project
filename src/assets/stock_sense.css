@@ -1,0 +1,119 @@
+/* Stock Sense ERP - Design System & Prototype Parity Styles */
+@layer components {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    line-height: 1;
+  }
+  .material-symbols-fill {
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  }
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #F8FAFC;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.custom-scrollbar::-webkit-scrollbar, ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track, ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb, ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover, ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-striped-blue {
+  background-image: repeating-linear-gradient(45deg, #EFF6FF, #EFF6FF 6px, #DBEAFE 6px, #DBEAFE 12px);
+}
+
+@keyframes red-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.25); }
+}
+.pulse-red-dot {
+  animation: red-dot-pulse 1.8s infinite;
+}
+
+.bg-frozen-stripes,
+.frozen-striped-bar {
+  background-color: #475569;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.22) 5px,
+    transparent 5px,
+    transparent 10px
+  );
+}
+
+.gap-pattern {
+  background: repeating-linear-gradient(
+    -45deg,
+    #FFE4E6,
+    #FFE4E6 5px,
+    #FECDD3 5px,
+    #FECDD3 10px
+  );
+}
+
+.kpi-card {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Collapsible Sidebar (216px -> 68px) */
+#appSidebar {
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#appSidebar.sidebar-collapsed {
+  width: 68px !important;
+}
+#appSidebar.sidebar-collapsed .sidebar-label,
+#appSidebar.sidebar-collapsed .sidebar-badge,
+#appSidebar.sidebar-collapsed .sidebar-section-header {
+  display: none !important;
+}
+#appSidebar.sidebar-collapsed .nav-tab-btn,
+#appSidebar.sidebar-collapsed .sidebar-quick-btn {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  position: relative;
+}
+#appSidebar.sidebar-collapsed .nav-tab-btn {
+  border-left-width: 0 !important;
+  border-radius: 0.5rem !important;
+}
+#appSidebar.sidebar-collapsed .sidebar-mini-dot {
+  display: block !important;
+}
+#appSidebar.sidebar-collapsed .sidebar-sync-card {
+  justify-content: center !important;
+  padding: 0.5rem !important;
+}
+#appSidebar.sidebar-collapsed .sidebar-sync-info {
+  display: none !important;
+}
