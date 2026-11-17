@@ -54,7 +54,7 @@
 | Thành phần Prototype | Thành phần Dash tương ứng (`src/dash_app/`) | Dữ liệu & Tương tác trọng tâm cần tái hiện 1:1 | Trạng thái |
 | :--- | :--- | :--- | :---: |
 | **App Shell & Modals chung** (`appSidebar`, `Topbar`, `quickSearchModal`, `toast`) | `components/layout_shell.py`<br>`callbacks/global_callbacks.py`<br>`src/assets/stock_sense.*` | • Sidebar thu gọn `216px -> 68px` (`Ctrl+B`), 2 nhóm menu + Badges + Thẻ Đồng bộ KiotViet<br>• Topbar `56px`: Chọn chi nhánh, Tìm nhanh `Ctrl+K`, Segmented Control RBAC `OWNER/SALES`, Chuông, Avatar `AT`<br>• Hệ thống Toast thông báo góc dưới phải | ✅ **ĐÃ HOÀN THÀNH** |
-| **Panel M1: Tổng quan kho** (`panel-m1`, `detailDrawer`) | `pages/m1_overview.py`<br>`callbacks/m1_callbacks.py` | • 4 KPI Cards (Thẻ 1 tích hợp Progress bar phân bổ vốn `Đọng 72% · Giữ 11% · Tốt 17%`; bấm thẻ để lọc 2 chiều)<br>• Thanh Filter Pills + Search + Bulk Action Floating Bar<br>• Bảng 9 cột mật độ cao (Tồn, Giữ, Bán ngay, Đang về, Sức khỏe, Vốn tồn, Hành động) + Biểu đồ Scatter SOH vs Tốc độ bán<br>• Slide-over `detailDrawer` tra cứu danh sách Serial/IMEI & $\Delta$ | ⏳ **KẾ HOẠCH MỚI** |
+| **Panel M1: Tổng quan kho** (`panel-m1`, `detailDrawer`) | `pages/m1_overview.py`<br>`callbacks/m1_callbacks.py` | • 4 KPI Cards (Thẻ 1 tích hợp Progress bar phân bổ vốn `Đọng 72% · Giữ 11% · Tốt 17%`; bấm thẻ để lọc 2 chiều)<br>• Thanh Filter Pills + Search + Bulk Action Floating Bar<br>• Bảng 9 cột mật độ cao (Tồn, Giữ, Bán ngay, Đang về, Sức khỏe, Vốn tồn, Hành động) + Biểu đồ Scatter SOH vs Tốc độ bán<br>• Slide-over `detailDrawer` tra cứu danh sách Serial/IMEI & $\Delta$ | ✅ **ĐÃ HOÀN THÀNH** |
 | **Panel M2: Cần xử lý hôm nay** (`panel-m2`, `m2DecisionDrawer`, `snoozeModal`, `m2ThresholdModal`) | `pages/m2_alerts.py`<br>`callbacks/m2_callbacks.py` | • Header 1 dòng có pulse-dot đỏ + Badges cảnh báo + Nút Xuất CSV & Ngưỡng cảnh báo<br>• 4 KPI Cards tối giản 3 dòng click lọc 2 chiều + 2 Biểu đồ (Phân bổ vốn kẹt & Runway `DOS` vs `Lead Time`)<br>• Bộ lọc 6 Pills + Bảng 7 cột + Khung khôi phục mã đã Hoãn<br>• `m2DecisionDrawer` + `snoozeModal` (`ERR_ACT_003`) + nút chuyển M3/M4 | ⏳ **KẾ HOẠCH MỚI** |
 | **Panel M3: Gợi ý xả hàng** (`panel-m3`, `m3SaleTagModal`, `m3CampaignModal`) | `pages/m3_clearance.py`<br>`callbacks/m3_callbacks.py` | • Header + 4 KPI Cards cao (`min-h-[146px]`) + Dải chọn 4 thẻ SKU ứng viên (`m3SkuSelectorGrid`)<br>• Cột trái 7 phần: 4 Kịch bản `PA1–PA4` (thẻ radio nổi bật Đề xuất tối ưu) + Simulator dòng tiền live (Slider giảm thêm + SL xả + 4 ô kết quả + Cảnh báo `MAP` / Cắt lỗ)<br>• Cột phải 5 phần: Biểu đồ so sánh Dòng tiền 4 chiến thuật + Bảng Radar đối chiếu ĐMX/MediaMart/Online + Hero Giá gợi ý làm tròn `..90k` ($PAI$) + `m3SaleTagModal` In tem giá xả đỏ | ⏳ **KẾ HOẠCH MỚI** |
 | **Panel M4: Gợi ý nhập hàng** (`panel-m4`, `m4SupplierDrawer`, `poPreviewModal`, `m4PoLifecycleModal`) | `pages/m4_replenishment.py`<br>`callbacks/m4_callbacks.py` | • Header + Bộ chuyển chu kỳ `14 ngày / 30 ngày` + Dropdown chỉnh nhanh Trần ngân sách (`150/200/250/350 tr`) + Nút Tự động cân đối<br>• 4 KPI Cards kèm thanh tiến độ giải ngân ngân sách + Biểu đồ Dự báo nhu cầu vs Hiện có & Phân bổ theo Hãng<br>• Bảng chỉnh sửa số lượng đặt mua + Card nhà cung cấp (`m4SupplierCardsContainer`) + `m4SupplierDrawer` + `poPreviewModal` gom PO theo Hãng & Xuất CSV | ⏳ **KẾ HOẠCH MỚI** |
@@ -196,10 +196,10 @@ flowchart LR
 
 ---
 
-### GIAI ĐOẠN 2: TDD MODULE 01 TRÊN PLOTLY DASH — TỔNG QUAN KHO & SERIAL DRILL-DOWN (`m1_overview`)
-**Thời lượng dự kiến:** 1.0 ngày | **Tham chiếu:** `L435–L668` & `L2679–L2763` của Prototype + `InventoryService` & `OrderService`.
+### GIAI ĐOẠN 2: TDD MODULE 01 TRÊN PLOTLY DASH — TỔNG QUAN KHO & SERIAL DRILL-DOWN (`m1_overview`) [x] ĐÃ HOÀN THÀNH
+**Thời lượng dự kiến:** 1.0 ngày | **Trạng thái:** ✅ Đã hoàn thành & Commit | **Tham chiếu:** `L435–L668` & `L2679–L2763` của Prototype + `InventoryService` & `OrderService`.
 
-#### Task 3–4: Trang Module 01 (`m1_overview.py`, `m1_callbacks.py`, `tests/test_dash_m1.py`)
+#### Task 3–4: Trang Module 01 (`m1_overview.py`, `m1_callbacks.py`, `tests/test_dash_m1.py`) [x] ĐÃ HOÀN THÀNH
 
 * **Thông tin chức năng:**
   - **4 Thẻ KPI Tương tác (`kpi-all`, `kpi-stagnant`, `kpi-held`, `kpi-low`):**
@@ -218,14 +218,14 @@ flowchart LR
   - Create: `src/dash_app/pages/m1_overview.py`, `src/dash_app/callbacks/m1_callbacks.py`, `tests/test_dash_m1.py`
 
 * **Cách thức triển khai (How-to - TDD Steps):**
-  - [ ] **Step 1 (RED):** Viết `tests/test_dash_m1.py` kiểm tra:
+  - [x] **Step 1 (RED):** Viết `tests/test_dash_m1.py` kiểm tra:
     - Render 4 KPI Cards M1 cho `ROLE_OWNER` (có giá vốn + thanh phân bổ 3 màu) vs `ROLE_SALES` (che giấu mọi giá vốn thành `"****** đ"`).
     - Filter callback theo KPI Card / Filter Pill / Search keyword trả về đúng số dòng SKU khớp `VW_INVENTORY_FLOW_OVERVIEW`.
     - Drawer callback `open_m1_serial_drawer("TV-SN-55X80K", role="ROLE_OWNER")` trả về danh sách Serial khớp với `stock_on_hand` và ẩn giá vốn khi `role="ROLE_SALES"`.
-  - [ ] **Step 2:** Chạy `tests/test_dash_m1.py` xác nhận **RED**.
-  - [ ] **Step 3 (GREEN):** Lập trình `m1_overview.py` và `m1_callbacks.py`.
-  - [ ] **Step 4:** Chạy `tests/test_dash_m1.py` xác nhận **GREEN**.
-  - [ ] **Step 5:** Cập nhật Plan & Commit Giai đoạn 2 (`feat(dash-m1): implement Module 01 Overview, 9-col Table and Serial Drawer in Dash`).
+  - [x] **Step 2:** Chạy `tests/test_dash_m1.py` xác nhận **RED**.
+  - [x] **Step 3 (GREEN):** Lập trình `m1_overview.py` và `m1_callbacks.py`.
+  - [x] **Step 4:** Chạy `tests/test_dash_m1.py` xác nhận **GREEN**.
+  - [x] **Step 5:** Cập nhật Plan & Commit Giai đoạn 2 (`feat(dash-m1): implement Module 01 Overview, 9-col Table and Serial Drawer in Dash`).
 
 ---
 
