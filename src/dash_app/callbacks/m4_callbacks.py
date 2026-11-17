@@ -1,13 +1,15 @@
 """
-Callbacks Module 04: Dự báo nhập hàng 14/30d, Cân đối ngân sách, Chỉnh SL +/-, Drawer Hãng, Gom PO & Xuất CSV.
+Callbacks Module 04 (Parity V2): Dự báo nhập hàng 14/30 ngày, Cân đối ngân sách, Chỉnh SL +/-, Drawer Hãng & Xuất CSV.
 """
 from typing import Any, Dict, List, Optional
 import dash
 from dash import ALL, Input, Output, State, dcc, html, no_update
-import plotly.graph_objects as go
 
-from src.dash_app.components.charts import apply_stock_sense_layout, empty_figure
-from src.dash_app.components.layout_shell import format_vnd_compact, format_vnd_full
+from src.dash_app.components.layout_shell import (
+    format_vnd_compact,
+    format_vnd_full,
+    get_brand_badge_class,
+)
 
 BRAND_COLORS = ["#0F172A", "#059669", "#F59E0B", "#2563EB", "#6366F1", "#EC4899"]
 
@@ -172,11 +174,16 @@ def render_m4_workspace(
         avl = int(it["avl"])
         inc = int(it["inc"])
         demand_total = max(1.0, float(it["forecast_demand"]) + float(it["safety_stock"]))
-        gap = max(0.0, demand_total - avl - inc)
-        pct_avl = min(100.0, round(max(0, avl) / demand_total * 100.0, 1))
-        pct_inc = min(100.0 - pct_avl, round(inc / demand_total * 100.0, 1))
-        pct_gap = max(0.0, round(100.0 - pct_avl - pct_inc, 1))
+        avl_pos = max(0, avl)
+        # Lượng hàng đang về ròng còn lại sau khi bù đơn đã giữ cọc nếu avl < 0
+        inc_effective = max(0, avl + inc - avl_pos)
+        gap = max(0.0, demand_total - (avl + inc))
+        bar_denom = max(1.0, float(avl_pos + inc_effective) + gap, demand_total)
+        pct_avl = min(100.0, round((avl_pos / bar_denom) * 100.0, 1))
+        pct_inc = min(100.0 - pct_avl, round((inc_effective / bar_denom) * 100.0, 1))
+        pct_gap = max(0.0, round(100.0 - pct_avl - pct_inc, 1)) if gap > 0 else 0.0
 
+        brand_cls = get_brand_badge_class(it.get("brand"))
         unit_price_txt = "****** đ" if role == "ROLE_SALES" else format_vnd_full(it["cost_price"], role)
         line_total_txt = "****** đ" if role == "ROLE_SALES" else format_vnd_compact(it["line_total"] or 0, role)
 
@@ -190,13 +197,16 @@ def render_m4_workspace(
                             html.Div(
                                 [
                                     html.Span(it["product_name"], className="font-semibold text-slate-900 leading-snug"),
-                                    html.Span(it["brand"], className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold"),
+                                    html.Span(it["brand"], className=f"px-1.5 py-0.5 rounded border text-[10px] font-bold {brand_cls}"),
                                 ],
                                 className="flex flex-wrap items-center gap-1.5",
                             ),
                             html.Div(
-                                f"{code} · MOQ {it['moq']} · Kiện {it['pack_size']} · Tin cậy {it['confidence_score']:.0f}%",
-                                className="text-[11px] font-mono text-slate-400 mt-0.5",
+                                [
+                                    html.Span(code, className="font-code font-semibold text-slate-500"),
+                                    html.Span(f" · Đặt tối thiểu {it['moq']} · Quy cách {it['pack_size']} · Độ tin cậy {it['confidence_score']:.0f}%"),
+                                ],
+                                className="text-[11px] text-slate-400 mt-0.5",
                             ),
                         ],
                     ),
@@ -205,12 +215,12 @@ def render_m4_workspace(
                         children=[
                             html.Div(
                                 [
-                                    html.Span(f"AVL: {avl}", className=f"font-bold {'text-rose-600' if avl <= 2 else 'text-slate-800'}"),
-                                    html.Span(f" · INC: {inc}", className="text-blue-600 font-semibold"),
+                                    html.Span(f"Có thể bán: {avl}", className=f"font-bold font-code {'text-rose-600' if avl <= 2 else 'text-slate-800'}"),
+                                    html.Span(f" · Đang về: +{inc}", className="text-blue-600 font-semibold font-code"),
                                 ],
                                 className="text-xs",
                             ),
-                            html.Div(f"An toàn: {it['safety_stock']} chiếc", className="text-[11px] text-slate-400 mt-0.5"),
+                            html.Div(f"Định mức an toàn: {it['safety_stock']} chiếc", className="text-[11px] text-slate-400 mt-0.5"),
                         ],
                     ),
                     html.Td(
@@ -218,8 +228,8 @@ def render_m4_workspace(
                         children=[
                             html.Div(
                                 [
-                                    html.Span(f"Nhu cầu {state['cycle_days']}d: {it['forecast_demand']:.1f}", className="font-medium text-slate-700"),
-                                    html.Span(f"Thiếu {gap:.0f}" if gap > 0 else "Đủ", className=f"font-bold {'text-rose-600' if gap > 0 else 'text-emerald-600'}"),
+                                    html.Span(f"Nhu cầu {state['cycle_days']} ngày: {it['forecast_demand']:.1f}", className="font-medium text-slate-700"),
+                                    html.Span(f"Thiếu {gap:.0f}" if gap > 0 else "Đủ tồn", className=f"font-bold {'text-rose-600' if gap > 0 else 'text-emerald-600'}"),
                                 ],
                                 className="flex items-center justify-between text-[11px] mb-1 tabular-nums",
                             ),
@@ -227,7 +237,7 @@ def render_m4_workspace(
                                 [
                                     html.Div(style={"width": f"{pct_avl}%"}, className="h-full bg-emerald-500"),
                                     html.Div(style={"width": f"{pct_inc}%"}, className="h-full bg-blue-600"),
-                                    html.Div(style={"width": f"{pct_gap}%"}, className="h-full bg-rose-300"),
+                                    html.Div(style={"width": f"{pct_gap}%"}, className="h-full gap-pattern"),
                                 ],
                                 className="w-full h-2 bg-slate-100 rounded-full overflow-hidden flex",
                             ),
@@ -239,7 +249,7 @@ def render_m4_workspace(
                             html.Div(
                                 [
                                     html.Button("−", id={"type": "m4-qty-minus", "sku": code}, n_clicks=0, className="w-7 h-7 rounded-md border border-slate-300 bg-white hover:bg-slate-100 font-bold text-slate-700 cursor-pointer"),
-                                    html.Span(str(it["suggested_qty"]), className="w-9 text-center font-mono font-bold text-sm text-slate-900 tabular-nums"),
+                                    html.Span(str(it["suggested_qty"]), className="w-9 text-center font-code font-bold text-sm text-slate-900 tabular-nums"),
                                     html.Button("+", id={"type": "m4-qty-plus", "sku": code}, n_clicks=0, className="w-7 h-7 rounded-md border border-slate-300 bg-white hover:bg-slate-100 font-bold text-slate-700 cursor-pointer"),
                                 ],
                                 className="inline-flex items-center justify-center gap-1",
@@ -250,7 +260,7 @@ def render_m4_workspace(
                     html.Td(
                         className="pl-2.5 pr-4 py-3 align-top text-right tabular-nums",
                         children=[
-                            html.Div(line_total_txt, className="font-mono font-bold text-slate-900 cost-val"),
+                            html.Div(line_total_txt, className="font-code font-bold text-slate-900 cost-val"),
                             html.Div(f"{unit_price_txt}/máy", className="text-[11px] text-slate-400 mt-0.5 cost-val"),
                         ],
                     ),
@@ -302,8 +312,8 @@ def render_m4_workspace(
                     html.Div(g["vendor_name"], className="text-[11px] text-slate-500 truncate mt-0.5"),
                     html.Div(
                         [
-                            html.Span(f"{len(g['items'])} SKU · {g['total_units']} thiết bị", className="text-[11px] font-medium text-slate-600"),
-                            html.Span(amt_txt, className="font-mono font-bold text-xs text-slate-900 cost-val"),
+                            html.Span(f"{len(g['items'])} mặt hàng · {g['total_units']} thiết bị", className="text-[11px] font-medium text-slate-600"),
+                            html.Span(amt_txt, className="font-code font-bold text-xs text-slate-900 cost-val"),
                         ],
                         className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100",
                     ),
@@ -319,7 +329,7 @@ def render_m4_workspace(
 
     if not supplier_cards:
         supplier_cards = [
-            html.Div("Chưa có mặt hàng nào có SL > 0 để gom đơn PO.", className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl")
+            html.Div("Chưa có mặt hàng nào có số lượng > 0 để gom đơn nhập.", className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl")
         ]
 
     # Approve Modal body
@@ -333,11 +343,11 @@ def render_m4_workspace(
                 children=[
                     html.Div(
                         [
-                            html.Strong(f"{idx}. PO-{g['brand'].upper()} · {g['vendor_name']}", className="text-slate-900"),
-                            html.Div(skus_txt, className="text-slate-500 mt-0.5"),
+                            html.Strong(f"{idx}. Đơn nhập {g['brand'].upper()} · {g['vendor_name']}", className="text-slate-900"),
+                            html.Div(skus_txt, className="text-slate-500 mt-0.5 font-code text-[11px]"),
                         ]
                     ),
-                    html.Span(amt_txt, className="font-mono font-bold text-slate-900 cost-val shrink-0"),
+                    html.Span(amt_txt, className="font-code font-bold text-slate-900 cost-val shrink-0"),
                 ],
             )
         )
@@ -345,8 +355,8 @@ def render_m4_workspace(
         html.Div(
             className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex justify-between items-center font-bold text-emerald-900",
             children=[
-                html.Span(f"TỔNG DỰ TOÁN ({len(groups)} PO · Đạt Freeship {freeship_count}/{len(groups)} hãng)"),
-                html.Span("****** đ" if role == "ROLE_SALES" else format_vnd_full(total_cost, role), className="font-mono text-sm cost-val"),
+                html.Span(f"TỔNG DỰ TOÁN ({len(groups)} đơn nhập · Đạt Freeship {freeship_count}/{len(groups)} hãng)"),
+                html.Span("****** đ" if role == "ROLE_SALES" else format_vnd_full(total_cost, role), className="font-code text-sm cost-val"),
             ],
         )
     )
@@ -400,39 +410,6 @@ def render_m4_workspace(
                 ],
             )
         )
-
-    # Demand Chart
-    if not state["visible_items"]:
-        fig_demand = empty_figure("Không có dữ liệu dự báo nhu cầu", height=230)
-    else:
-        chart_items = state["visible_items"][:6]
-        names = [x["product_code"] for x in chart_items]
-        demands = [round(x["forecast_demand"] + x["safety_stock"], 1) for x in chart_items]
-        supplies = [x["avl"] + x["inc"] for x in chart_items]
-        sugs = [x["suggested_qty"] for x in chart_items]
-        fig_demand = go.Figure()
-        fig_demand.add_bar(name="Nhu cầu an toàn", x=names, y=demands, marker_color="#94A3B8")
-        fig_demand.add_bar(name="Có sẵn + Đang về", x=names, y=supplies, marker_color="#059669")
-        fig_demand.add_bar(name="Đề xuất nhập", x=names, y=sugs, marker_color="#2563EB")
-        fig_demand.update_layout(barmode="group", legend=dict(orientation="h", y=1.15, x=0))
-        apply_stock_sense_layout(fig_demand, height=230, margin=dict(l=28, r=12, t=32, b=28))
-
-    # Budget Allocation Chart
-    if role == "ROLE_SALES":
-        fig_budget = empty_figure("Đã ẩn số liệu phân bổ vốn theo quyền Nhân viên bán hàng", height=230)
-    elif not groups:
-        fig_budget = empty_figure("Chưa có đơn hàng cần phân bổ vốn", height=230)
-    else:
-        fig_budget = go.Figure()
-        fig_budget.add_bar(
-            x=[g["brand"] for g in groups],
-            y=[round(g["total_amount"] / 1_000_000.0, 1) for g in groups],
-            marker_color=BRAND_COLORS[: len(groups)],
-            text=[f"{g['total_amount']/1_000_000.0:.1f} tr" for g in groups],
-            textposition="outside",
-        )
-        fig_budget.update_yaxes(title_text="Triệu VNĐ")
-        apply_stock_sense_layout(fig_budget, height=230, margin=dict(l=38, r=12, t=28, b=28))
 
     # Strings for KPIs
     budget_text_short = "****** đ" if role == "ROLE_SALES" else format_vnd_compact(cap, role)
@@ -488,8 +465,6 @@ def render_m4_workspace(
         "recent_po_strip": po_strip_cards,
         "po_lifecycle_list": po_lifecycle_rows,
         "approve_modal_body": approve_body,
-        "fig_demand": fig_demand,
-        "fig_budget": fig_budget,
     }
 
 
@@ -682,8 +657,6 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Output("m4RecentPoStrip", "children"),
         Output("m4PoLifecycleList", "children"),
         Output("m4ApproveModalBody", "children"),
-        Output("m4DemandChart", "figure"),
-        Output("m4BudgetChart", "figure"),
         Input("store-m4-cycle", "data"),
         Input("store-m4-budget", "data"),
         Input("store-m4-brand", "data"),
@@ -737,8 +710,6 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
             res["recent_po_strip"],
             res["po_lifecycle_list"],
             res["approve_modal_body"],
-            res["fig_demand"],
-            res["fig_budget"],
         )
 
     @app.callback(

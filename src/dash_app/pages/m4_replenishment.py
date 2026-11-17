@@ -111,7 +111,7 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition cursor-pointer",
                                         children=[
                                             html.Span("📋"),
-                                            html.Span(["PO đã phát hành (", html.Strong("2", id="m4IssuedPoCountBadge"), ")"]),
+                                            html.Span(["Đơn đặt nhập đã phát hành (", html.Strong("2", id="m4IssuedPoCountBadge", className="font-code"), ")"]),
                                         ],
                                     ),
                                     html.Button(
@@ -277,34 +277,14 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                         type="text",
                                         value="",
                                         debounce=True,
-                                        placeholder="Tìm tên máy, mã SKU...",
+                                        placeholder="Tìm tên máy, mã sản phẩm...",
                                         className="px-3 py-1.5 w-52 rounded-lg text-xs bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none",
                                     ),
                                 ],
                             ),
                         ],
                     ),
-                    # 4. CHARTS STRIP (2 BIỂU ĐỒ TRỰC QUAN DỰ BÁO NHU CẦU & NGÂN SÁCH THEO HÃNG)
-                    html.Section(
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-4",
-                        children=[
-                            html.Div(
-                                className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs",
-                                children=[
-                                    html.Div("Nhu cầu an toàn vs Tồn khả dụng & Đang về", className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2"),
-                                    dcc.Graph(id="m4DemandChart", config={"displayModeBar": False}, style={"height": "230px"}),
-                                ],
-                            ),
-                            html.Div(
-                                className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs",
-                                children=[
-                                    html.Div("Phân bổ vốn đặt hàng theo Nhà phân phối", className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2"),
-                                    dcc.Graph(id="m4BudgetChart", config={"displayModeBar": False}, style={"height": "230px"}),
-                                ],
-                            ),
-                        ],
-                    ),
-                    # 5. MAIN 8:4 INTERACTIVE WORKSPACE
+                    # 4. MAIN 8:4 INTERACTIVE WORKSPACE (Đã bỏ 2 biểu đồ top theo thiết kế mới)
                     html.Section(
                         className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-stretch",
                         children=[
@@ -328,7 +308,7 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                                         [
                                                             html.Span([html.Span(className="w-2.5 h-2 rounded-sm bg-emerald-500"), html.Span(" Khả dụng")], className="inline-flex items-center gap-1"),
                                                             html.Span([html.Span(className="w-2.5 h-2 rounded-sm bg-blue-600"), html.Span(" Đang về")], className="inline-flex items-center gap-1"),
-                                                            html.Span([html.Span(className="w-2.5 h-2 rounded-sm bg-rose-300 border border-rose-400"), html.Span(" Khoảng thiếu")], className="inline-flex items-center gap-1"),
+                                                            html.Span([html.Span(className="w-3 h-2.5 rounded-xs gap-pattern border border-rose-300"), html.Span(" Khoảng thiếu")], className="inline-flex items-center gap-1"),
                                                         ],
                                                         className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500",
                                                     ),
@@ -367,8 +347,8 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                                 children=[
                                                     html.Div(
                                                         [
-                                                            html.Span("Tiến độ đơn PO đã phát hành (Cập nhật hàng đang về INC)", className="text-[11px] font-bold uppercase tracking-wider text-slate-500"),
-                                                            html.Button("Quản lý tất cả PO →", id="m4ManageAllPoBtn", n_clicks=0, className="text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"),
+                                                            html.Span("Tiến độ đơn nhập đã phát hành (Cập nhật hàng đang về)", className="text-[11px] font-bold uppercase tracking-wider text-slate-500"),
+                                                            html.Button("Quản lý tất cả đơn nhập →", id="m4ManageAllPoBtn", n_clicks=0, className="text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer"),
                                                         ],
                                                         className="flex items-center justify-between gap-2 mb-2",
                                                     ),
@@ -520,8 +500,8 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                 children=[
                                     html.Div(
                                         [
-                                            html.H3("Xác nhận Phê duyệt & Phát hành Đơn nhập hàng (PO)", className="text-base font-bold text-slate-900"),
-                                            html.P("Hệ thống sẽ sinh mã PO-xxxx riêng cho từng Nhà phân phối", className="text-xs text-slate-500 mt-0.5"),
+                                            html.H3("Xác nhận Phê duyệt & Phát hành Đơn nhập hàng", className="text-base font-bold text-slate-900"),
+                                            html.P("Hệ thống sẽ sinh mã phiếu nhập riêng cho từng Nhà phân phối", className="text-xs text-slate-500 mt-0.5"),
                                         ]
                                     ),
                                     html.Button("✕", id="m4CloseApproveModalBtn", n_clicks=0, className="text-slate-400 hover:text-slate-600 cursor-pointer"),
@@ -531,11 +511,11 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                             html.Div(
                                 className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100",
                                 children=[
-                                    html.Button("📥 Xuất file Excel PO", id="m4ApproveExportCsvBtn", n_clicks=0, className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"),
+                                    html.Button("📥 Xuất file Excel đơn nhập", id="m4ApproveExportCsvBtn", n_clicks=0, className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"),
                                     html.Div(
                                         [
                                             html.Button("Xem lại", id="m4CancelApproveModalBtn", n_clicks=0, className="px-3.5 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 cursor-pointer"),
-                                            html.Button("✓ Ký duyệt & Phát hành PO", id="m4ConfirmApproveBtn", n_clicks=0, className="px-4 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm cursor-pointer"),
+                                            html.Button("✓ Ký duyệt & Phát hành đơn", id="m4ConfirmApproveBtn", n_clicks=0, className="px-4 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm cursor-pointer"),
                                         ],
                                         className="flex items-center gap-2",
                                     ),
@@ -545,7 +525,7 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                     )
                 ],
             ),
-            # PO LIFECYCLE MODAL (m4PoLifecycleModal)
+            # LIFECYCLE MODAL (m4PoLifecycleModal)
             html.Div(
                 id="m4PoLifecycleModal",
                 className="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4",
@@ -558,8 +538,8 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                                 children=[
                                     html.Div(
                                         [
-                                            html.H3("Theo dõi Tiến độ Đơn Mua Hàng (PO Lifecycle)", className="text-base font-bold text-slate-900"),
-                                            html.P("Danh sách đơn nhập từ SQLite PURCHASE_ORDERS & hàng đang về (INC)", className="text-xs text-slate-500 mt-0.5"),
+                                            html.H3("Theo dõi Tiến độ Đơn Mua Hàng", className="text-base font-bold text-slate-900"),
+                                            html.P("Danh sách đơn nhập đang theo dõi & hàng đang vận chuyển về kho", className="text-xs text-slate-500 mt-0.5"),
                                         ]
                                     ),
                                     html.Button("✕", id="m4CloseLifecycleModalBtn", n_clicks=0, className="text-slate-400 hover:text-slate-600 cursor-pointer"),
@@ -569,7 +549,7 @@ def build_m4_panel(is_active: bool = False) -> html.Main:
                             html.Div(
                                 className="flex items-center justify-between pt-3 border-t border-slate-100",
                                 children=[
-                                    html.Button("📥 Xuất danh sách PO (Excel)", id="m4LifecycleExportCsvBtn", n_clicks=0, className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"),
+                                    html.Button("📥 Xuất danh sách đơn nhập (Excel)", id="m4LifecycleExportCsvBtn", n_clicks=0, className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"),
                                     html.Button("Đóng", id="m4CloseLifecycleFooterBtn", n_clicks=0, className="px-4 py-2 rounded-lg text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"),
                                 ],
                             ),
