@@ -286,10 +286,10 @@ Mọi màn hình từ M1 đến M6 đều tuân thủ ánh xạ sau để chủ 
 * **Files:**
   - Modify: `src/app_dashboard.py`, `tests/test_dash_e2e_integration.py`, `docs/IMPLEMENTATION_PLAN_DASH_PARITY_V2.md`
 * **Cách thức triển khai (Verification Steps):**
-  - [ ] **Step 1:** Rà soát toàn bộ `src/dash_app/` + `src/app_dashboard.py` bảo đảm `test_dash_e2e_integration.py` kiểm tra thêm các ID/callback mới (`m1ReservedOrdersSection`, `m1OrderDetailModal`, `m2-capital-pie`, `m5ServiceRevenuePie`, `m6PolicyConfigPanel`) trả HTTP 200 ở `/`, `/_dash-layout`, `/_dash-update-component`.
-  - [ ] **Step 2:** Chạy toàn bộ `.venv/bin/python -m unittest discover tests -v` — tất cả tests cũ và mới **PASS 100%**, sau đó `git checkout data/retail_dienmay.db` (hoặc giữ nguyên DB seed mới đã kiểm chứng sạch).
-  - [ ] **Step 3:** Chạy server thực `.venv/bin/python src/app_dashboard.py` trên cổng `8050` (`8059` tạm khi test), dùng Chrome DevTools Protocol (`1440×1400`) chụp lại **6 ảnh thực tế M1–M6**, mở bằng `read_file` để kiểm tra kỹ từng mục (không cắt chữ, không đè tên trên scatter, đủ badge/chỉ báo tiếng Việt, Pie chart M2/M5, sọc chéo M4, 7:5 M5, policy M6).
-  - [ ] **Step 4:** Khởi chạy server Dash chuẩn trên `http://127.0.0.1:8050/`, tích hoàn tất mọi checkbox trong Plan và Commit Giai đoạn 8 (`feat(dash-v2): complete full prototype parity and plain Vietnamese UX across M1-M6`).
+  - [x] **Step 1:** Rà soát toàn bộ `src/dash_app/` + `src/app_dashboard.py` bảo đảm `test_dash_e2e_integration.py` kiểm tra thêm các ID/callback mới (`m1ReservedOrdersSection`, `m1OrderDetailModal`, `m2-capital-chart`, `m5ServiceRevenuePie`, `m6PolicyConfigPanel`) trả HTTP 200 ở `/`, `/_dash-layout`, `/_dash-update-component`.
+  - [x] **Step 2:** Chạy toàn bộ `.venv/bin/python -m unittest discover tests -v` — tất cả tests cũ và mới **PASS 100%** (`Ran 72 tests - OK`), DB seed sạch sẽ không rác test.
+  - [x] **Step 3:** Chạy server thực `.venv/bin/python src/app_dashboard.py` trên cổng `8050`, dùng Chrome DevTools Protocol (`1440×1400`) chụp lại **6 ảnh thực tế M1–M6**, kiểm tra trực tiếp bằng `read_file` xác nhận từng mục (không cắt chữ, không đè tên trên scatter, đủ badge/chỉ báo tiếng Việt, Pie chart M2/M5, sọc chéo `.gap-pattern` M4, 7:5 M5, policy M6).
+  - [x] **Step 4:** Máy chủ Dash chuẩn đang chạy ổn định tại `http://127.0.0.1:8050/` (`HTTP 200`), tích hoàn tất mọi checkbox trong Plan và Commit Giai đoạn 8 (`feat(dash-v2): complete full prototype parity and plain Vietnamese UX across M1-M6`).
 
 ---
 

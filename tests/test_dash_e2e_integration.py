@@ -33,14 +33,36 @@ class TestDashE2EIntegration(unittest.TestCase):
             "panel-m5",
             "panel-m6",
             "detailDrawer",
+            "m1ReservedOrdersSection",
+            "m1OrderDetailModal",
+            "m1BrandSelect",
             "m2DecisionDrawer",
+            "m2-capital-chart",
+            "btn-m2-pareto-filter",
+            "m3SyncRadarPriceBtn",
+            "m3PricePositionRuler",
+            "m3StrategicInsightBox",
             "poPreviewModal",
+            "m5ServiceRevenuePie",
+            "m5QueueScrollBox",
             "m5CycleModal",
+            "m6PolicyConfigPanel",
+            "m6TotalBonusFundDisplay",
         ]:
             self.assertIn(landmark, layout_text, f"Thiếu ID '{landmark}' trong JSON /_dash-layout")
 
+        for removed_id in [
+            "m2-runway-chart",
+            "m3-tactic-chart",
+            "m4DemandChart",
+            "m4BudgetChart",
+            "m5PriorityChart",
+            "m5TriggersChart",
+        ]:
+            self.assertNotIn(removed_id, layout_text, f"Biểu đồ cũ '{removed_id}' phải được gỡ bỏ khỏi /_dash-layout")
+
         # Kiểm tra đã nạp callbacks của cả Global + M1..M6
-        self.assertGreater(len(app.callback_map), 15)
+        self.assertGreater(len(app.callback_map), 20)
 
     def test_dash_post_rbac_and_tab_switch_callbacks(self):
         """POST /_dash-update-component mô phỏng chuyển RBAC -> ROLE_SALES và chuyển Tab m1 -> m3."""
@@ -120,6 +142,23 @@ class TestDashE2EIntegration(unittest.TestCase):
         self.assertEqual(tab_res["response"]["store-active-tab"]["data"], "m3")
         self.assertEqual(tab_res["response"]["panel-m3"]["style"]["display"], "flex")
         self.assertEqual(tab_res["response"]["panel-m1"]["style"]["display"], "none")
+
+        # 3. POST /_dash-update-component kiểm tra đổi kỳ Pie Chart Doanh thu M5 sang 90 ngày (3 tháng)
+        m5_rev_key = next(k for k in app.callback_map if "store-m5-rev-period.data" in k)
+        m5_payload = {
+            "output": m5_rev_key,
+            "outputs": {"id": "store-m5-rev-period", "property": "data"},
+            "inputs": [
+                {"id": "m5RevPeriod14", "property": "n_clicks", "value": 0},
+                {"id": "m5RevPeriod30", "property": "n_clicks", "value": 0},
+                {"id": "m5RevPeriod90", "property": "n_clicks", "value": 1},
+            ],
+            "changedPropIds": ["m5RevPeriod90.n_clicks"],
+            "state": [],
+        }
+        r_m5 = client.post("/_dash-update-component", data=json.dumps(m5_payload), content_type="application/json")
+        self.assertEqual(r_m5.status_code, 200, r_m5.data.decode("utf-8"))
+        self.assertEqual(r_m5.get_json()["response"]["store-m5-rev-period"]["data"], 90)
 
 
 if __name__ == "__main__":

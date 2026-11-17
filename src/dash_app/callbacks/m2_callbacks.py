@@ -553,21 +553,24 @@ def render_m2_workspace(
                             ],
                             className="cell-hscroll",
                         ),
-                        className="py-3 px-3 max-w-[260px]",
+                        className="py-3 px-2.5",
                     ),
-                    # Cột 3: Tồn thực / Định mức
+                    # Cột 3: Tồn thực / Định mức (.cell-hscroll)
                     html.Td(
-                        [
-                            html.Div(
-                                [
-                                    html.Span(f"{soh_display} / {norm_val} {r['unit']}", className="font-bold text-slate-900 font-code"),
-                                    html.Span(rec["ratio_badge"], className=f"px-1.5 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap {rec['ratio_badge_cls']}"),
-                                ],
-                                className="flex items-center gap-1.5 whitespace-nowrap",
-                            ),
-                            html.Div(rec["stock_subline"], className="text-[11px] text-slate-500 mt-0.5 whitespace-nowrap"),
-                        ],
-                        className="py-3 px-3",
+                        html.Div(
+                            [
+                                html.Div(
+                                    [
+                                        html.Span(f"{soh_display} / {norm_val} {r['unit']}", className="font-bold text-slate-900 font-code"),
+                                        html.Span(rec["ratio_badge"], className=f"px-1.5 py-0.5 rounded border text-[10px] font-semibold whitespace-nowrap {rec['ratio_badge_cls']}"),
+                                    ],
+                                    className="flex items-center gap-1.5 whitespace-nowrap",
+                                ),
+                                html.Div(rec["stock_subline"], className="text-[11px] text-slate-500 mt-0.5 whitespace-nowrap"),
+                            ],
+                            className="cell-hscroll",
+                        ),
+                        className="py-3 px-2.5",
                     ),
                     # Cột 4: Đường băng & Tốc độ bán (.cell-hscroll)
                     html.Td(
@@ -587,15 +590,18 @@ def render_m2_workspace(
                             ],
                             className="cell-hscroll",
                         ),
-                        className="py-3 px-3 max-w-[225px]",
+                        className="py-3 px-2.5",
                     ),
                     # Cột 5: Vốn đọng / Rủi ro
                     html.Td(
-                        [
-                            html.Div(rec["risk_top"], className=f"font-bold text-[12px] font-code whitespace-nowrap {rec['risk_top_cls']}"),
-                            html.Div(rec["risk_sub"], className="text-[11px] text-slate-400 mt-0.5 cost-val whitespace-nowrap"),
-                        ],
-                        className="py-3 px-3",
+                        html.Div(
+                            [
+                                html.Div(rec["risk_top"], className=f"font-bold text-[12px] font-code whitespace-nowrap {rec['risk_top_cls']}"),
+                                html.Div(rec["risk_sub"], className="text-[11px] text-slate-400 mt-0.5 cost-val whitespace-nowrap"),
+                            ],
+                            className="cell-hscroll",
+                        ),
+                        className="py-3 px-2.5",
                     ),
                     # Cột 6: Nguyên nhân cốt lõi (.cell-hscroll)
                     html.Td(
@@ -606,24 +612,24 @@ def render_m2_workspace(
                             ],
                             className="cell-hscroll",
                         ),
-                        className="py-3 px-3 max-w-[235px]",
+                        className="py-3 px-2.5",
                     ),
                     # Cột 7: Hành động quyết định + Nút Tạm hoãn
                     html.Td(
                         html.Div(
                             [
-                                html.Button(rec["cta_label"], id=action_btn_id, n_clicks=0, className=rec["cta_cls"]),
+                                html.Button(rec["cta_label"], id=action_btn_id, n_clicks=0, className=f"{rec['cta_cls']} text-[11px] px-2 py-1"),
                                 html.Button(
                                     html.I(className="ph-bold ph-clock text-sm"),
                                     id={"type": "m2-row-snooze", "sku": code, "kind": row_kind},
                                     n_clicks=0,
                                     title="Tạm hoãn cảnh báo",
-                                    className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 cursor-pointer",
+                                    className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 cursor-pointer shrink-0",
                                 ),
                             ],
-                            className="flex items-center justify-end gap-1.5",
+                            className="flex items-center justify-end gap-1",
                         ),
-                        className="py-3 px-3 text-right whitespace-nowrap",
+                        className="py-3 px-2.5 text-right whitespace-nowrap",
                     ),
                 ],
             )

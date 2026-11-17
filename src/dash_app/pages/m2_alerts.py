@@ -382,20 +382,20 @@ def build_m2_panel(services: Dict[str, Any], active: bool = False, role: str = "
                                 html.Thead(
                                     html.Tr(
                                         [
-                                            html.Th("☐", className="py-2.5 pl-3.5 pr-1.5 text-center text-slate-400 w-9"),
-                                            html.Th("SẢN PHẨM & VỊ TRÍ KỆ", className="py-2.5 px-3 min-w-[230px]"),
-                                            html.Th("TỒN THỰC / ĐỊNH MỨC", className="py-2.5 px-3 min-w-[165px]"),
-                                            html.Th("ĐƯỜNG BĂNG & TỐC ĐỘ BÁN", className="py-2.5 px-3 min-w-[205px]"),
-                                            html.Th("VỐN ĐỌNG / RỦI RO", className="py-2.5 px-3 min-w-[140px]"),
-                                            html.Th("NGUYÊN NHÂN CỐT LÕI", className="py-2.5 px-3 min-w-[215px]"),
-                                            html.Th("HÀNH ĐỘNG QUYẾT ĐỊNH", className="py-2.5 px-3 text-right min-w-[175px]"),
+                                            html.Th("☐", className="py-2.5 pl-3 pr-1 text-center text-slate-400 w-[32px]"),
+                                            html.Th("SẢN PHẨM & VỊ TRÍ KỆ", className="py-2.5 px-2.5 w-[20%]"),
+                                            html.Th("TỒN THỰC / ĐỊNH MỨC", className="py-2.5 px-2.5 w-[15%]"),
+                                            html.Th("ĐƯỜNG BĂNG & TỐC ĐỘ BÁN", className="py-2.5 px-2.5 w-[17%]"),
+                                            html.Th("VỐN ĐỌNG / RỦI RO", className="py-2.5 px-2.5 w-[12%]"),
+                                            html.Th("NGUYÊN NHÂN CỐT LÕI", className="py-2.5 px-2.5 w-[18%]"),
+                                            html.Th("HÀNH ĐỘNG QUYẾT ĐỊNH", className="py-2.5 px-2.5 text-right w-[15%]"),
                                         ],
                                         className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500",
                                     )
                                 ),
                                 html.Tbody(init_ws["table_rows"], id="m2-alerts-table-body", className="divide-y divide-slate-200/60 text-xs"),
                             ],
-                            className="w-full text-left border-collapse",
+                            className="w-full table-fixed text-left border-collapse",
                         ),
                         className="overflow-x-auto",
                     ),
