@@ -692,7 +692,7 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Input("store-m4-qty-overrides", "data"),
         Input("store-m4-autobalance", "data"),
         Input("store-m4-po-refresh", "data"),
-        Input("store-rbac-role", "data"),
+        Input("store-role", "data"),
     )
     def sync_m4_workspace(cycle, budget, brand, show_adq, search_txt, overrides, auto_bal, _po_ref, role):
         res = render_m4_workspace(
@@ -755,7 +755,7 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
         State("store-m4-budget", "data"),
         State("store-m4-qty-overrides", "data"),
         State("store-m4-autobalance", "data"),
-        State("store-rbac-role", "data"),
+        State("store-role", "data"),
         prevent_initial_call=True,
     )
     def toggle_supplier_drawer(open_clicks, c1, c2, go_approve, cycle, budget, overrides, auto_bal, role):
@@ -834,13 +834,13 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
 
     @app.callback(
         Output("store-m4-po-refresh", "data"),
-        Output("store-toast-msg", "data", allow_duplicate=True),
+        Output("store-toast", "data", allow_duplicate=True),
         Input("m4ConfirmApproveBtn", "n_clicks"),
         State("store-m4-cycle", "data"),
         State("store-m4-budget", "data"),
         State("store-m4-qty-overrides", "data"),
         State("store-m4-autobalance", "data"),
-        State("store-rbac-role", "data"),
+        State("store-role", "data"),
         State("store-m4-po-refresh", "data"),
         prevent_initial_call=True,
     )
@@ -857,8 +857,8 @@ def register_m4_callbacks(app: Any, services: Dict[str, Any]) -> None:
         )
         res = submit_m4_purchase_orders(replenish_svc, state["items"], role=role or "ROLE_OWNER")
         if res.get("success"):
-            return (cur_ref or 0) + 1, res["message"]
-        return no_update, res.get("error", "Không thể phát hành đơn PO")
+            return (cur_ref or 0) + 1, {"open": True, "message": res["message"], "kind": "success"}
+        return no_update, {"open": True, "message": res.get("error", "Không thể phát hành đơn PO"), "kind": "error"}
 
     @app.callback(
         Output("m4-download-csv", "data"),

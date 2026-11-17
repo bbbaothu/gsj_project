@@ -4,25 +4,17 @@ Giao diện Dash cho Phân hệ 06: Hiệu quả kinh doanh, Thác nước Lợi
 from dash import dcc, html
 
 
-def build_m6_panel(is_active: bool = False) -> html.Div:
+def build_m6_panel(is_active: bool = False) -> html.Main:
     """Xây dựng Panel M6 (Header kỳ đánh giá, 4 KPI Cards, Waterfall 6:6, Attach-Rate & Hoa hồng)."""
-    main_cls = (
-        "tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-        if is_active
-        else "tab-panel hidden flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-    )
-    return html.Div(
-        id="panel-m6-wrapper",
-        className="flex-1 min-w-0 flex flex-col" if is_active else "hidden",
+    return html.Main(
+        id="panel-m6",
+        style={"display": "flex" if is_active else "none"},
+        className="tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 flex-col gap-4",
         children=[
             dcc.Store(id="store-m6-refresh", data=0),
             dcc.Download(id="m6-download-csv"),
-            html.Main(
-                id="panel-m6",
-                className=main_cls,
-                children=[
-                    # 1. HEADER BAR
-                    html.Header(
+            # 1. HEADER BAR
+            html.Header(
                         className="flex flex-wrap items-center justify-between gap-3",
                         children=[
                             html.Div(
@@ -249,7 +241,5 @@ def build_m6_panel(is_active: bool = False) -> html.Div:
                             html.Div(id="m6StaffCommissionCards", className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs"),
                         ],
                     ),
-                ],
-            ),
         ],
     )

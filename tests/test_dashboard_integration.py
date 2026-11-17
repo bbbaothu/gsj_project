@@ -46,10 +46,10 @@ class TestDashboardIntegration(unittest.TestCase):
         # Tất cả các mặt hàng SOH == 0 đều phải có INC > 0
         self.assertTrue(all(stockouts["inc"] > 0), "Hàng cháy (SOH=0) bắt buộc phải có đơn nhập INC đang về")
 
-    def test_streamlit_cloud_requirements_tracked_and_complete(self):
+    def test_dash_requirements_tracked_and_complete(self):
         """
-        Kiểm tra file requirements.txt tồn tại ở thư mục gốc, chứa đủ thư viện cho Streamlit Cloud
-        (đặc biệt là plotly và Jinja2) và đã được Git theo dõi để đẩy lên GitHub.
+        Kiểm tra file requirements.txt tồn tại ở thư mục gốc, chứa đủ thư viện cho Plotly Dash
+        (dash, pandas, numpy, plotly) và đã được Git theo dõi.
         """
         import subprocess
 
@@ -60,7 +60,7 @@ class TestDashboardIntegration(unittest.TestCase):
         with open(req_path, "r", encoding="utf-8") as f:
             content = f.read().lower()
 
-        for pkg in ("streamlit", "pandas", "numpy", "plotly", "jinja2"):
+        for pkg in ("dash", "pandas", "numpy", "plotly"):
             self.assertIn(pkg, content, f"Thiếu thư viện bắt buộc '{pkg}' trong requirements.txt")
 
         tracked = subprocess.run(
@@ -72,7 +72,7 @@ class TestDashboardIntegration(unittest.TestCase):
         self.assertEqual(
             tracked.returncode,
             0,
-            "requirements.txt chưa được git track (Streamlit Cloud chỉ đọc file đã push lên GitHub)",
+            "requirements.txt chưa được git track",
         )
 
 if __name__ == '__main__':

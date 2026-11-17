@@ -203,9 +203,9 @@ def _build_m1_kpi_cards(
                         html.Div(
                             [
                                 html.Span(f"{urgent_low_no_po} mã trống PO", className="text-2xl xl:text-3xl font-bold tracking-tight text-slate-900"),
-                                html.Span(f"+{incoming_cnt} mã đang về", className="text-[11px] xl:text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-md"),
+                                html.Span(f"+{incoming_cnt} mã đang về", className="text-[11px] xl:text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-md whitespace-nowrap"),
                             ],
-                            className="flex items-baseline gap-2 my-1 whitespace-nowrap",
+                            className="flex items-baseline flex-wrap gap-x-2 gap-y-1 my-1",
                         ),
                         html.P(f"Đang vận chuyển +{ord_kpis['in_transit_units']} thiết bị từ Hãng", className="text-xs text-slate-500 mt-1"),
                     ]
@@ -390,8 +390,8 @@ def render_m1_kpis_and_table(
             size_max=34,
         )
         fig_sc.update_traces(textposition="top center", textfont_size=10)
-        fig_sc.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
-        apply_stock_sense_layout(fig_sc, height=320)
+        fig_sc.update_layout(legend=dict(title_text="", orientation="h", yanchor="bottom", y=1.04, xanchor="left", x=0))
+        apply_stock_sense_layout(fig_sc, height=320, margin=dict(l=44, r=16, t=44, b=36))
     else:
         fig_sc = empty_figure("Không có dữ liệu biểu đồ", height=320)
 

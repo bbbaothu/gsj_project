@@ -219,9 +219,9 @@ def render_m5_workspace(
         prio_counts = df_all["priority_tier"].value_counts().to_dict()
         labels = ["Cao", "Trung bình", "Thấp", "Cooldown 30d"]
         vals = [
-            int(prio_counts.get("CAO", 0)),
-            int(prio_counts.get("TRUNG_BINH", 0)),
-            int(prio_counts.get("THAP", 0)),
+            int(prio_counts.get("Cao", prio_counts.get("CAO", 0))),
+            int(prio_counts.get("Vừa", prio_counts.get("Trung bình", prio_counts.get("TRUNG_BINH", 0)))),
+            int(prio_counts.get("Thấp", prio_counts.get("THAP", 0))),
             int(kpis["cooldown_blocked_count"]),
         ]
         fig_priority = go.Figure(
@@ -414,7 +414,7 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Input("m5TechnicianSelect", "value"),
         Input("store-m5-refresh", "data"),
         Input("m5ScanTriggersBtn", "n_clicks"),
-        Input("store-rbac-role", "data"),
+        Input("store-role", "data"),
     )
     def sync_m5_workspace(
         trig, include_cd, search_txt, sel_cust, appt_date, appt_slot, tech_code, _ref, _scan, role
@@ -472,7 +472,7 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
 
     @app.callback(
         Output("store-m5-refresh", "data"),
-        Output("store-toast-msg", "data", allow_duplicate=True),
+        Output("store-toast", "data", allow_duplicate=True),
         Input("m5PrimarySaveBtn", "n_clicks"),
         Input("m5SecondaryActionBtn", "n_clicks"),
         State("store-m5-trigger", "data"),
@@ -502,7 +502,7 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         records = ws["queue_records"]
         active = next((r for r in records if r["customer_code"] == ws["active_customer_code"]), None)
         if not active:
-            return no_update, "Chưa chọn khách hàng để tác chiến."
+            return no_update, {"open": True, "message": "Chưa chọn khách hàng để tác chiến.", "kind": "error"}
 
         if tid == "m5SecondaryActionBtn":
             res = submit_m5_outcome(
@@ -515,8 +515,8 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
                 channel="ZALO_ZNS",
             )
             if res.get("success"):
-                return (cur_ref or 0) + 1, f"Đã gửi tin Zalo ZNS tới {active['customer_name']} ({active['phone']})!"
-            return no_update, res.get("error", "Không thể gửi Zalo ZNS.")
+                return (cur_ref or 0) + 1, {"open": True, "message": f"Đã gửi tin Zalo ZNS tới {active['customer_name']} ({active['phone']})!", "kind": "success"}
+            return no_update, {"open": True, "message": res.get("error", "Không thể gửi Zalo ZNS."), "kind": "error"}
 
         res = submit_m5_outcome(
             crm_svc,
@@ -531,12 +531,12 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
             service_name=svc_name or ws["default_service"],
         )
         if res.get("success"):
-            return (cur_ref or 0) + 1, res["message"]
-        return no_update, res.get("error", "Lỗi lưu nhật ký CRM")
+            return (cur_ref or 0) + 1, {"open": True, "message": res["message"], "kind": "success"}
+        return no_update, {"open": True, "message": res.get("error", "Lỗi lưu nhật ký CRM"), "kind": "error"}
 
     @app.callback(
         Output("m5CycleModal", "className"),
-        Output("store-toast-msg", "data", allow_duplicate=True),
+        Output("store-toast", "data", allow_duplicate=True),
         Input("m5OpenCycleModalBtn", "n_clicks"),
         Input("m5CloseCycleModalBtn", "n_clicks"),
         Input("m5CancelCycleModalBtn", "n_clicks"),
@@ -549,5 +549,5 @@ def register_m5_callbacks(app: Any, services: Dict[str, Any]) -> None:
         if tid == "m5OpenCycleModalBtn":
             return "fixed inset-0 bg-slate-900/40 z-50 flex items-center justify-center p-4", no_update
         if tid == "m5SaveCycleModalBtn":
-            return "fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4", "Đã lưu cấu hình chu kỳ chăm sóc tự động"
+            return "fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4", {"open": True, "message": "Đã lưu cấu hình chu kỳ chăm sóc tự động", "kind": "success"}
         return "fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4", no_update

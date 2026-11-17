@@ -1,18 +1,34 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-STOCK SENSE ERP - MASTER DASHBOARD (6 MODULES)
-Cửa hàng Điện máy Anh Tâm (108 Cầu Giấy, Quan Hoa, Cầu Giấy, Hà Nội - CN01)
-Điều hướng 6 phân hệ qua Sidebar trái, đồng bộ kiến trúc từ docs/SRS_01..06 và prototypes/stock_sense_dashboard.html.
+Entry point chính của ứng dụng Stock Sense Retail Analytics trên Plotly Dash (6 Modules).
+Tích hợp 1:1 thiết kế Prototype HTML + Tailwind + Services Layer SQLite Retail Dien May.
 """
 import os
 import sys
-import streamlit as st
+from pathlib import Path
+from typing import Any, Dict
+from urllib.parse import parse_qs
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
+import dash
+from dash import Dash, Input, Output, dcc, no_update
+
+from src.dash_app.components.layout_shell import MODULE_KEYS, build_app_shell
+from src.dash_app.callbacks.global_callbacks import register_global_callbacks
+from src.dash_app.callbacks.m1_callbacks import register_m1_callbacks
+from src.dash_app.callbacks.m2_callbacks import register_m2_callbacks
+from src.dash_app.callbacks.m3_callbacks import register_m3_callbacks
+from src.dash_app.callbacks.m4_callbacks import register_m4_callbacks
+from src.dash_app.callbacks.m5_callbacks import register_m5_callbacks
+from src.dash_app.callbacks.m6_callbacks import register_m6_callbacks
+from src.dash_app.pages.m1_overview import build_m1_detail_drawer, build_m1_panel
+from src.dash_app.pages.m2_alerts import build_m2_modals_and_drawer, build_m2_panel
+from src.dash_app.pages.m3_clearance import build_m3_modals, build_m3_panel
+from src.dash_app.pages.m4_replenishment import build_m4_panel
+from src.dash_app.pages.m5_crm import build_m5_panel
+from src.dash_app.pages.m6_performance import build_m6_panel
 from src.services.alert_service import AlertService
 from src.services.clearance_service import ClearanceService
 from src.services.crm_service import CrmService
@@ -20,162 +36,188 @@ from src.services.inventory_service import InventoryService
 from src.services.order_service import OrderService
 from src.services.performance_service import PerformanceService
 from src.services.replenishment_service import ReplenishmentService
-from src.views.styles import inject_stock_sense_styles, render_module_header
-from src.views.tab_alerts_view import render_tab_alerts
-from src.views.tab_clearance_view import render_tab_clearance
-from src.views.tab_crm_view import render_tab_crm
-from src.views.tab_inventory_view import render_tab_inventory
-from src.views.tab_order_flow_view import render_tab_order_flow
-from src.views.tab_performance_view import render_tab_performance
-from src.views.tab_replenishment_view import render_tab_replenishment
 
-st.set_page_config(
-    page_title="Stock Sense ERP - Điện Máy Anh Tâm",
-    page_icon="🏪",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+DB_PATH = str(PROJECT_ROOT / "data" / "retail_dienmay.db")
 
-inject_stock_sense_styles()
+PROTOTYPE_INDEX_STRING = """<!DOCTYPE html>
+<html class="h-full bg-[#F1F5F9]" lang="vi">
+<head>
+  {%metas%}
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{%title%}</title>
+  {%favicon%}
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "background": "#f8f9ff",
+          "on-secondary-container": "#fefcff",
+          "primary-fixed": "#dae2fd",
+          "tertiary-fixed-dim": "#68dba9",
+          "on-background": "#0b1c30",
+          "outline-variant": "#c6c6cd",
+          "primary-container": "#131b2e",
+          "secondary-fixed-dim": "#b4c5ff",
+          "on-tertiary-fixed-variant": "#005137",
+          "on-tertiary": "#ffffff",
+          "on-error": "#ffffff",
+          "tertiary-fixed": "#85f8c4",
+          "primary-fixed-dim": "#bec6e0",
+          "secondary": "#0051d5",
+          "on-secondary-fixed-variant": "#003ea8",
+          "surface-container-highest": "#d3e4fe",
+          "on-primary-container": "#7c839b",
+          "on-error-container": "#93000a",
+          "inverse-surface": "#213145",
+          "surface": "#f8f9ff",
+          "surface-container-low": "#eff4ff",
+          "on-primary-fixed-variant": "#3f465c",
+          "error-container": "#ffdad6",
+          "on-surface": "#0b1c30",
+          "inverse-on-surface": "#eaf1ff",
+          "on-primary-fixed": "#131b2e",
+          "secondary-fixed": "#dbe1ff",
+          "surface-tint": "#565e74",
+          "surface-container-lowest": "#ffffff",
+          "surface-container": "#e5eeff",
+          "surface-dim": "#cbdbf5",
+          "surface-bright": "#f8f9ff",
+          "outline": "#76777d",
+          "surface-variant": "#d3e4fe",
+          "inverse-primary": "#bec6e0",
+          "primary": "#000000",
+          "on-tertiary-container": "#069669",
+          "tertiary": "#000000",
+          "surface-container-high": "#dce9ff",
+          "on-surface-variant": "#45464d",
+          "on-secondary-fixed": "#00174b",
+          "secondary-container": "#316bf3",
+          "on-primary": "#ffffff",
+          "error": "#ba1a1a",
+          "tertiary-container": "#002114",
+          "on-tertiary-fixed": "#002114",
+          "on-secondary": "#ffffff"
+        },
+        fontFamily: {
+          "label-sm": ["JetBrains Mono"],
+          "headline-xl": ["Inter"],
+          "body-lg": ["Inter"],
+          "headline-md": ["Inter"],
+          "headline-lg": ["Inter"],
+          "body-md": ["Inter"],
+          "label-md": ["JetBrains Mono"],
+          "body-sm": ["Inter"],
+          "label-lg": ["JetBrains Mono"]
+        }
+      }
+    }
+  };
+  </script>
+  {%css%}
+</head>
+<body class="h-full overflow-hidden bg-slate-50 text-slate-900 antialiased">
+  {%app_entry%}
+  <footer>
+    {%config%}
+    {%scripts%}
+    {%renderer%}
+  </footer>
+</body>
+</html>"""
 
-DB_PATH = os.path.join(PROJECT_ROOT, "data", "retail_dienmay.db")
 
-MODULES = [
-    "1. Tổng quan kho",
-    "2. Cần xử lý hôm nay",
-    "3. Gợi ý xả hàng",
-    "4. Gợi ý nhập hàng",
-    "5. Khách cần chăm sóc",
-    "6. Hiệu quả kinh doanh",
-]
-
-MODULE_LABELS = {
-    "1. Tổng quan kho": "📦 1. Tổng quan kho (US-1.1 & 1.2)",
-    "2. Cần xử lý hôm nay": "🔔 2. Cần xử lý hôm nay (US-2.1 & 2.2)",
-    "3. Gợi ý xả hàng": "🏷️ 3. Gợi ý xả hàng (US-3.1 & 3.2)",
-    "4. Gợi ý nhập hàng": "🛒 4. Gợi ý nhập hàng (US-4.1)",
-    "5. Khách cần chăm sóc": "🎧 5. Khách cần chăm sóc (US-5.1)",
-    "6. Hiệu quả kinh doanh": "📊 6. Hiệu quả kinh doanh (US-6.1)",
-}
-
-
-@st.cache_resource
-def get_all_services():
+def init_services(db_path: str = DB_PATH) -> Dict[str, Any]:
+    """Khởi tạo 7 Service Layers dùng chung cho 6 Modules."""
     return {
-        "inventory": InventoryService(DB_PATH),
-        "order": OrderService(DB_PATH),
-        "alert": AlertService(DB_PATH),
-        "clearance": ClearanceService(DB_PATH),
-        "replenishment": ReplenishmentService(DB_PATH),
-        "crm": CrmService(DB_PATH),
-        "performance": PerformanceService(DB_PATH),
+        "inventory": InventoryService(db_path=db_path),
+        "order": OrderService(db_path=db_path),
+        "alert": AlertService(db_path=db_path),
+        "clearance": ClearanceService(db_path=db_path),
+        "replenishment": ReplenishmentService(db_path=db_path),
+        "crm": CrmService(db_path=db_path),
+        "performance": PerformanceService(db_path=db_path),
     }
 
 
-services = get_all_services()
+def create_dash_app(db_path: str = DB_PATH) -> Dash:
+    """Khởi tạo và lắp ghép hoàn chỉnh Plotly Dash Application 6 Modules."""
+    services = init_services(db_path)
+    assets_dir = str(Path(__file__).resolve().parent / "assets")
 
-# -----------------------------------------------------------------------------
-# SIDEBAR TRÁI: THƯƠNG HIỆU, ĐIỀU HƯỚNG 6 MODULES & RBAC TOÀN CỤC
-# -----------------------------------------------------------------------------
-with st.sidebar:
-    st.markdown("### 🏪 Stock Sense ERP")
-    st.caption("**Điện Máy Anh Tâm** · 108 Cầu Giấy, Hà Nội (`CN01`)")
-    st.markdown("---")
+    dash_app = Dash(
+        __name__,
+        suppress_callback_exceptions=True,
+        assets_folder=assets_dir,
+        title="Stock Sense · Điện Máy Anh Tâm (Master 6-Module Dashboard)",
+    )
+    dash_app.index_string = PROTOTYPE_INDEX_STRING
 
-    st.markdown("**🔐 Phân Quyền Truy Cập (RBAC)**")
-    role_options = {
-        "👑 Chủ tiệm (Xem đầy đủ Giá vốn)": "ROLE_OWNER",
-        "👤 Bán hàng (Ẩn trường Giá vốn)": "ROLE_SALES",
+    page_panels = {
+        "m1": build_m1_panel(services, active=True, role="ROLE_OWNER"),
+        "m2": build_m2_panel(services, active=False, role="ROLE_OWNER"),
+        "m3": build_m3_panel(services, active=False, role="ROLE_OWNER"),
+        "m4": build_m4_panel(is_active=False),
+        "m5": build_m5_panel(is_active=False),
+        "m6": build_m6_panel(is_active=False),
     }
-    selected_role_label = st.selectbox("Vai trò vận hành:", list(role_options.keys()), index=0, label_visibility="collapsed")
-    current_role = role_options[selected_role_label]
+    extra_overlays = [
+        dcc.Location(id="url", refresh=False),
+        build_m1_detail_drawer(),
+        build_m2_modals_and_drawer(),
+        build_m3_modals(),
+    ]
 
-    st.markdown("---")
-    st.markdown("**🧭 Menu Điều Hành (6 Modules)**")
-
-    if "active_module" not in st.session_state or st.session_state["active_module"] not in MODULES:
-        st.session_state["active_module"] = MODULES[0]
-
-    current_idx = MODULES.index(st.session_state["active_module"])
-    chosen_module = st.radio(
-        "Chọn phân hệ:",
-        options=MODULES,
-        index=current_idx,
-        format_func=lambda m: MODULE_LABELS[m],
-        label_visibility="collapsed",
+    dash_app.layout = build_app_shell(
+        services,
+        active_tab="m1",
+        role="ROLE_OWNER",
+        page_panels=page_panels,
+        extra_overlays=extra_overlays,
     )
-    if chosen_module != st.session_state["active_module"]:
-        st.session_state["active_module"] = chosen_module
-        st.rerun()
 
-    st.markdown("---")
-    st.caption("Chủ hộ: **Nguyễn Anh Tâm (`NV0001`)**  \nCSDL: `data/retail_dienmay.db` (KiotViet x SQLite)")
+    # Đăng ký callbacks toàn cục + 6 Modules
+    register_global_callbacks(dash_app, services)
+    register_m1_callbacks(dash_app, services)
+    register_m2_callbacks(dash_app, services)
+    register_m3_callbacks(dash_app, services)
+    register_m4_callbacks(dash_app, services)
+    register_m5_callbacks(dash_app, services)
+    register_m6_callbacks(dash_app, services)
 
-
-# -----------------------------------------------------------------------------
-# NỘI DUNG CHÍNH THEO MODULE ĐANG CHỌN (LAZY MODULE RENDERING)
-# -----------------------------------------------------------------------------
-active = st.session_state["active_module"]
-
-if active == "1. Tổng quan kho":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 01: Tổng quan kho & Điều phối dòng hàng",
-        "Tổng quan Kho & Dòng hàng 4 Trạng thái (SOH · RES · AVL · INC)",
-        "Giám sát sức khỏe tồn kho thiết bị điện máy theo thời gian thực, kiểm đếm Serial/IMEI và điều phối đơn cọc/trả góp.",
+    @dash_app.callback(
+        Output("store-active-tab", "data"),
+        Input("url", "search"),
     )
-    sub1, sub2 = st.tabs([
-        "📦 Danh mục & Tồn kho Thiết bị (US-1.1)",
-        "🚚 Điều phối Đơn hàng & Dòng hàng (US-1.2)",
-    ])
-    with sub1:
-        render_tab_inventory(services["inventory"], role=current_role)
-    with sub2:
-        render_tab_order_flow(services["order"])
+    def sync_tab_from_query_string(search):
+        if not search:
+            return "m1"
+        qs = parse_qs(search.lstrip("?"))
+        tab_val = (qs.get("tab") or [None])[0]
+        if tab_val in MODULE_KEYS:
+            return tab_val
+        return "m1"
 
-elif active == "2. Cần xử lý hôm nay":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 02: Cần xử lý hôm nay",
-        "Trung tâm Radar Cảnh báo Tác chiến Đầu ngày",
-        "Phát hiện tức thời SKU bán chậm/vượt trần chôn vốn (DSI > 60) và nguy cơ cháy hàng (DOS <= Lead Time), tự động khử báo động giả qua INC.",
-    )
-    render_tab_alerts(services["alert"], role=current_role)
+    return dash_app
 
-elif active == "3. Gợi ý xả hàng":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 03: Gợi ý xả hàng & Định giá cạnh tranh",
-        "Chiến lược Thanh lý Tồn kho & Radar Giá Thị Trường",
-        "Sinh 4 kịch bản khuyến mại thông minh (Giảm thẳng, Combo phụ kiện, Bảo dưỡng 24T, Trả góp 0%) kèm mô phỏng dòng tiền và làm tròn giá tâm lý.",
-    )
-    render_tab_clearance(services["clearance"], role=current_role)
 
-elif active == "4. Gợi ý nhập hàng":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 04: Gợi ý nhập hàng & Tự động hóa PO",
-        "Đề xuất Nhập Bổ sung Thích ứng & Gom Đơn PO Theo Hãng",
-        "Dự báo nhu cầu RR14/RR30 kết hợp hệ số mùa vụ, tồn an toàn thích ứng, kiểm soát trần ngân sách và tự động gom PO gửi Nhà phân phối.",
-    )
-    render_tab_replenishment(services["replenishment"], role=current_role)
+app = create_dash_app()
+server = app.server
 
-elif active == "5. Khách cần chăm sóc":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 05: Khách hàng cần chăm sóc & Smart CRM",
-        "Trung tâm CSKH 5 Điểm chạm Vàng & Xếp lịch Kỹ thuật viên",
-        "Tự động quét hạn bảo dưỡng điều hòa, bán chéo phụ kiện và bảo hành; sinh kịch bản thoại AI, chặn spam 30 ngày và đặt lịch thợ tận nhà.",
-    )
-    render_tab_crm(services["crm"], role=current_role)
-
-elif active == "6. Hiệu quả kinh doanh":
-    render_module_header(
-        "Hệ thống Quản trị Kho › Module 06: Hiệu quả kinh doanh & Thác nước lợi nhuận",
-        "Phân rã Lợi nhuận Thác nước (Waterfall) & Tỷ lệ Bán kèm (Attach-Rate)",
-        "Đo lường vốn gốc thu hồi, chứng minh đòn bẩy lợi nhuận từ Phụ kiện/Dịch vụ, đánh giá Attach-Rate theo chuẩn 60%/70% và duyệt hoa hồng nhân sự.",
-    )
-    render_tab_performance(services["performance"], role=current_role)
-
-st.markdown("---")
-st.markdown(
-    "<div style='text-align:center; color:#64748B; font-size:12px;'>"
-    "Stock Sense ERP v2.0 · Cửa hàng Điện máy Anh Tâm (108 Cầu Giấy, Hà Nội) · Dữ liệu SQLite Data Warehouse"
-    "</div>",
-    unsafe_allow_html=True,
-)
+if __name__ == "__main__":
+    if "streamlit" in sys.modules:
+        print(
+            "[Stock Sense] Ứng dụng đã chuyển sang Plotly Dash (cổng 8050). "
+            "Vui lòng chạy `.venv/bin/python src/app_dashboard.py` thay vì `streamlit run`."
+        )
+    else:
+        port = int(os.environ.get("PORT", 8050))
+        app.run(debug=False, host="127.0.0.1", port=port)

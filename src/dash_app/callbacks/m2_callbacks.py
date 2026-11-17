@@ -179,7 +179,7 @@ def render_m2_workspace(
                         html.Td(
                             html.Div(
                                 [
-                                    html.Button("Chi tiết", id={"type": "m2-open-drawer", "sku": r["product_code"]}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"),
+                                    html.Button("Chi tiết", id={"type": "m2-open-drawer", "sku": r["product_code"], "kind": "slow"}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"),
                                     html.Button("Xả hàng →", id={"type": "m2-goto-m3", "sku": r["product_code"]}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-semibold cursor-pointer whitespace-nowrap"),
                                 ],
                                 className="flex items-center justify-end gap-1.5",
@@ -216,7 +216,7 @@ def render_m2_workspace(
                         html.Td(
                             html.Div(
                                 [
-                                    html.Button("Chi tiết", id={"type": "m2-open-drawer", "sku": r["product_code"]}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"),
+                                    html.Button("Chi tiết", id={"type": "m2-open-drawer", "sku": r["product_code"], "kind": "stockout"}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium cursor-pointer"),
                                     html.Button("Nhập gấp →", id={"type": "m2-goto-m4", "sku": r["product_code"]}, n_clicks=0, className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold cursor-pointer whitespace-nowrap"),
                                 ],
                                 className="flex items-center justify-end gap-1.5",
@@ -418,7 +418,7 @@ def register_m2_callbacks(app: dash.Dash, services: Dict[str, Any]) -> None:
         Output("m2DrawerMeta", "children"),
         Output("m2DrawerBodyContent", "children"),
         Output("btn-m2-drawer-primary", "children"),
-        Input({"type": "m2-open-drawer", "sku": ALL}, "n_clicks"),
+        Input({"type": "m2-open-drawer", "sku": ALL, "kind": ALL}, "n_clicks"),
         Input("btn-close-m2-drawer", "n_clicks"),
         Input("m2DrawerBackdrop", "n_clicks"),
         prevent_initial_call=True,

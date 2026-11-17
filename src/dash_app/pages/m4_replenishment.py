@@ -4,16 +4,12 @@ Giao diện Dash cho Phân hệ 04: Gợi ý nhập hàng & Cân đối ngân s�
 from dash import dcc, html
 
 
-def build_m4_panel(is_active: bool = False) -> html.Div:
+def build_m4_panel(is_active: bool = False) -> html.Main:
     """Xây dựng Panel M4 (Gợi ý nhập hàng, Bảng điều phối +/-, Gom PO theo Hãng & Modals)."""
-    main_cls = (
-        "tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-        if is_active
-        else "tab-panel hidden flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-    )
-    return html.Div(
-        id="panel-m4-wrapper",
-        className="flex-1 min-w-0 flex flex-col" if is_active else "hidden",
+    return html.Main(
+        id="panel-m4",
+        style={"display": "flex" if is_active else "none"},
+        className="tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 flex-col gap-4",
         children=[
             dcc.Store(id="store-m4-cycle", data=14),
             dcc.Store(id="store-m4-budget", data=250_000_000.0),
@@ -24,12 +20,8 @@ def build_m4_panel(is_active: bool = False) -> html.Div:
             dcc.Store(id="store-m4-active-vendor", data=None),
             dcc.Store(id="store-m4-po-refresh", data=0),
             dcc.Download(id="m4-download-csv"),
-            html.Main(
-                id="panel-m4",
-                className=main_cls,
-                children=[
-                    # 1. COMPACT HEADER BAR
-                    html.Header(
+            # 1. COMPACT HEADER BAR
+            html.Header(
                         className="flex flex-wrap items-center justify-between gap-3",
                         children=[
                             html.Div(
@@ -474,8 +466,6 @@ def build_m4_panel(is_active: bool = False) -> html.Div:
                             ),
                         ],
                     ),
-                ],
-            ),
             # SUPPLIER DRAWER (m4SupplierDrawer)
             html.Div(id="m4DrawerBackdrop", className="fixed inset-0 bg-slate-900/30 backdrop-blur-[1px] z-40 hidden"),
             html.Aside(

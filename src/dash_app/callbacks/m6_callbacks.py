@@ -75,9 +75,9 @@ def render_m6_workspace(
         )
         fig_attach.add_vline(x=60, line_dash="dash", line_color="#E11D48", line_width=1.5)
         fig_attach.add_vline(x=70, line_dash="solid", line_color="#0F172A", line_width=1.5)
-        fig_attach.update_xaxes(range=[0, 105], ticksuffix="%")
+        fig_attach.update_xaxes(range=[0, 122], ticksuffix="%")
         fig_attach.update_yaxes(autorange="reversed")
-        apply_stock_sense_layout(fig_attach, height=190, margin=dict(l=140, r=36, t=12, b=24))
+        apply_stock_sense_layout(fig_attach, height=190, margin=dict(l=140, r=42, t=12, b=24))
 
     # 3. Category Attach Table Rows
     cat_rows: List[Any] = []
@@ -261,7 +261,7 @@ def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
         Output("m6ApproveAllBonusBtn", "disabled"),
         Input("m6PeriodSelect", "value"),
         Input("store-m6-refresh", "data"),
-        Input("store-rbac-role", "data"),
+        Input("store-role", "data"),
     )
     def sync_m6_workspace(period, _ref, role):
         res = render_m6_workspace(perf_svc, period=period or "T10_11", role=role or "ROLE_OWNER")
@@ -287,10 +287,10 @@ def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
 
     @app.callback(
         Output("store-m6-refresh", "data"),
-        Output("store-toast-msg", "data", allow_duplicate=True),
+        Output("store-toast", "data", allow_duplicate=True),
         Input({"type": "m6-approve-emp", "emp": ALL}, "n_clicks"),
         Input("m6ApproveAllBonusBtn", "n_clicks"),
-        State("store-rbac-role", "data"),
+        State("store-role", "data"),
         State("store-m6-refresh", "data"),
         prevent_initial_call=True,
     )
@@ -306,18 +306,18 @@ def register_m6_callbacks(app: Any, services: Dict[str, Any]) -> None:
             staff_list = perf_svc.get_staff_commission_list(role="ROLE_OWNER")
             pending = [s for s in staff_list if s["status"] != "APPROVED"]
             if not pending:
-                return no_update, "Tất cả nhân sự đã được duyệt chi hoa hồng."
+                return no_update, {"open": True, "message": "Tất cả nhân sự đã được duyệt chi hoa hồng.", "kind": "success"}
             for s in pending:
                 res = submit_m6_approve_commission(perf_svc, s["employee_code"], role=eff_role)
                 if not res.get("success"):
-                    return no_update, res.get("error", "Không đủ quyền duyệt hoa hồng")
-            return (cur_ref or 0) + 1, f"Đã duyệt chi hoa hồng cho {len(pending)} nhân sự!"
+                    return no_update, {"open": True, "message": res.get("error", "Không đủ quyền duyệt hoa hồng"), "kind": "error"}
+            return (cur_ref or 0) + 1, {"open": True, "message": f"Đã duyệt chi hoa hồng cho {len(pending)} nhân sự!", "kind": "success"}
 
         if isinstance(tid, dict) and tid.get("type") == "m6-approve-emp" and any(emp_clicks or []):
             res = submit_m6_approve_commission(perf_svc, tid["emp"], role=eff_role)
             if res.get("success"):
-                return (cur_ref or 0) + 1, res["message"]
-            return no_update, res.get("error", "Không thể duyệt chi hoa hồng")
+                return (cur_ref or 0) + 1, {"open": True, "message": res["message"], "kind": "success"}
+            return no_update, {"open": True, "message": res.get("error", "Không thể duyệt chi hoa hồng"), "kind": "error"}
         return no_update, no_update
 
     @app.callback(

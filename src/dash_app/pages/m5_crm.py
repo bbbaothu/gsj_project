@@ -4,28 +4,20 @@ Giao diện Dash cho Phân hệ 05: Chăm sóc khách hàng & Smart CRM 5 Điể
 from dash import dcc, html
 
 
-def build_m5_panel(is_active: bool = False) -> html.Div:
+def build_m5_panel(is_active: bool = False) -> html.Main:
     """Xây dựng Panel M5 (KPIs lọc nhanh, Phễu 5 điểm chạm, Master-Detail 7:5 & Modal chu kỳ)."""
-    main_cls = (
-        "tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-        if is_active
-        else "tab-panel hidden flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 space-y-4"
-    )
-    return html.Div(
-        id="panel-m5-wrapper",
-        className="flex-1 min-w-0 flex flex-col" if is_active else "hidden",
+    return html.Main(
+        id="panel-m5",
+        style={"display": "flex" if is_active else "none"},
+        className="tab-panel flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto custom-scrollbar px-5 py-4 flex-col gap-4",
         children=[
             dcc.Store(id="store-m5-trigger", data="Tất cả"),
             dcc.Store(id="store-m5-include-cooldown", data=False),
             dcc.Store(id="store-m5-selected-customer", data=None),
             dcc.Store(id="store-m5-outcome", data="booked"),
             dcc.Store(id="store-m5-refresh", data=0),
-            html.Main(
-                id="panel-m5",
-                className=main_cls,
-                children=[
-                    # 1. HEADER BAR
-                    html.Header(
+            # 1. HEADER BAR
+            html.Header(
                         className="flex flex-wrap items-center justify-between gap-3",
                         children=[
                             html.Div(
@@ -468,7 +460,5 @@ def build_m5_panel(is_active: bool = False) -> html.Div:
                             )
                         ],
                     ),
-                ],
-            ),
         ],
     )

@@ -375,13 +375,13 @@ flowchart LR
 #### Task 16: Kiểm thử E2E Dash Server & Đối chiếu Thị giác Chrome 1440px vs Prototype (`tests/test_dash_e2e_integration.py`)
 
 * **Cách thức triển khai (How-to - Verification Steps):**
-  - [ ] **Step 1 (RED -> GREEN):** Viết `tests/test_dash_e2e_integration.py` sử dụng Flask `test_client()` của `app.server` để kiểm tra:
+  - [x] **Step 1 (RED -> GREEN):** Viết `tests/test_dash_e2e_integration.py` sử dụng Flask `test_client()` của `app.server` để kiểm tra:
     - `GET /` trả HTTP 200, chứa tiêu đề `Stock Sense` và cấu hình Tailwind/Dash.
     - `GET /_dash-layout` trả HTTP 200 JSON hợp lệ chứa đầy đủ 6 Panel IDs (`panel-m1`..`panel-m6`), `appSidebar`, `quickSearchModal`, `detailDrawer`, `m2DecisionDrawer`, `poPreviewModal`.
     - `POST /_dash-update-component` mô phỏng chuyển đổi RBAC sang `ROLE_SALES` và chuyển tab `m1` $\rightarrow$ `m3` hoạt động bình thường không lỗi `500`.
-  - [ ] **Step 2:** Chạy toàn bộ Test Suite `.venv/bin/python -m unittest discover tests -v` — tất cả các file test cũ (39 tests) và test Dash mới (`test_dash_*`) phải **PASS 100%**.
-  - [ ] **Step 3:** Khởi động server `.venv/bin/python src/app_dashboard.py`, dùng Google Chrome headless (`--headless=new --window-size=1440,1400`) chụp 6 ảnh thực tế cho M1–M6 tại `http://127.0.0.1:8050/` và inspect bằng `view_file` để đối chiếu trực tiếp với `prototypes/stock_sense_dashboard.html` (đảm bảo không vỡ layout, không mất Tailwind CSS, không cắt chữ).
-  - [ ] **Step 4:** Cập nhật hoàn tất tất cả checkbox trong Plan và Commit Giai đoạn 8 (`feat(dash-master): complete Plotly Dash UI rewrite matching prototype 1:1`).
+  - [x] **Step 2:** Chạy toàn bộ Test Suite `.venv/bin/python -m unittest discover tests -v` — tất cả các file test cũ (39 tests) và test Dash mới (`test_dash_*`) phải **PASS 100%**.
+  - [x] **Step 3:** Khởi động server `.venv/bin/python src/app_dashboard.py`, dùng Google Chrome headless qua CDP (`1440×1400`) chụp 6 ảnh thực tế cho M1–M6 (`/?tab=m1..m6`) và inspect bằng `view_file` để đối chiếu trực tiếp với `prototypes/stock_sense_dashboard.html` (đảm bảo không vỡ layout, không mất Tailwind CSS, không cắt chữ).
+  - [x] **Step 4:** Cập nhật hoàn tất tất cả checkbox trong Plan và Commit Giai đoạn 8 (`feat(dash-master): complete Plotly Dash UI rewrite matching prototype 1:1`).
 
 ---
 

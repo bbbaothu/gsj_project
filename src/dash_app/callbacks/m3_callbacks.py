@@ -108,8 +108,10 @@ def render_m3_workspace(
         tactic_fig = go.Figure()
         tactic_fig.add_trace(go.Bar(name="Vốn hoàn két", y=t_names, x=[cap_val] * 4, orientation="h", marker_color="#1E293B", text=[f"{cap_val/1e6:.0f}tr"] * 4, textposition="inside"))
         tactic_fig.add_trace(go.Bar(name="Lãi gộp ròng", y=t_names, x=t_profs, orientation="h", marker_color="#059669", text=[f"+{p/1e6:.1f}tr" for p in t_profs], textposition="outside"))
+        max_x = max([cap_val + max(0.0, float(p)) for p in t_profs] or [cap_val])
         tactic_fig.update_layout(barmode="stack", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
-        apply_stock_sense_layout(tactic_fig, height=230)
+        tactic_fig.update_xaxes(range=[0, max_x * 1.24])
+        apply_stock_sense_layout(tactic_fig, height=230, margin=dict(l=36, r=42, t=28, b=24))
 
     # Competitor Radar rows
     comp_rows = []
