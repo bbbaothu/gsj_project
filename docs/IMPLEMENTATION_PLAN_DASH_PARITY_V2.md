@@ -142,11 +142,11 @@ Mọi màn hình từ M1 đến M6 đều tuân thủ ánh xạ sau để chủ 
 * **Files:**
   - Modify: `src/services/order_service.py`, `src/services/replenishment_service.py`, `src/services/crm_service.py`, `src/services/performance_service.py`, `data/retail_dienmay.db`, `tests/test_service_v2_enhancements.py` (new TDD test file)
 * **Cách thức triển khai (TDD):**
-  - [ ] **Step 1 (RED):** Viết `tests/test_service_v2_enhancements.py` kiểm tra `expired_capital` + `get_order_detail`, M4 trả `>= 4` mã đề xuất ở `>= 3` hãng, `get_service_revenue_breakdown(14/30/90)` khác nhau theo kỳ, và `calculate_dynamic_commission_ranking(acc_rate_pct=20, srv_rate_pct=25)` đổi hạng & tăng Quỹ chi.
-  - [ ] **Step 2:** Chạy test xác nhận **RED**.
-  - [ ] **Step 3 (GREEN):** Triển khai cập nhật 4 services + cập nhật DB sạch.
-  - [ ] **Step 4:** Chạy cả `tests/test_service_v2_enhancements.py` VÀ 39 tests cũ xác nhận **PASS 100%**.
-  - [ ] **Step 5:** Cập nhật Plan & Commit (`feat(services): add overdue order detail, multi-vendor replenishment depth, CRM revenue periods and dynamic commission`).
+  - [x] **Step 1 (RED):** Viết `tests/test_service_v2_enhancements.py` kiểm tra `expired_capital` + `get_order_detail`, M4 trả `>= 4` mã đề xuất ở `>= 3` hãng, `get_service_revenue_breakdown(14/30/90)` khác nhau theo kỳ, và `calculate_dynamic_commission_ranking(acc_rate_pct=20, srv_rate_pct=25)` đổi hạng & tăng Quỹ chi.
+  - [x] **Step 2:** Chạy test xác nhận **RED**.
+  - [x] **Step 3 (GREEN):** Triển khai cập nhật 4 services + cập nhật DB sạch.
+  - [x] **Step 4:** Chạy cả `tests/test_service_v2_enhancements.py` VÀ 39 tests cũ xác nhận **PASS 100%**. (`37/37 + 4/4 tests - OK`)
+  - [x] **Step 5:** Cập nhật Plan & Commit (`feat(services): add overdue order detail, multi-vendor replenishment depth, CRM revenue periods and dynamic commission`).
 
 ---
 

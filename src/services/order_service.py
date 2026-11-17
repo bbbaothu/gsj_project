@@ -16,20 +16,32 @@ class OrderService:
         conn.row_factory = sqlite3.Row
         return conn
 
-    def get_order_flow_kpis(self) -> Dict[str, Any]:
+    def _mask_vnd(self, val: Optional[float], role: str) -> str:
+        if role == "ROLE_SALES" or val is None:
+            return "****** đ"
+        abs_val = abs(float(val))
+        if abs_val >= 1_000_000_000:
+            return f"{abs_val / 1_000_000_000:.2f}".replace(".", ",") + " tỷ"
+        if abs_val >= 1_000_000:
+            return f"{abs_val / 1_000_000:.1f}".replace(".", ",") + " tr"
+        return f"{abs_val:,.0f} đ"
+
+    def get_order_flow_kpis(self, role: str = "ROLE_OWNER") -> Dict[str, Any]:
         """
         FR-ORD-01 & FR-ORD-05: Thống kê 4 thẻ KPI của phân hệ Đơn hàng & Dòng hàng.
         """
         conn = self._get_connection()
         cur = conn.cursor()
 
-        # 1. Đơn đang giữ chỗ (Chờ xử lý, Đã xác nhận)
+        # 1. Đơn đang giữ chỗ (Chờ xử lý, Đã xác nhận) + tổng vốn/giá trị đang giữ
         cur.execute("""
             SELECT 
                 COUNT(DISTINCT fo.order_code) AS reserved_orders,
-                COALESCE(SUM(fol.quantity), 0) AS reserved_units
+                COALESCE(SUM(fol.quantity), 0) AS reserved_units,
+                COALESCE(SUM(fol.quantity * p.cost_price), 0) AS reserved_capital
             FROM FACT_ORDERS fo
             JOIN FACT_ORDERS_LINES fol ON fo.order_code = fol.order_code
+            JOIN DIM_PRODUCTS p ON fol.product_code = p.product_code
             WHERE fo.status IN ('Chờ xử lý', 'Đã xác nhận');
         """)
         res_info = cur.fetchone()
@@ -52,13 +64,18 @@ class OrderService:
         """)
         inst_count = cur.fetchone()["installment_count"]
 
-        # 4. Đơn quá hạn 48 giờ (Hold time policy violation)
+        # 4. Đơn quá hạn 48 giờ (Hold time policy violation) & tổng vốn bị kẹt
         cur.execute("""
-            SELECT COUNT(*) AS expired_count
-            FROM FACT_ORDERS
-            WHERE status = 'Chờ xử lý' AND note LIKE '%48h%';
+            SELECT 
+                COUNT(DISTINCT fo.order_code) AS expired_count,
+                COALESCE(SUM(fol.quantity * p.cost_price), 0) AS expired_capital
+            FROM FACT_ORDERS fo
+            JOIN FACT_ORDERS_LINES fol ON fo.order_code = fol.order_code
+            JOIN DIM_PRODUCTS p ON fol.product_code = p.product_code
+            WHERE fo.status = 'Chờ xử lý'
+              AND (fo.note LIKE '%48h%' OR fo.order_time <= '2026-11-02 15:30:00');
         """)
-        exp_count = cur.fetchone()["expired_count"]
+        exp_row = cur.fetchone()
 
         # 5. Đơn cần giao hôm nay (Đã xác nhận)
         cur.execute("""
@@ -70,14 +87,92 @@ class OrderService:
 
         conn.close()
 
+        raw_res_cap = float(res_info["reserved_capital"] or 0.0)
+        raw_exp_cap = float(exp_row["expired_capital"] or 0.0)
+
         return {
             "reserved_orders_count": res_info["reserved_orders"] or 0,
             "reserved_units_count": res_info["reserved_units"] or 0,
+            "reserved_capital": None if role == "ROLE_SALES" else round(raw_res_cap, 0),
+            "display_reserved_capital": self._mask_vnd(raw_res_cap, role),
             "in_transit_units": po_info["in_transit_units"] or 0,
             "in_transit_po_count": po_info["po_count"] or 0,
             "installment_orders_count": inst_count or 0,
-            "expired_orders_count": exp_count or 0,
-            "today_dispatch_count": dispatch_count or 0
+            "expired_orders_count": exp_row["expired_count"] or 0,
+            "expired_capital": None if role == "ROLE_SALES" else round(raw_exp_cap, 0),
+            "display_expired_capital": self._mask_vnd(raw_exp_cap, role),
+            "today_dispatch_count": dispatch_count or 0,
+        }
+
+    def get_order_detail(self, order_code: str, role: str = "ROLE_OWNER") -> Dict[str, Any]:
+        """Truy vấn thông tin chi tiết khách hàng & mặt hàng của 1 đơn giữ chỗ."""
+        conn = self._get_connection()
+        hdr = conn.execute(
+            """
+            SELECT
+                fo.order_code, fo.order_time, fo.customer_code,
+                c.customer_name, c.phone, c.address,
+                fo.total_amount, fo.amount_due, fo.amount_paid,
+                fo.pay_installment, fo.status AS order_status, fo.note
+            FROM FACT_ORDERS fo
+            JOIN DIM_CUSTOMERS c ON fo.customer_code = c.customer_code
+            WHERE fo.order_code = ?;
+            """,
+            (order_code,),
+        ).fetchone()
+        if not hdr:
+            conn.close()
+            return {"error": f"Không tìm thấy đơn hàng {order_code}"}
+
+        lines = conn.execute(
+            """
+            SELECT
+                fol.product_code, p.product_name, p.brand,
+                fol.quantity, fol.unit_price, fol.line_total, p.cost_price
+            FROM FACT_ORDERS_LINES fol
+            JOIN DIM_PRODUCTS p ON fol.product_code = p.product_code
+            WHERE fol.order_code = ?;
+            """,
+            (order_code,),
+        ).fetchall()
+        conn.close()
+
+        is_exp = False
+        if hdr["order_status"] == "Chờ xử lý":
+            if "48h" in str(hdr["note"] or ""):
+                is_exp = True
+            else:
+                try:
+                    ot = datetime.datetime.strptime(hdr["order_time"], "%Y-%m-%d %H:%M:%S")
+                    is_exp = ((datetime.datetime(2026, 11, 4, 15, 30, 0) - ot).total_seconds() / 3600) > 48
+                except Exception:
+                    is_exp = False
+
+        pay_type = "Trả góp" if float(hdr["pay_installment"] or 0) > 0 else (
+            "Trả đủ" if float(hdr["amount_paid"] or 0) >= float(hdr["amount_due"] or 0) else "Đặt cọc (COD)"
+        )
+        items = []
+        for l in lines:
+            d = dict(l)
+            if role == "ROLE_SALES":
+                d["cost_price"] = None
+            items.append(d)
+
+        return {
+            "order_code": hdr["order_code"],
+            "order_time": hdr["order_time"],
+            "customer_code": hdr["customer_code"],
+            "customer_name": hdr["customer_name"],
+            "phone": hdr["phone"],
+            "address": hdr["address"],
+            "status": hdr["order_status"],
+            "note": hdr["note"] or "",
+            "payment_type": pay_type,
+            "is_expired": is_exp,
+            "total_amount": float(hdr["total_amount"] or 0),
+            "amount_paid": float(hdr["amount_paid"] or 0),
+            "amount_due": float(hdr["amount_due"] or 0),
+            "items": items,
         }
 
     def get_inventory_flow_matrix(self) -> pd.DataFrame:

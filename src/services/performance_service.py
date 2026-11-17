@@ -274,3 +274,55 @@ class PerformanceService(BaseService):
         buf = io.BytesIO()
         buf.write(df_cat.to_csv(index=False).encode("utf-8-sig"))
         return buf.getvalue()
+
+    def calculate_dynamic_commission_ranking(
+        self,
+        acc_rate_pct: float = 15.0,
+        srv_rate_pct: float = 20.0,
+        hot_bonus_per_case: float = 50_000.0,
+        sort_by: str = "commission",
+        role: str = "ROLE_OWNER",
+    ) -> Dict[str, Any]:
+        """Tính lại tiền thưởng bán kèm & bảng xếp hạng nhân sự theo chính sách thưởng tùy biến."""
+        staff_raw = self.get_staff_commission_list(role="ROLE_OWNER")
+        acc_mult = max(0.0, float(acc_rate_pct)) / 100.0
+        srv_mult = max(0.0, float(srv_rate_pct)) / 100.0
+        hot_bonus = max(0.0, float(hot_bonus_per_case))
+
+        enriched: List[Dict[str, Any]] = []
+        for s in staff_raw:
+            acc_s = float(s["accessory_sales"] or 0.0)
+            srv_s = float(s["service_sales"] or 0.0)
+            acc_p = float(s["accessory_profit"] or 0.0)
+            srv_p = float(s["service_profit"] or 0.0)
+            est_cases = max(1, round(srv_s / 800_000.0)) if srv_s > 0 else 1
+            dyn_comm = round(acc_s * acc_mult + srv_s * srv_mult + est_cases * hot_bonus, 0)
+            item = dict(s)
+            item["attached_sales"] = round(acc_s + srv_s, 0)
+            item["attached_profit"] = None if role == "ROLE_SALES" else round(acc_p + srv_p, 0)
+            item["raw_profit_sort"] = round(acc_p + srv_p, 0)
+            item["estimated_cases"] = est_cases
+            item["dynamic_commission"] = None if role == "ROLE_SALES" else dyn_comm
+            item["raw_comm_sort"] = dyn_comm
+            if role == "ROLE_SALES":
+                item["accessory_profit"] = None
+                item["service_profit"] = None
+            enriched.append(item)
+
+        if sort_by == "attached_sales":
+            enriched.sort(key=lambda x: x["attached_sales"], reverse=True)
+        elif sort_by == "attached_profit":
+            enriched.sort(key=lambda x: x["raw_profit_sort"], reverse=True)
+        else:
+            enriched.sort(key=lambda x: x["raw_comm_sort"], reverse=True)
+
+        total_fund = sum(x["raw_comm_sort"] for x in enriched)
+        return {
+            "acc_rate_pct": round(float(acc_rate_pct), 1),
+            "srv_rate_pct": round(float(srv_rate_pct), 1),
+            "hot_bonus_per_case": round(hot_bonus, 0),
+            "sort_by": sort_by,
+            "total_fund": None if role == "ROLE_SALES" else round(total_fund, 0),
+            "display_total_fund": self.mask_currency(total_fund, role),
+            "staff": enriched,
+        }

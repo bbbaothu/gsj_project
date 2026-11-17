@@ -232,6 +232,63 @@ class CrmService(BaseService):
             "interactions_logged_count": int(log_cnt),
         }
 
+    def get_service_revenue_breakdown(
+        self, period_days: int = 30, ref_date: str = "2026-11-12"
+    ) -> List[Dict[str, Any]]:
+        """Thống kê doanh thu & số đơn theo 5 nhóm dịch vụ CSKH trong khoảng thời gian (14 / 30 / 90 ngày)."""
+        ref_d = datetime.date.fromisoformat(ref_date)
+        start_d = (ref_d - datetime.timedelta(days=int(period_days or 30))).isoformat()
+        end_d = (ref_d + datetime.timedelta(days=7)).isoformat()
+
+        conn = self._get_connection()
+        rows = conn.execute(
+            """
+            SELECT service_name, expected_fee, appointment_date
+            FROM FACT_SERVICE_APPOINTMENTS
+            WHERE status != 'CANCELLED'
+              AND DATE(appointment_date) >= DATE(?)
+              AND DATE(appointment_date) <= DATE(?);
+            """,
+            (start_d, end_d),
+        ).fetchall()
+        conn.close()
+
+        groups_order = [
+            "Bảo dưỡng điều hòa",
+            "Thay lõi & Vệ sinh máy lọc nước",
+            "Lắp đặt & Phụ kiện bán kèm",
+            "Kiểm tra & Gia hạn bảo hành",
+            "Chăm sóc định kỳ khách VIP",
+        ]
+        agg: Dict[str, Dict[str, Any]] = {
+            g: {"service_group": g, "order_count": 0, "total_revenue": 0.0} for g in groups_order
+        }
+
+        for r in rows:
+            sname = (r["service_name"] or "").lower()
+            fee = float(r["expected_fee"] or 0.0)
+            if "lõi" in sname or "lọc nước" in sname:
+                grp = "Thay lõi & Vệ sinh máy lọc nước"
+            elif "phụ kiện" in sname or "lắp đặt" in sname or "giá treo" in sname:
+                grp = "Lắp đặt & Phụ kiện bán kèm"
+            elif "bảo hành" in sname:
+                grp = "Kiểm tra & Gia hạn bảo hành"
+            elif "vip" in sname or "nâng cấp" in sname:
+                grp = "Chăm sóc định kỳ khách VIP"
+            else:
+                grp = "Bảo dưỡng điều hòa"
+            agg[grp]["order_count"] += 1
+            agg[grp]["total_revenue"] += fee
+
+        total_rev = sum(v["total_revenue"] for v in agg.values())
+        res = []
+        for g in groups_order:
+            item = agg[g]
+            if item["order_count"] > 0 or total_rev == 0:
+                item["share_pct"] = round((item["total_revenue"] / total_rev) * 100.0, 1) if total_rev > 0 else 0.0
+                res.append(item)
+        return res
+
     def generate_personalized_script(
         self, customer_code: str, product_code: str, trigger_type: str
     ) -> Dict[str, str]:

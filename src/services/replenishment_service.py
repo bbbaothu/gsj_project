@@ -97,9 +97,10 @@ class ReplenishmentService(BaseService):
             blended_rr = (rr_14 * 0.70) + (rr_30 * 0.30)
             demand_t = round(blended_rr * float(cycle_days) * s_factor, 2)
 
-            # Tồn kho an toàn thích ứng (Z = 1.28 ~ 90% mức độ phục vụ)
+            # Tồn kho an toàn thích ứng (Z = 1.28 ~ 90% mức độ phục vụ) & sàn min_stock cửa hàng
             lt = int(r["lead_time_days"])
-            safety_stock = max(1, math.ceil(rr_14 * lt * 1.28)) if (blended_rr > 0 or int(r["avl"]) <= int(r["min_stock"])) else 0
+            min_stk = int(r["min_stock"])
+            safety_stock = max(min_stk, math.ceil(rr_14 * lt * 1.28)) if (blended_rr > 0 or int(r["avl"]) <= min_stk) else 0
 
             avl = int(r["avl"])
             inc = int(r["inc"])
