@@ -60,7 +60,7 @@ class TestDashboardIntegration(unittest.TestCase):
         with open(req_path, "r", encoding="utf-8") as f:
             content = f.read().lower()
 
-        for pkg in ("dash", "pandas", "numpy", "plotly"):
+        for pkg in ("streamlit", "dash", "pandas", "numpy", "plotly"):
             self.assertIn(pkg, content, f"Thiếu thư viện bắt buộc '{pkg}' trong requirements.txt")
 
         tracked = subprocess.run(

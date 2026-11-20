@@ -209,15 +209,134 @@ def create_dash_app(db_path: str = DB_PATH) -> Dash:
     return dash_app
 
 
-app = create_dash_app()
+_DASH_SINGLETON_KEY = "_stock_sense_dash_app_singleton"
+if _DASH_SINGLETON_KEY not in sys.modules:
+    sys.modules[_DASH_SINGLETON_KEY] = create_dash_app()  # type: ignore[assignment]
+
+app: Dash = sys.modules[_DASH_SINGLETON_KEY]  # type: ignore[assignment]
 server = app.server
 
-if __name__ == "__main__":
-    if "streamlit" in sys.modules:
-        print(
-            "[Stock Sense] Ứng dụng đã chuyển sang Plotly Dash (cổng 8050). "
-            "Vui lòng chạy `.venv/bin/python src/app_dashboard.py` thay vì `streamlit run`."
+
+def mount_dash_on_tornado_app(tornado_app: Any = None) -> bool:
+    """
+    Gắn trực tiếp WSGI server của Plotly Dash (Flask) vào Tornado Application của Streamlit
+    trên cùng một cổng (port 8501 trên Streamlit Community Cloud).
+    """
+    import gc
+    import re
+    import tornado.web
+    import tornado.wsgi
+    from tornado.routing import PathMatches, Rule
+
+    if tornado_app is None:
+        for obj in gc.get_objects():
+            try:
+                if isinstance(obj, tornado.web.Application):
+                    tornado_app = obj
+                    break
+            except ReferenceError:
+                continue
+
+    if tornado_app is None:
+        return False
+
+    if getattr(tornado_app, "_stock_sense_dash_mounted", False):
+        return True
+
+    wsgi_container = tornado.wsgi.WSGIContainer(server)
+    dash_subpath_re = re.compile(r"^.*?(/(_dash-.*|_reload-hash|assets/.*))$")
+
+    class DashWSGIHandler(tornado.web.RequestHandler):
+        def check_xsrf_cookie(self) -> None:
+            # Cho phép POST /_dash-update-component từ Dash React client không bị chặn bởi cookie _xsrf của Streamlit
+            pass
+
+        def prepare(self) -> None:
+            raw_path = self.request.path or "/"
+            if raw_path.rstrip("/").endswith("/dash-app"):
+                self.request.path = "/"
+            else:
+                m = dash_subpath_re.match(raw_path)
+                if m:
+                    self.request.path = m.group(1)
+
+            query_part = f"?{self.request.query}" if self.request.query else ""
+            self.request.uri = f"{self.request.path}{query_part}"
+            wsgi_container(self.request)
+            self._finished = True
+            self.on_finish()
+
+    rule = Rule(
+        PathMatches(r".*/(dash-app|_dash-.*|_reload-hash|assets/.*)"),
+        DashWSGIHandler,
+    )
+    tornado_app.wildcard_router.rules.insert(0, rule)
+    setattr(tornado_app, "_stock_sense_dash_mounted", True)
+    return True
+
+
+def _is_running_in_streamlit() -> bool:
+    """Kiểm tra xem file đang được thực thi bởi `streamlit run` / `AppTest` hay không."""
+    if "streamlit" not in sys.modules:
+        return False
+    try:
+        from streamlit.runtime.scriptrunner_utils.script_run_context import (
+            get_script_run_ctx,
         )
+
+        return get_script_run_ctx() is not None
+    except Exception:
+        return True
+
+
+def render_streamlit_cloud_shell() -> None:
+    """Render toàn màn hình giao diện Plotly Dash 6-Module bên trong Streamlit Community Cloud."""
+    import streamlit as st
+
+    mount_dash_on_tornado_app()
+    st.set_page_config(
+        page_title="Stock Sense · Điện Máy Anh Tâm (Master 6-Module Dashboard)",
+        page_icon="📦",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+    )
+    st.markdown(
+        """
+        <style>
+            #MainMenu, header, footer,
+            [data-testid="stHeader"],
+            [data-testid="stToolbar"],
+            [data-testid="stDecoration"],
+            [data-testid="stStatusWidget"] {
+                display: none !important;
+            }
+            .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], .block-container {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100vw !important;
+                overflow: hidden !important;
+            }
+            #stock-sense-dash-frame {
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                border: none;
+                margin: 0;
+                padding: 0;
+                z-index: 999999;
+                background: #F8FAFC;
+            }
+        </style>
+        <iframe id="stock-sense-dash-frame" src="./dash-app" allow="clipboard-read; clipboard-write"></iframe>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+if __name__ == "__main__":
+    if _is_running_in_streamlit():
+        render_streamlit_cloud_shell()
     else:
         port = int(os.environ.get("PORT", 8050))
         app.run(debug=False, host="127.0.0.1", port=port)

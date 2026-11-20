@@ -160,6 +160,76 @@ class TestDashE2EIntegration(unittest.TestCase):
         self.assertEqual(r_m5.status_code, 200, r_m5.data.decode("utf-8"))
         self.assertEqual(r_m5.get_json()["response"]["store-m5-rev-period"]["data"], 90)
 
+    def test_streamlit_cloud_tornado_wsgi_bridge(self):
+        """
+        Kiểm tra cầu nối Tornado-WSGI cho phép Streamlit Community Cloud phục vụ
+        trực tiếp toàn bộ giao diện & callback Plotly Dash trên cùng cổng Tornado.
+        """
+        import tornado.web
+        from tornado.testing import AsyncHTTPTestCase
+        from src.app_dashboard import app, mount_dash_on_tornado_app
+
+        class BridgeTest(AsyncHTTPTestCase):
+            def get_app(self):
+                t_app = tornado.web.Application([], xsrf_cookies=True)
+                mount_dash_on_tornado_app(t_app)
+                mount_dash_on_tornado_app(t_app)  # Idempotency check
+                return t_app
+
+            def runTest(self):
+                pass
+
+        bt = BridgeTest()
+        bt.setUp()
+        try:
+            # 1. GET /dash-app trả về trang chủ Plotly Dash
+            res_home = bt.fetch("/dash-app")
+            self.assertEqual(res_home.code, 200)
+            self.assertIn("Stock Sense", res_home.body.decode("utf-8"))
+
+            # 2. GET /_dash-layout trả về JSON 6 modules
+            res_layout = bt.fetch("/_dash-layout")
+            self.assertEqual(res_layout.code, 200)
+            self.assertIn("panel-m1", res_layout.body.decode("utf-8"))
+            self.assertIn("panel-m6", res_layout.body.decode("utf-8"))
+
+            # 3. GET /assets/stock_sense.css trả về CSS tĩnh
+            res_css = bt.fetch("/assets/stock_sense.css")
+            self.assertEqual(res_css.code, 200)
+
+            # 4. POST /_dash-update-component hoạt động qua Tornado mà không bị chặn XSRF
+            m5_rev_key = next(k for k in app.callback_map if "store-m5-rev-period.data" in k)
+            m5_payload = {
+                "output": m5_rev_key,
+                "outputs": {"id": "store-m5-rev-period", "property": "data"},
+                "inputs": [
+                    {"id": "m5RevPeriod14", "property": "n_clicks", "value": 0},
+                    {"id": "m5RevPeriod30", "property": "n_clicks", "value": 0},
+                    {"id": "m5RevPeriod90", "property": "n_clicks", "value": 1},
+                ],
+                "changedPropIds": ["m5RevPeriod90.n_clicks"],
+                "state": [],
+            }
+            res_post = bt.fetch(
+                "/_dash-update-component",
+                method="POST",
+                body=json.dumps(m5_payload),
+                headers={"Content-Type": "application/json"},
+            )
+            self.assertEqual(res_post.code, 200)
+            self.assertEqual(json.loads(res_post.body.decode("utf-8"))["response"]["store-m5-rev-period"]["data"], 90)
+        finally:
+            bt.tearDown()
+
+        # 5. Kiểm tra Streamlit AppTest thực thi src/app_dashboard.py không bị treo hoặc văng lỗi
+        from streamlit.testing.v1 import AppTest
+
+        at = AppTest.from_file("src/app_dashboard.py", default_timeout=15)
+        at.run()
+        self.assertFalse(at.exception, f"Streamlit AppTest gặp lỗi: {at.exception}")
+        self.assertGreaterEqual(len(at.markdown), 1)
+        self.assertIn("stock-sense-dash-frame", at.markdown[0].value)
+
 
 if __name__ == "__main__":
     unittest.main()
