@@ -148,12 +148,73 @@ def init_services(db_path: str = DB_PATH) -> Dict[str, Any]:
     }
 
 
+class StockSenseDash(Dash):
+    """Subclass Dash hỗ trợ chuyển đổi đường dẫn tài nguyên tương đối (./) cho proxy /~/+/ trên Streamlit Cloud."""
+
+    def interpolate_index(
+        self,
+        metas: str = "",
+        title: str = "",
+        css: str = "",
+        config: str = "",
+        scripts: str = "",
+        app_entry: str = "",
+        favicon: str = "",
+        renderer: str = "",
+    ) -> str:
+        rel_css = css.replace('href="/assets/', 'href="./assets/').replace(
+            'href="/_dash-', 'href="./_dash-'
+        )
+        rel_favicon = favicon.replace('href="/_favicon.ico', 'href="./_favicon.ico').replace(
+            'href="/assets/', 'href="./assets/'
+        )
+        rel_scripts = scripts.replace(
+            'src="/_dash-component-suites/', 'src="./_dash-component-suites/'
+        ).replace('src="/assets/', 'src="./assets/')
+
+        prefix_sync_script = """<script id="_stock-sense-prefix-sync">
+(function() {
+  var prefix = window.location.pathname.replace(/\\/dash-app\\/?$/, '/');
+  if (!prefix.endsWith('/')) prefix += '/';
+  var cfgEl = document.getElementById('_dash-config');
+  if (cfgEl) {
+    try {
+      var cfg = JSON.parse(cfgEl.textContent);
+      cfg.requests_pathname_prefix = prefix;
+      cfg.routes_pathname_prefix = prefix;
+      cfgEl.textContent = JSON.stringify(cfg);
+    } catch (e) {}
+  }
+  if (prefix !== '/' && window.fetch) {
+    var origFetch = window.fetch;
+    window.fetch = function(input, init) {
+      if (typeof input === 'string' && /^\\/(_dash-|_reload-hash|_favicon\\.ico|assets\\/)/.test(input)) {
+        input = prefix + input.slice(1);
+      }
+      return origFetch.call(this, input, init);
+    };
+  }
+})();
+</script>"""
+
+        return super().interpolate_index(
+            metas=metas,
+            title=title,
+            css=rel_css,
+            config=f"{config}\n    {prefix_sync_script}",
+            scripts=rel_scripts,
+            app_entry=app_entry,
+            favicon=rel_favicon,
+            renderer=renderer,
+        )
+
+
 def create_dash_app(db_path: str = DB_PATH) -> Dash:
     """Khởi tạo và lắp ghép hoàn chỉnh Plotly Dash Application 6 Modules."""
     services = init_services(db_path)
     assets_dir = str(Path(__file__).resolve().parent / "assets")
 
-    dash_app = Dash(
+    dash_app = StockSenseDash(
         __name__,
         suppress_callback_exceptions=True,
         assets_folder=assets_dir,
@@ -244,7 +305,7 @@ def mount_dash_on_tornado_app(tornado_app: Any = None) -> bool:
         return True
 
     wsgi_container = tornado.wsgi.WSGIContainer(server)
-    dash_subpath_re = re.compile(r"^.*?(/(_dash-.*|_reload-hash|assets/.*))$")
+    dash_subpath_re = re.compile(r"^.*?(/(_dash-.*|_reload-hash|_favicon\.ico|assets/.*))$")
 
     class DashWSGIHandler(tornado.web.RequestHandler):
         def check_xsrf_cookie(self) -> None:
@@ -267,7 +328,7 @@ def mount_dash_on_tornado_app(tornado_app: Any = None) -> bool:
             self.on_finish()
 
     rule = Rule(
-        PathMatches(r".*/(dash-app|_dash-.*|_reload-hash|assets/.*)"),
+        PathMatches(r".*/(dash-app|_dash-.*|_reload-hash|_favicon\.ico|assets/.*)"),
         DashWSGIHandler,
     )
     tornado_app.wildcard_router.rules.insert(0, rule)

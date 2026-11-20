@@ -182,22 +182,30 @@ class TestDashE2EIntegration(unittest.TestCase):
         bt = BridgeTest()
         bt.setUp()
         try:
-            # 1. GET /dash-app trả về trang chủ Plotly Dash
-            res_home = bt.fetch("/dash-app")
+            # 1. GET /~/+/dash-app (mô phỏng đường dẫn con /~/+/ trên Streamlit Community Cloud)
+            res_home = bt.fetch("/~/+/dash-app")
             self.assertEqual(res_home.code, 200)
-            self.assertIn("Stock Sense", res_home.body.decode("utf-8"))
+            home_html = res_home.body.decode("utf-8")
+            self.assertIn("Stock Sense", home_html)
+            # Toàn bộ script/css của Dash phải dùng đường dẫn tương đối ./ để không mất tiền tố /~/+/
+            self.assertNotIn('src="/_dash-component-suites/', home_html)
+            self.assertNotIn('href="/assets/', home_html)
+            self.assertNotIn('src="/assets/', home_html)
+            self.assertIn('src="./_dash-component-suites/', home_html)
+            self.assertIn('href="./assets/', home_html)
+            self.assertIn("requests_pathname_prefix", home_html)
 
-            # 2. GET /_dash-layout trả về JSON 6 modules
-            res_layout = bt.fetch("/_dash-layout")
+            # 2. GET /~/+/_dash-layout trả về JSON 6 modules
+            res_layout = bt.fetch("/~/+/_dash-layout")
             self.assertEqual(res_layout.code, 200)
             self.assertIn("panel-m1", res_layout.body.decode("utf-8"))
             self.assertIn("panel-m6", res_layout.body.decode("utf-8"))
 
-            # 3. GET /assets/stock_sense.css trả về CSS tĩnh
-            res_css = bt.fetch("/assets/stock_sense.css")
+            # 3. GET /~/+/assets/stock_sense.css trả về CSS tĩnh
+            res_css = bt.fetch("/~/+/assets/stock_sense.css")
             self.assertEqual(res_css.code, 200)
 
-            # 4. POST /_dash-update-component hoạt động qua Tornado mà không bị chặn XSRF
+            # 4. POST /~/+/_dash-update-component hoạt động qua Tornado mà không bị chặn XSRF
             m5_rev_key = next(k for k in app.callback_map if "store-m5-rev-period.data" in k)
             m5_payload = {
                 "output": m5_rev_key,
@@ -211,7 +219,7 @@ class TestDashE2EIntegration(unittest.TestCase):
                 "state": [],
             }
             res_post = bt.fetch(
-                "/_dash-update-component",
+                "/~/+/_dash-update-component",
                 method="POST",
                 body=json.dumps(m5_payload),
                 headers={"Content-Type": "application/json"},
